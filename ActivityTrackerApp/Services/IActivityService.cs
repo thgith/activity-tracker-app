@@ -1,8 +1,8 @@
 namespace ActivityTrackerApp.Services
 {
-    ///<summary>
+    /// <summary>
     /// Activity service.
-    ///</summary>
+    /// </summary>
     public interface IActivityService
     {
     }

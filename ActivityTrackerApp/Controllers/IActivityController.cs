@@ -1,8 +1,8 @@
 namespace ActivityTrackerApp.Controllers
 {
-    ///<summary>
+    /// <summary>
     /// Activity endpoints.
-    ///</summary>
+    /// </summary>
     public interface IActivityController : BaseController
     {
     }

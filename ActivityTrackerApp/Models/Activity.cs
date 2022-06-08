@@ -1,56 +1,56 @@
 namespace ActivityTrackerApp.Models
 {
-    ///<summary>
+    /// <summary>
     /// An activity.
-    ///</summary>
+    /// </summary>
     public class Activity : BaseEntity
     {
-        ///<summary>
+        /// <summary>
         /// Name of the activity.
-        ///</summary>
+        /// </summary>
         public string Title { get; set; }
 
-        ///<summary>
+        /// <summary>
         /// Description of the activity.
-        ///</summary>
+        /// </summary>
         public string Description { get; set; }
 
-        ///<summary>
+        /// <summary>
         /// The date the activity was started.
-        ///</summary>
+        /// </summary>
         public DateTime StartDateUtc { get; set; }
 
-        ///<summary>
+        /// <summary>
         /// The deadline the user set for the activity.
-        ///</summary>
+        /// </summary>
         public DateTime DueDateUtc { get; set; }
 
-        ///<summary>
+        /// <summary>
         /// The date the user manual set the activity as complete.
-        ///</summary>
+        /// </summary>
         public DateTime CompleteDateUtc { get; set; }
 
-        ///<summary>
+        /// <summary>
         /// The date the activity was archived.
         /// The user can still see it in archived activities.
-        ///</summary>
+        /// </summary>
         public DateTime ArchiveDateUtc { get; set; }
 
-        ///<summary>
+        /// <summary>
         /// The date the activity was soft-deleted in the system.
         /// The user can no longer see it.
-        ///</summary>
+        /// </summary>
         public DateTime DeletedDateUtc { get; set; }
 
-        ///<summary>
+        /// <summary>
         /// The custom color of the activity for rendering.
-        ///</summary>
+        /// </summary>
         public string Color { get; set; }
 
-        ///<summary>
+        /// <summary>
         /// A list of tags associated with the activity.
         /// Used for sorting and filtering.
-        ///</summary>
+        /// </summary>
         public string[] Tags { get; set; }
     }
 }

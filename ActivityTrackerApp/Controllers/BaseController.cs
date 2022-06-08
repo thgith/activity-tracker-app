@@ -1,8 +1,8 @@
 namespace ActivityTrackerApp.Controllers
 {
-    ///<summary>
+    /// <summary>
     /// Base controller that other controllers inherit from.
-    ///</summary>
+    /// </summary>
     public class BaseController : ControllerBase
     {
         // TODO set up logger here

@@ -1,8 +1,8 @@
 namespace ActivityTrackerApp.Controllers
 {
-    ///<summary>
+    /// <summary>
     /// User endpoints.
-    ///</summary>
+    /// </summary>
     public interface IUserController : BaseController
     {
         public User GetUser(Guid userId);

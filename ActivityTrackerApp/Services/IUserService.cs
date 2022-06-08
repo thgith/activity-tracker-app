@@ -1,8 +1,8 @@
 namespace ActivityTrackerApp.Services
 {
-    ///<summary>
+    /// <summary>
     /// User service.
-    ///</summary>
+    /// </summary>
     public interface IUserService
     {
     }
