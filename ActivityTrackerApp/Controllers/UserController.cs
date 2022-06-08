@@ -1,3 +1,7 @@
+using ActivityTrackerApp.Models;
+using ActivityTrackerApp.Services;
+using Microsoft.AspNetCore.Mvc;
+
 namespace ActivityTrackerApp.Controllers
 {
     /// <summary>
@@ -6,7 +10,7 @@ namespace ActivityTrackerApp.Controllers
     /// </summary>
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class UserController : IUserController
+    public class UserController : BaseController, IUserController
     {
         IUserService _userService;
 
@@ -31,7 +35,7 @@ namespace ActivityTrackerApp.Controllers
         /// <returns>Task of the newly created user.</returns>
         /// <param name="userDto">The user model for the create.</param>
         [HttpPost]
-        public async Task<IActionResult<UserDto>> CreateUser(UserDto userDto)
+        public async Task<ActionResult<UserDto>> CreateUser(UserDto userDto)
         {
             return null;
         }

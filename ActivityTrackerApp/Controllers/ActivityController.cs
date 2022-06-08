@@ -1,3 +1,5 @@
+using ActivityTrackerApp.Services;
+
 namespace ActivityTrackerApp.Controllers
 {
     /// <summary>
