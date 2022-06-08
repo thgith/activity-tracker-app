@@ -1,14 +1,23 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace ActivityTrackerApp.Models
 {
     /// <summary>
     /// An activity.
     /// </summary>
-    public class Activity : BaseEntity
+    [Table(nameof(Activity))]
+    public class Activity
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid ActivityId { get; set; }
+
         /// <summary>
         /// Name of the activity.
         /// </summary>
-        public string Title { get; set; }
+        [Required]
+        public string Name { get; set; }
 
         /// <summary>
         /// Description of the activity.
@@ -18,6 +27,7 @@ namespace ActivityTrackerApp.Models
         /// <summary>
         /// The date the activity was started.
         /// </summary>
+        [Required]
         public DateTime StartDateUtc { get; set; }
 
         /// <summary>
@@ -45,12 +55,14 @@ namespace ActivityTrackerApp.Models
         /// <summary>
         /// The custom color of the activity for rendering.
         /// </summary>
-        public string Color { get; set; }
+        [MaxLength(7)]
+        public string ColorHex { get; set; }
 
         /// <summary>
         /// A list of tags associated with the activity.
         /// Used for sorting and filtering.
         /// </summary>
-        public string[] Tags { get; set; }
+        [MaxLength(10)]
+        public IList<string> Tags { get; set; }
     }
 }

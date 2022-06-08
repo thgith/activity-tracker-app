@@ -6,7 +6,7 @@ namespace ActivityTrackerApp.Controllers
     /// Activity endpoints.
     /// </summary>
     public class ActivityController : BaseController
-    {
+    {        
         IActivityService _activityService;
 
         public ActivityController(IActivityService activityService)
