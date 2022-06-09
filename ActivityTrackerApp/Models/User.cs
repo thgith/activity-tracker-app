@@ -6,7 +6,6 @@ namespace ActivityTrackerApp.Models
     /// <summary>
     /// User info.
     /// </summary>
-    [Table(nameof(User))]
     public class User
     {
         [Key]

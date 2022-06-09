@@ -6,7 +6,6 @@ namespace ActivityTrackerApp.Models
     /// <summary>
     /// A timed session. 
     /// </summary>
-    [Table(nameof(Session))]
     public class Session
     {
         [Key]
