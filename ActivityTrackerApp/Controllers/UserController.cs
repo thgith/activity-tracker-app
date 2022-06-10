@@ -1,5 +1,5 @@
+using System.Net.Mail;
 using ActivityTrackerApp.Dtos;
-using ActivityTrackerApp.Entities;
 using ActivityTrackerApp.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +32,8 @@ namespace ActivityTrackerApp.Controllers
         /// </summary>
         /// <returns>List of users</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAllAsync()
         {
             try
@@ -52,6 +54,9 @@ namespace ActivityTrackerApp.Controllers
         /// </summary>
         /// <returns>Task of the user.</returns>
         [HttpGet("{userId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<UserDto>> GetAsync(Guid userId)
         {
             try
@@ -77,8 +82,41 @@ namespace ActivityTrackerApp.Controllers
         /// <returns>Task of the newly created user.</returns>
         /// <param name="userDto">The user model for the create.</param>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> PostAsync(UserPostDto userPostDto)
         {
+            if (userPostDto.FirstName == null)
+            {
+                BadRequest("User must have a FirstName");
+            }
+
+            if (userPostDto.LastName == null)
+            {
+                BadRequest("User must have a LastName");
+            }
+
+            if (userPostDto.Email == null)
+            {
+                BadRequest("User must have an Email");
+            }
+
+            if (!_isEmailValid(userPostDto.Email))
+            {
+                BadRequest("Invalid Email");
+            }
+
+            if (userPostDto.Password == null)
+            {
+                BadRequest("User must have a Password");
+            }
+
+            if (await _userService.IsEmailTaken(userPostDto.Email))
+            {
+                BadRequest("Email already taken.");
+            }
+
             try
             {
                 var res = await _userService.CreateUserAsync(userPostDto);
@@ -92,17 +130,45 @@ namespace ActivityTrackerApp.Controllers
             }
         }
 
+
+        public bool _isEmailValid(string emailAddress)
+        {
+            try
+            {
+                var m = new MailAddress(emailAddress);
+
+                return true;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// Update the user.
         /// </summary>
         /// <returns>Task of the updated user.</returns>
         /// <param name="userDto">The user model for the update.</param>
         [HttpPut("{userId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutAsync(Guid userId, UserPutDto userPutDto)
         {
+            if (userPutDto.Email != null && !_isEmailValid(userPutDto.Email))
+            {
+                return BadRequest("Invalid Email");
+            }
+
             try
             {
                 var res = await _userService.UpdateUserAsync(userId, userPutDto);
+                if (res == null)
+                {
+                    return NotFound($"The user with the ID {userId} does not exist");
+                }
                 return Ok(res);
             }
             catch (Exception e)

@@ -17,5 +17,7 @@ namespace ActivityTrackerApp.Services
         Task<UserPutDto> UpdateUserAsync(Guid userId, UserPutDto user);
 
         Task<bool> DeleteUserAsync(Guid userId);
+        
+        Task<bool> IsEmailTaken(string email);
     }
 }

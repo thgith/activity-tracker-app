@@ -57,11 +57,11 @@ namespace ActivityTrackerApp.Services
         /// <returns>The created user.</returns>
         public async Task<UserPostDto> CreateUserAsync(UserPostDto userPostDto)
         {
-            // Auto set join date
-            userPostDto.DateJoined = DateTime.UtcNow;
-
             // Convert DTO to entity
             var user =  _mapper.Map<User>(userPostDto);
+
+            // Auto set join date
+            user.DateJoined = DateTime.UtcNow;
 
             // Add user
             var newUser = await _dbContext.Users.AddAsync(user);
@@ -71,7 +71,13 @@ namespace ActivityTrackerApp.Services
 
             return userPostDto;
         }
-        
+
+
+        public async Task<bool> IsEmailTaken(string email)
+        {
+            return await _dbContext.Users.AnyAsync(x => x.Email == email);
+        }
+
         /// <summary>
         /// Updates the user.
         /// </summary>
