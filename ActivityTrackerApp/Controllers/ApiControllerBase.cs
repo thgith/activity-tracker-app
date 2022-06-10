@@ -9,11 +9,8 @@ namespace ActivityTrackerApp.Controllers
     [ApiController]
     public class ApiControllerBase : Controller
     {
-        // TODO set up logger here
-
         public ApiControllerBase()
         {
-            // TODO set up logger here
         }
 
     }

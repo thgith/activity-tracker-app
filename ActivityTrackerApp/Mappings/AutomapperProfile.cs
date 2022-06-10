@@ -9,6 +9,8 @@ namespace ActivityTrackerApp.Mappings
         public AutomapperProfile()
         {
             _mapUser();
+            _mapActivity();
+            _mapSession();
         }
 
         private void _mapUser()
@@ -20,6 +22,26 @@ namespace ActivityTrackerApp.Mappings
             CreateMap<UserDto, User>();
             CreateMap<UserPutDto, User>();
             CreateMap<UserPostDto, User>();
+        }
+        private void _mapActivity()
+        {
+            CreateMap<Activity, ActivityDto>();
+            CreateMap<Activity, ActivityPutDto>();
+            CreateMap<Activity, ActivityPostDto>();
+
+            CreateMap<ActivityDto, Activity>();
+            CreateMap<ActivityPutDto, Activity>();
+            CreateMap<ActivityPostDto, Activity>();
+        }
+        private void _mapSession()
+        {
+            CreateMap<Session, SessionDto>();
+            CreateMap<Session, UserPutDto>();
+            CreateMap<Session, UserPostDto>();
+
+            CreateMap<SessionDto, Session>();
+            CreateMap<SessionPutDto, Session>();
+            CreateMap<SessionPostDto, Session>();
         }
     }
 }

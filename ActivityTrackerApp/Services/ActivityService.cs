@@ -1,3 +1,5 @@
+using AutoMapper;
+
 namespace ActivityTrackerApp.Services
 {
     /// <summary>
@@ -6,10 +8,12 @@ namespace ActivityTrackerApp.Services
     public class ActivityService : IActivityService
     {
         private readonly IDataContext _dbContext;
+        private readonly IMapper _mapper;
 
-        public ActivityService(IDataContext dbContext)
+        public ActivityService(IDataContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
     }
 }

@@ -1,4 +1,5 @@
 using ActivityTrackerApp.Entities;
+using AutoMapper;
 
 namespace ActivityTrackerApp.Services
 {
@@ -8,10 +9,12 @@ namespace ActivityTrackerApp.Services
     public class SessionService : ISessionService
     {
         private readonly IDataContext _dbContext;
+        private readonly IMapper _mapper;
 
-        public SessionService(IDataContext dbContext)
+        public SessionService(IDataContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public Task<Session> CreateSessionAsync(Session newSession)
