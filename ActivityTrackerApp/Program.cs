@@ -81,7 +81,7 @@ try
     app.UseCors(options => options
         // The port for React
         // TODO set this in appsettings
-        .WithOrigins(new []{ "http://localhost:3000"})
+        .WithOrigins(new []{ "http://localhost:3000" })
         .AllowAnyHeader()
         .AllowAnyMethod()
         // This is so we can store the JWT token in cookies

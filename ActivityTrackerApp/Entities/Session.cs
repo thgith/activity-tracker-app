@@ -11,10 +11,6 @@ namespace ActivityTrackerApp.Entities
         /// <summary>
         /// The ID of the activity the session is associated with.
         /// </summary>
-        /// <remarks>
-        /// The annotation is using the name of the corresponding C# model,
-        /// not the name of the table, which is pluralized.
-        /// </remarks>
         [Required]
         public Guid ActivityId { get; set; }
 

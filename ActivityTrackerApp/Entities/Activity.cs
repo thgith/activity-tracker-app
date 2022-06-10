@@ -58,9 +58,13 @@ namespace ActivityTrackerApp.Entities
         /// A list of tags associated with the activity.
         /// Used for sorting and filtering.
         /// </summary>
+        /// <remarks>No more than 10 tags allowed.</remarks>
         [MaxLength(10)]
         public IList<string> Tags { get; set; }
 
+        /// <summary>
+        /// The sessions associated with the Activity
+        /// </summary>
         public virtual IList<Session> Sessions { get; set; }
     }
 }

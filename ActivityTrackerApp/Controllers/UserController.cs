@@ -15,18 +15,15 @@ namespace ActivityTrackerApp.Controllers
     {
         private readonly IUserService _userService;
         private readonly IHelperMethods _helperService;
-        private readonly IMapper _mapper;
-        private readonly ILogger<UserController> _logger;
+        private readonly ILogger _logger;
 
         public UserController(
             IUserService userService,
             IHelperMethods helperService,
-            IMapper mapper,
-            ILogger<UserController> logger)
+            ILogger logger)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _helperService = helperService ?? throw new ArgumentNullException(nameof(helperService));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
