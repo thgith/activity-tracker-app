@@ -7,7 +7,7 @@ namespace ActivityTrackerApp.Controllers
     /// <summary>
     /// Session endpoints.
     /// </summary>
-    [Route("api/v1/Session")]
+    [Route("api/v1/[controller]")]
     public class SessionController : ApiControllerBase, ISessiController
     {
         private readonly ISessionService _sessionService;

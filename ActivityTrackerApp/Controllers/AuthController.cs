@@ -9,9 +9,9 @@ namespace ActivityTrackerApp.Controllers
 {
     /// <summary>
     /// An activity. 
-    /// Endpoint will be: api/v1/User
+    /// Endpoint will be: api/v1/Auth
     /// </summary>
-    [Route("api/v1/Auth")] // api/v1/[controller] didn't work
+    [Route("api/v1/[controller]")]
     public class AuthController : ApiControllerBase
     {
         private readonly IUserService _userService;
@@ -49,7 +49,7 @@ namespace ActivityTrackerApp.Controllers
 
                 if (await _userService.IsEmailTaken(userPostDto.Email))
                 {
-                    return BadRequest("Email already taken.");
+                    return BadRequest("Email already taken");
                 }
 
                 var userPostDtoWithToken = await _userService.RegisterUserAsync(userPostDto);

@@ -9,7 +9,7 @@ namespace ActivityTrackerApp.Controllers
     /// <summary>
     /// Activity endpoints.
     /// </summary>
-    [Route("api/v1/Activity")]
+    [Route("api/v1/[controller]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ActivityController : ApiControllerBase, IActivityController
     {        

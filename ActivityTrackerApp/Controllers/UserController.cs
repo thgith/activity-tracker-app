@@ -10,7 +10,7 @@ namespace ActivityTrackerApp.Controllers
     /// An activity. 
     /// Endpoint will be: api/v1/User
     /// </summary>
-    [Route("api/v1/User")] // api/v1/[controller] didn't work
+    [Route("api/v1/[controller]")]
     public class UserController : ApiControllerBase, IUserController
     {
         private readonly IUserService _userService;
