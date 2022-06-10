@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
 using AutoMapper;
@@ -38,7 +39,7 @@ namespace ActivityTrackerApp.Services
             };
         }
 
-        public async Task<EntityWithToken<UserUpdateDto>> AuthenticateAsync(UserUpdateDto userPutDto)
+        public async Task<EntityWithToken<UserUpdateDto>> AuthenticateUserAsync(UserUpdateDto userPutDto)
         {
             var user = await _dbContext.Users.SingleOrDefaultAsync(x => 
                 x.Email == userPutDto.Email &&
@@ -107,7 +108,7 @@ namespace ActivityTrackerApp.Services
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userRegisterDto.Password);
 
             // TODO make Roles class
-            user.Role = "member";
+            user.Role = Roles.MEMBER;
 
             // Add user
             await _dbContext.Users.AddAsync(user);

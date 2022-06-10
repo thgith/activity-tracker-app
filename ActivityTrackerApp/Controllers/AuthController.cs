@@ -85,7 +85,7 @@ namespace ActivityTrackerApp.Controllers
                     BadRequest("Email already taken");
                 }
 
-                var userPutDtoWithToken = await _userService.AuthenticateAsync(userPutDto);
+                var userPutDtoWithToken = await _userService.AuthenticateUserAsync(userPutDto);
 
                 if (userPutDtoWithToken == null)
                 {

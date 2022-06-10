@@ -8,7 +8,7 @@ namespace ActivityTrackerApp.Services
     /// </summary>
     public interface IUserService
     {
-        Task<EntityWithToken<UserUpdateDto>> AuthenticateAsync(UserUpdateDto userPutDto);
+        Task<EntityWithToken<UserUpdateDto>> AuthenticateUserAsync(UserUpdateDto userPutDto);
 
         Task<EntityWithToken<UserRegisterDto>> RegisterUserAsync(UserRegisterDto userPostDto);
 

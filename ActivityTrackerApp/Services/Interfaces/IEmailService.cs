@@ -1,3 +1,5 @@
+using ActivityTrackerApp.Entities;
+
 namespace ActivityTrackerApp.Services
 {
     public interface IEmailService
