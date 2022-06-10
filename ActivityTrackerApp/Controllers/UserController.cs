@@ -14,23 +14,23 @@ namespace ActivityTrackerApp.Controllers
     public class UserController : ApiControllerBase, IUserController
     {
         private readonly IUserService _userService;
+        private readonly IHelperMethods _helperService;
         private readonly IMapper _mapper;
         private readonly ILogger<UserController> _logger;
 
         public UserController(
             IUserService userService,
+            IHelperMethods helperService,
             IMapper mapper,
             ILogger<UserController> logger)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _helperService = helperService ?? throw new ArgumentNullException(nameof(helperService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <summary>
-        /// Retrieves users.
-        /// </summary>
-        /// <returns>List of users</returns>
+        /// <inheritdoc/>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -49,10 +49,7 @@ namespace ActivityTrackerApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Get the user with the given ID.
-        /// </summary>
-        /// <returns>Task of the user.</returns>
+        /// <inheritdoc/>
         [HttpGet("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -76,18 +73,15 @@ namespace ActivityTrackerApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Create the new user.
-        /// </summary>
-        /// <returns>Task of the newly created user.</returns>
-        /// <param name="userDto">The user model for the create.</param>
+        /// <inheritdoc/>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> PostAsync(UserPostDto userPostDto)
         {
-            if (!_isEmailValid(userPostDto.Email))
+            // Requirement annotations 
+            if (!_helperService.IsEmailValid(userPostDto.Email))
             {
                 BadRequest("Invalid Email");
             }
@@ -110,26 +104,7 @@ namespace ActivityTrackerApp.Controllers
             }
         }
 
-
-        public bool _isEmailValid(string emailAddress)
-        {
-            try
-            {
-                var m = new MailAddress(emailAddress);
-
-                return true;
-            }
-            catch (FormatException)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Update the user.
-        /// </summary>
-        /// <returns>Task of the updated user.</returns>
-        /// <param name="userDto">The user model for the update.</param>
+        /// <inheritdoc/>
         [HttpPut("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -137,7 +112,7 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutAsync(Guid userId, UserPutDto userPutDto)
         {
-            if (userPutDto.Email != null && !_isEmailValid(userPutDto.Email))
+            if (userPutDto.Email != null && !_helperService.IsEmailValid(userPutDto.Email))
             {
                 return BadRequest("Invalid Email");
             }
@@ -159,15 +134,12 @@ namespace ActivityTrackerApp.Controllers
             }
         }
 
-        /// <summary>
-        /// Delete the user with the given ID.
-        /// <summary>
-        /// <param name="userId">The GUID of the user to delete.</param>
+        /// <inheritdoc/>
         [HttpDelete("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<int>> DeleteAsync(Guid userId)
+        public async Task<IActionResult> DeleteAsync(Guid userId)
         {
             try
             {
