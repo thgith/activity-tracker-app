@@ -7,6 +7,7 @@ namespace ActivityTrackerApp.Entities
     /// <summary>
     /// User info.
     /// </summary>
+    [Index(nameof(Email))]
     public class User : BaseEntity
     {
         [Required]
@@ -17,7 +18,6 @@ namespace ActivityTrackerApp.Entities
         [MinLength(1), MaxLength(50)]
         public string LastName { get; set; }
         
-        // TODO put index here
         [Required]
         [MinLength(6), MaxLength(200)]
         public string Email { get; set; }
