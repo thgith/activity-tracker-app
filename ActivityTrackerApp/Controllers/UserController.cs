@@ -79,7 +79,7 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> PostAsync(UserPostDto userPostDto)
         {
-            // Requirement annotations 
+            // Note: model annotation handle error checking for requirements
             if (!_helperService.IsEmailValid(userPostDto.Email))
             {
                 BadRequest("Invalid Email");

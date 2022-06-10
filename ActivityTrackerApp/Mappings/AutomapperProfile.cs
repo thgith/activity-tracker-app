@@ -23,6 +23,7 @@ namespace ActivityTrackerApp.Mappings
             CreateMap<UserPutDto, User>();
             CreateMap<UserPostDto, User>();
         }
+        
         private void _mapActivity()
         {
             CreateMap<Activity, ActivityDto>();
@@ -33,6 +34,7 @@ namespace ActivityTrackerApp.Mappings
             CreateMap<ActivityPutDto, Activity>();
             CreateMap<ActivityPostDto, Activity>();
         }
+
         private void _mapSession()
         {
             CreateMap<Session, SessionDto>();
