@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ActivityTrackerApp.Entities
+namespace ActivityTrackerApp.Dtos
 {
     /// <summary>
     /// A timed session.

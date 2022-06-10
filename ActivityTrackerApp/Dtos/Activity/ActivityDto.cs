@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+using ActivityTrackerApp.Entities;
 
-namespace ActivityTrackerApp.Entities
+namespace ActivityTrackerApp.Dtos
 {
     /// <summary>
     /// An activity.

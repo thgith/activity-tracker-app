@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ActivityTrackerApp.Entities
+namespace ActivityTrackerApp.Dtos
 {
     /// <summary>
     /// An activity.
@@ -40,15 +40,13 @@ namespace ActivityTrackerApp.Entities
         /// The custom color of the activity for rendering.
         /// </summary>
         [MaxLength(7)]
-        public string ColorHex { get; set; }
+        public string? ColorHex { get; set; }
 
         /// <summary>
         /// A list of tags associated with the activity.
         /// Used for sorting and filtering.
         /// </summary>
         [MaxLength(10)]
-        public IList<string> Tags { get; set; }
-
-        public virtual IList<Session> Sessions { get; set; }
+        public IList<string>? Tags { get; set; }
     }
 }

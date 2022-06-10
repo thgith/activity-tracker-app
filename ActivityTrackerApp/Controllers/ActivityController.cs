@@ -1,11 +1,14 @@
+using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ActivityTrackerApp.Controllers
 {
     /// <summary>
     /// Activity endpoints.
     /// </summary>
-    public class ActivityController : ApiControllerBase
+    [Route("api/v1/Activity")]
+    public class ActivityController : ApiControllerBase, IActivityController
     {        
         IActivityService _activityService;
 
@@ -14,9 +17,34 @@ namespace ActivityTrackerApp.Controllers
             _activityService = activityService ?? throw new ArgumentNullException(nameof(activityService));
         }
 
-        // GET
-        // CREATE
-        // UPDATE
-        // DELETE
+        /// <inheritdoc/>
+        public Task<IActionResult> DeleteAsync(Guid activityId)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public Task<ActionResult<IEnumerable<ActivityDto>>> GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public Task<ActionResult<ActivityDto>> GetAsync(Guid activityId)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public Task<ActionResult> PostAsync(ActivityPostDto activityPostDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public Task<IActionResult> PutAsync(Guid activityId, ActivityPutDto activityPutDto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

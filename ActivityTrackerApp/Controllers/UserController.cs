@@ -1,4 +1,3 @@
-using System.Net.Mail;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Services;
 using AutoMapper;
