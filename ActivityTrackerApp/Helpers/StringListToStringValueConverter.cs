@@ -20,18 +20,18 @@ namespace ActivityTrackerApp.Helpers
             {
                 return null;
             }
- 
+
             return string.Join(",", value);
         }
 
         public static IList<string> StringToList(string value)
-        {  
+        {
             if (value == null || value == string.Empty)
             {
                 return null;
             }
 
-            return value.Split(','); ; 
+            return value.Split(','); ;
         }
     }
 }

@@ -5,9 +5,11 @@ namespace ActivityTrackerApp.Services
     /// </summary>
     public class ActivityService : IActivityService
     {
-        public ActivityService()
-        {
+        private readonly IDataContext _dbContext;
 
+        public ActivityService(IDataContext dbContext)
+        {
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
     }
 }

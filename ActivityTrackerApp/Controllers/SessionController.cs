@@ -3,8 +3,8 @@ namespace ActivityTrackerApp.Controllers
     /// <summary>
     /// Session endpoints.
     /// </summary>
-    public class SessionController : BaseController
+    public class SessionController : ApiControllerBase
     {
-        
+
     }
 }

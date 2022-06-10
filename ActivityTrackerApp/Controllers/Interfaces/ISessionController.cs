@@ -1,9 +1,10 @@
 namespace ActivityTrackerApp.Controllers
 {
     /// <summary>
-    /// User endpoints.
+    /// Session endpoints.
     /// </summary>
-    public interface IUserController
+    public interface ISessionController
     {
+
     }
 }

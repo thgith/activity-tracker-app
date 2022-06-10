@@ -1,4 +1,5 @@
 using ActivityTrackerApp.Database;
+using ActivityTrackerApp.Services;
 using Microsoft.EntityFrameworkCore;
 using NLog;
 using NLog.Web;
@@ -9,31 +10,57 @@ logger.Info("=== Starting ===");
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    var services = builder.Services;
 
     // Get the DB config from appsettings.json
     var dbConnectionString = builder.Configuration["ConnectionStrings:Postgres"];
 
     // Set up to use Postgres
-    builder.Services.AddDbContext<DataContext>(options =>
+    services.AddDbContext<DataContext>(options =>
     {
         options.UseNpgsql(dbConnectionString, b => b.MigrationsAssembly("ActivityTrackerApp"));
     });
 
-    builder.Services.Configure<HostOptions>(hostOptions =>
-    {
-        hostOptions.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
-    });
+    // Set up to map between entities and DTOs
+    services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+    // Inject data context into services
+    services.AddScoped<IDataContext, DataContext>();
+    services.AddScoped<IActivityService, ActivityService>();
+    services.AddScoped<ISessionService, SessionService>();
+    services.AddScoped<IUserService, UserService>();
+
+    services.AddControllers();
 
     var app = builder.Build();
+
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Home/Error");
+        app.UseHsts();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseStaticFiles();
+
+    // app.UseMvc();
+    app.UseRouting();
+    // app.UseAuthentication();
+    // app.UseAuthorization();
+    app.UseEndpoints(endpoints => endpoints.MapControllers());
 
     app.MapGet("/", () => "Hello World!");
 
     app.Run();
+
 }
-catch (Exception exception)
+// This catch is to ignore the stop host error we get when running migrations.
+catch (Exception ex) when (ex.GetType().Name == "StopTheHostException") { }
+catch (Exception ex)
 {
     // NLog: catch setup errors
-    logger.Error(exception, "Stopped program because of exception" + exception.Message + exception.InnerException.ToString());
+    logger.Error(ex.StackTrace);
+    logger.Error(ex, "Stopped program because of exception" + ex.Message + ex.InnerException.ToString());
     throw;
 }
 finally

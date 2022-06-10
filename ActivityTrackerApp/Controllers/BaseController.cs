@@ -5,11 +5,13 @@ namespace ActivityTrackerApp.Controllers
     /// <summary>
     /// Base controller that other controllers inherit from.
     /// </summary>
-    public class BaseController : ControllerBase
+    [Produces("application/json")]
+    [ApiController]
+    public class ApiControllerBase : Controller
     {
         // TODO set up logger here
 
-        public BaseController()
+        public ApiControllerBase()
         {
             // TODO set up logger here
         }

@@ -1,11 +1,11 @@
-using ActivityTrackerApp.Models;
-using ActivityTrackerApp.Helpers;
+using ActivityTrackerApp.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 public interface IDataContext
 {
     DbSet<User> Users { get; set; }
     DbSet<Activity> Activities { get; set; }
     DbSet<Session> Sessions { get; set; }
+    int SaveChanges();
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
