@@ -1,6 +1,7 @@
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Services;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ActivityTrackerApp.Controllers
@@ -30,6 +31,7 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -49,6 +51,7 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
+        [Authorize]
         [HttpGet("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -73,21 +76,22 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
+        [Authorize]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> PostAsync(UserPostDto userPostDto)
+        public async Task<ActionResult> PostAsync([FromBody] UserPostDto userPostDto)
         {
             // Note: model annotation handle error checking for requirements
             if (!_helperService.IsEmailValid(userPostDto.Email))
             {
-                BadRequest("Invalid Email");
+                return BadRequest("Invalid Email");
             }
 
             if (await _userService.IsEmailTaken(userPostDto.Email))
             {
-                BadRequest("Email already taken.");
+                return BadRequest("Email already taken.");
             }
 
             try
@@ -104,12 +108,13 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
+        [Authorize]
         [HttpPut("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutAsync(Guid userId, UserPutDto userPutDto)
+        public async Task<IActionResult> PutAsync(Guid userId, [FromBody] UserPutDto userPutDto)
         {
             if (userPutDto.Email != null && !_helperService.IsEmailValid(userPutDto.Email))
             {
@@ -134,6 +139,7 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
+        [Authorize]
         [HttpDelete("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

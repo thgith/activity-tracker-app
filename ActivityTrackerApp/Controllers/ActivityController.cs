@@ -1,5 +1,7 @@
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ActivityTrackerApp.Controllers
@@ -8,6 +10,7 @@ namespace ActivityTrackerApp.Controllers
     /// Activity endpoints.
     /// </summary>
     [Route("api/v1/Activity")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ActivityController : ApiControllerBase, IActivityController
     {        
         IActivityService _activityService;

@@ -8,6 +8,11 @@ namespace ActivityTrackerApp.Services
     /// </summary>
     public interface IUserService
     {
+        Task<User> AuthenticateAsync(UserPutDto userPutDto);
+        Task<UserPostDtoWithToken> RegisterUserAsync(UserPostDto userPostDto);
+
+        string GenerateJwtToken(User user);
+
         Task<IEnumerable<UserDto>> GetAllUsersAsync();
 
         Task<UserDto> GetUserAsync(Guid userId);
@@ -17,7 +22,7 @@ namespace ActivityTrackerApp.Services
         Task<UserPutDto> UpdateUserAsync(Guid userId, UserPutDto user);
 
         Task<bool> DeleteUserAsync(Guid userId);
-        
+
         Task<bool> IsEmailTaken(string email);
     }
 }

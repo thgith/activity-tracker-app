@@ -1,17 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace ActivityTrackerApp.Entities
 {
     /// <summary>
     /// User info.
     /// </summary>
-    public class User
+    public class User : BaseEntity
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid UserId { get; set; }
-
         [Required]
         [MinLength(1), MaxLength(50)]
         public string FirstName { get; set; }
@@ -20,13 +17,14 @@ namespace ActivityTrackerApp.Entities
         [MinLength(1), MaxLength(50)]
         public string LastName { get; set; }
         
+        // TODO put index here
         [Required]
         [MinLength(6), MaxLength(200)]
         public string Email { get; set; }
         
         [Required]
-        [MinLength(8), MaxLength(50)]
-        public string Password { get; set; }
+        [MinLength(8), MaxLength(256)]
+        public string PasswordHash { get; set; }
         
         [Required]
         public DateTime DateJoined { get; set; }
@@ -37,5 +35,9 @@ namespace ActivityTrackerApp.Entities
         /// The IDs of the user's activities.
         /// </summary>
         public IList<int> ActivityIds { get; set; }
+
+        [Required]
+        [MaxLength(50)]
+        public string Role { get; set; }
     }
 }

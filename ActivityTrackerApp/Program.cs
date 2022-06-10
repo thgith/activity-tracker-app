@@ -1,6 +1,10 @@
+using System.Text;
 using ActivityTrackerApp.Database;
 using ActivityTrackerApp.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NLog;
 using NLog.Web;
 
@@ -21,6 +25,33 @@ try
         options.UseNpgsql(dbConnectionString, b => b.MigrationsAssembly("ActivityTrackerApp"));
     });
 
+    services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(jwt => {
+        // Used to encrypt our JWT tokens
+        var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Secret"]);
+
+        // Set up encryption settings
+        jwt.SaveToken = true;
+        jwt.TokenValidationParameters = new TokenValidationParameters {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            // Enable this later. Then set in appsettings.json
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            // Change this to true when not testing
+            RequireExpirationTime = false
+        };
+    });
+    
+    services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            .AddEntityFrameworkStores<DataContext>();
+
     // Set up to map between entities and DTOs
     services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -29,6 +60,7 @@ try
     services.AddScoped<IActivityService, ActivityService>();
     services.AddScoped<ISessionService, SessionService>();
     services.AddScoped<IUserService, UserService>();
+    services.AddScoped<IHelperMethods, HelperMethods>();
 
     services.AddControllers();
 
@@ -36,17 +68,17 @@ try
 
     if (!app.Environment.IsDevelopment())
     {
-        app.UseExceptionHandler("/Home/Error");
         app.UseHsts();
     }
 
     app.UseHttpsRedirection();
     app.UseStaticFiles();
-
-    // app.UseMvc();
     app.UseRouting();
-    // app.UseAuthentication();
-    // app.UseAuthorization();
+
+    // Allow API to authenticate users
+    app.UseAuthentication();
+    app.UseAuthorization();
+
     app.UseEndpoints(endpoints => endpoints.MapControllers());
 
     app.MapGet("/", () => "Hello World!");
