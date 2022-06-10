@@ -87,29 +87,9 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> PostAsync(UserPostDto userPostDto)
         {
-            if (userPostDto.FirstName == null)
-            {
-                BadRequest("User must have a FirstName");
-            }
-
-            if (userPostDto.LastName == null)
-            {
-                BadRequest("User must have a LastName");
-            }
-
-            if (userPostDto.Email == null)
-            {
-                BadRequest("User must have an Email");
-            }
-
             if (!_isEmailValid(userPostDto.Email))
             {
                 BadRequest("Invalid Email");
-            }
-
-            if (userPostDto.Password == null)
-            {
-                BadRequest("User must have a Password");
             }
 
             if (await _userService.IsEmailTaken(userPostDto.Email))

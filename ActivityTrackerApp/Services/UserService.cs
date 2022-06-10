@@ -97,10 +97,25 @@ namespace ActivityTrackerApp.Services
             }
 
             // Update fields
-            user.FirstName = userPutDto.FirstName;
-            user.LastName = userPutDto.LastName;
-            user.Email = userPutDto.Email;
-            user.Password = userPutDto.Password;
+            if (user.FirstName != null)
+            {
+                user.FirstName = userPutDto.FirstName;
+            }
+
+            if (user.LastName != null)
+            {
+                user.LastName = userPutDto.LastName;
+            }
+
+            if (user.Email != null)
+            {
+                user.Email = userPutDto.Email;
+            }
+
+            if (user.Password != null)
+            {
+                user.Password = userPutDto.Password;
+            }
 
             // Save to DB
             await _dbContext.SaveChangesAsync();
