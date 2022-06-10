@@ -15,6 +15,8 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
     var services = builder.Services;
+    
+    services.AddCors();
 
     // Get the DB config from appsettings.json
     var dbConnectionString = builder.Configuration["ConnectionStrings:Postgres"];
@@ -74,6 +76,17 @@ try
     app.UseHttpsRedirection();
     app.UseStaticFiles();
     app.UseRouting();
+
+    // Allow CORS for frontend
+    app.UseCors(options => options
+        // The port for React
+        // TODO set this in appsettings
+        .WithOrigins(new []{ "http://localhost:3000"})
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        // This is so we can store the JWT token in cookies
+        .AllowCredentials()
+    );
 
     // Allow API to authenticate users
     app.UseAuthentication();
