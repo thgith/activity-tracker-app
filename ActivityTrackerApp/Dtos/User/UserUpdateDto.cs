@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ActivityTrackerApp.Dtos
 {
-    public class UserPutDto
+    public class UserUpdateDto
     {
         [MinLength(1), MaxLength(50)]
         public string? FirstName { get; set; }

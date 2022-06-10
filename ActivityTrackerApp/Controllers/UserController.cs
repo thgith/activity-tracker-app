@@ -35,7 +35,7 @@ namespace ActivityTrackerApp.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<UserGetDto>>> GetAllAsync()
         {
             try
             {
@@ -56,7 +56,7 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UserDto>> GetAsync(Guid userId)
+        public async Task<ActionResult<UserGetDto>> GetAsync(Guid userId)
         {
             try
             {
@@ -77,44 +77,12 @@ namespace ActivityTrackerApp.Controllers
 
         /// <inheritdoc/>
         [Authorize]
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> PostAsync([FromBody] UserPostDto userPostDto)
-        {
-            // Note: model annotation handle error checking for requirements
-            if (!_helperService.IsEmailValid(userPostDto.Email))
-            {
-                return BadRequest("Invalid Email");
-            }
-
-            if (await _userService.IsEmailTaken(userPostDto.Email))
-            {
-                return BadRequest("Email already taken.");
-            }
-
-            try
-            {
-                var res = await _userService.CreateUserAsync(userPostDto);
-                return Ok(res);
-            }
-            catch (Exception e)
-            {
-                var message = $"There was an error creating the user: {e.Message}";
-                _logger.LogError(message, e.StackTrace);
-                return Problem(message, statusCode: 500);
-            }
-        }
-
-        /// <inheritdoc/>
-        [Authorize]
         [HttpPut("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutAsync(Guid userId, [FromBody] UserPutDto userPutDto)
+        public async Task<IActionResult> PutAsync(Guid userId, [FromBody] UserUpdateDto userPutDto)
         {
             if (userPutDto.Email != null && !_helperService.IsEmailValid(userPutDto.Email))
             {

@@ -1,8 +1,8 @@
 namespace ActivityTrackerApp.Dtos
 {
-    public class UserPostDtoWithToken
+    public class EntityWithToken<T>
     {
-        public UserPostDto User { get; set; }
+        public T Entity { get; set; }
 
         public string Token { get; set; }
     }

@@ -33,28 +33,66 @@ namespace ActivityTrackerApp.Controllers
 
         /// <inheritdoc/>
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> RegisterAsync([FromBody] UserPostDto userPostDto)
+        public async Task<ActionResult> RegisterAsync([FromBody] UserRegisterDto userRegisterDto)
         {
             try
             {
                 // Note: model annotation handle error checking for requirements
-                if (!_helperService.IsEmailValid(userPostDto.Email))
+                if (!_helperService.IsEmailValid(userRegisterDto.Email))
                 {
                     return BadRequest("Invalid Email");
                 }
 
-                if (await _userService.IsEmailTaken(userPostDto.Email))
+                if (await _userService.IsEmailTaken(userRegisterDto.Email))
                 {
                     return BadRequest("Email already taken");
                 }
 
-                var userPostDtoWithToken = await _userService.RegisterUserAsync(userPostDto);
+                var userRegisterDtoWithToken = await _userService.RegisterUserAsync(userRegisterDto);
         
-                return Ok(userPostDtoWithToken.Token);
+                return Ok(userRegisterDtoWithToken.Token);
+            }
+            catch (Exception e)
+            {
+                var message = $"There was an error logging in: {e.Message}";
+                _logger.LogError(message, e.StackTrace);
+                return Problem(message, statusCode: 500);
+            }
+        }
+
+        /// <inheritdoc/>
+        [AllowAnonymous]
+        [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> LoginAsync([FromBody] UserUpdateDto userPutDto)
+        {
+            try
+            {
+                // Note: model annotation handle error checking for requirements
+                if (!_helperService.IsEmailValid(userPutDto.Email))
+                {
+                    BadRequest("Invalid Email");
+                }
+
+                if (await _userService.IsEmailTaken(userPutDto.Email))
+                {
+                    BadRequest("Email already taken");
+                }
+
+                var userPutDtoWithToken = await _userService.AuthenticateAsync(userPutDto);
+
+                if (userPutDtoWithToken == null)
+                {
+                    return BadRequest("Incorrect username/password combination");
+                }
+
+                return Ok(userPutDtoWithToken.Token);
             }
             catch (Exception e)
             {

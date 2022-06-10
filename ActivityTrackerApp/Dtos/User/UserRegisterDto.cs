@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ActivityTrackerApp.Dtos
 {
-    public class UserPostDto
+    public class UserRegisterDto
     {
         [Required]
         [MinLength(1), MaxLength(50)]
@@ -19,7 +19,5 @@ namespace ActivityTrackerApp.Dtos
         [Required]
         [MinLength(8), MaxLength(50)]
         public string Password { get; set; }
-
-        public DateTime DateJoined { get; set; }
     }
 }

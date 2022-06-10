@@ -1,8 +1,6 @@
-using ActivityTrackerApp.Entities;
-
 namespace ActivityTrackerApp.Dtos
 {
-    public class UserDto
+    public class UserGetDto
     {
         public string FirstName { get; set; }
 

@@ -8,18 +8,15 @@ namespace ActivityTrackerApp.Services
     /// </summary>
     public interface IUserService
     {
-        Task<User> AuthenticateAsync(UserPutDto userPutDto);
-        Task<UserPostDtoWithToken> RegisterUserAsync(UserPostDto userPostDto);
+        Task<EntityWithToken<UserUpdateDto>> AuthenticateAsync(UserUpdateDto userPutDto);
 
-        string GenerateJwtToken(User user);
+        Task<EntityWithToken<UserRegisterDto>> RegisterUserAsync(UserRegisterDto userPostDto);
 
-        Task<IEnumerable<UserDto>> GetAllUsersAsync();
+        Task<IEnumerable<UserGetDto>> GetAllUsersAsync();
 
-        Task<UserDto> GetUserAsync(Guid userId);
+        Task<UserGetDto> GetUserAsync(Guid userId);
 
-        Task<UserPostDto> CreateUserAsync(UserPostDto user);
-
-        Task<UserPutDto> UpdateUserAsync(Guid userId, UserPutDto user);
+        Task<UserUpdateDto> UpdateUserAsync(Guid userId, UserUpdateDto user);
 
         Task<bool> DeleteUserAsync(Guid userId);
 

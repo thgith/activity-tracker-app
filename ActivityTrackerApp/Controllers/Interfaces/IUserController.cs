@@ -13,7 +13,7 @@ namespace ActivityTrackerApp.Controllers
         /// </summary>
         /// <returns>List of users</returns>
         [HttpGet]
-        Task<ActionResult<IEnumerable<UserDto>>> GetAllAsync();
+        Task<ActionResult<IEnumerable<UserGetDto>>> GetAllAsync();
 
         /// <summary>
         /// Get the user with the given ID.
@@ -21,15 +21,7 @@ namespace ActivityTrackerApp.Controllers
         /// <param name="userId">The ID of the user to get</param>
         /// <returns>Task of the user.</returns>
         [HttpGet]
-        Task<ActionResult<UserDto>> GetAsync(Guid userId);
-
-        /// <summary>
-        /// Create the new user.
-        /// </summary>
-        /// <param name="userDto">The user model for the create.</param>
-        /// <returns>Task of the newly created user.</returns>
-        [HttpPost]
-        Task<ActionResult> PostAsync(UserPostDto userPostDto);
+        Task<ActionResult<UserGetDto>> GetAsync(Guid userId);
 
         /// <summary>
         /// Update the user.
@@ -37,7 +29,7 @@ namespace ActivityTrackerApp.Controllers
         /// <param name="userDto">The user model for the update.</param>
         /// <returns>Task of the updated user.</returns>
         [HttpPut("{userId}")]
-        Task<IActionResult> PutAsync(Guid userId, UserPutDto userPutDto);
+        Task<IActionResult> PutAsync(Guid userId, UserUpdateDto userPutDto);
 
         /// <summary>
         /// Delete the user with the given ID.
