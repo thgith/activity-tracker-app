@@ -28,40 +28,6 @@ namespace ActivityTrackerApp.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<bool> IsCurrentUserAuthorized(
-            Guid currentUserId, 
-            Guid? userIdOfResource,
-            bool allowIfSameUser)
-        {
-            // Admin always allowed
-            if (await IsAdmin(currentUserId))
-            {
-                return true;
-            }
-
-            if (userIdOfResource == null)
-            {
-                return false;
-            }
-
-            // Same user acting on their info
-            if (allowIfSameUser && currentUserId.ToString() == userIdOfResource.ToString())
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public async Task<bool> IsAdmin(Guid userId)
-        {
-            return await _dbContext.Users
-                .AnyAsync(x => 
-                x.Id == userId && 
-                x.DateDeleted == null &&
-                x.Role == Roles.ADMIN);
-        }
-
         public async Task<EntityWithToken<UserRegisterDto>> RegisterUserAsync(UserRegisterDto userRegisterDto)
         {
             var user = await _createUserAsync(userRegisterDto);
@@ -72,10 +38,10 @@ namespace ActivityTrackerApp.Services
             };
         }
 
-        public async Task<EntityWithToken<UserUpdateDto>> AuthenticateUserAsync(UserUpdateDto userPutDto)
+        public async Task<EntityWithToken<UserLoginDto>> AuthenticateUserAsync(UserLoginDto userLoginDto)
         {
             var user = await _dbContext.Users.SingleOrDefaultAsync(x => 
-                x.Email == userPutDto.Email &&
+                x.Email == userLoginDto.Email &&
                 x.DateDeleted == null);
 
             // User with email doesn't exist
@@ -85,14 +51,14 @@ namespace ActivityTrackerApp.Services
             }
 
             // Password is invalid
-            if (!BCrypt.Net.BCrypt.Verify(userPutDto.Password, user.PasswordHash))
+            if (!BCrypt.Net.BCrypt.Verify(userLoginDto.Password, user.PasswordHash))
             {
                 return null;
             }
 
-            return new EntityWithToken<UserUpdateDto>()
+            return new EntityWithToken<UserLoginDto>()
             {
-                Entity = userPutDto,
+                Entity = userLoginDto,
                 Token = _jwtService.GenerateJwtToken(user)
             };
         }
@@ -101,12 +67,16 @@ namespace ActivityTrackerApp.Services
         /// Gets all active users.
         /// </summary>
         /// <returns>All the active users.</returns>
-        public async Task<IEnumerable<UserGetDto>> GetAllUsersAsync()
+        public async Task<IEnumerable<UserGetDto>> GetAllUsersAsync(Guid currUserId)
         {
-            // AsNoTracking() since we are not modifying the result we get
+            // Check permissions
+            if (!(await IsAdmin(currUserId)))
+            {
+                throw new UnauthorizedAccessException("The current user is not authorized to get all users");
+            }
+
             // Excludes deleted users
             var users = await _dbContext.Users
-                .AsNoTracking()
                 .Where(x => x.DateDeleted == null)
                 .OrderBy(x => x.DateJoined)
                 .ToListAsync();       
@@ -120,17 +90,18 @@ namespace ActivityTrackerApp.Services
         /// </summary>
         /// <param name="userId">The ID of the user to get.</param>
         /// <returns>The requested user.</returns>
-        public async Task<UserGetDto> GetUserAsync(Guid userId)
+        public async Task<UserGetDto> GetUserAsync(Guid currUserId, Guid userId)
         {
+            // Check permissions
+            if (currUserId != userId && !(await IsAdmin(currUserId)))
+            {
+                throw new UnauthorizedAccessException("The current user is not authorized to get this user");
+            }
+
             var user = await _getActiveUser(userId);
 
             // Convert entity to DTO and return
             return _mapper.Map<UserGetDto>(user);
-        }
-
-        public async Task<bool> IsEmailTaken(string email)
-        {
-            return await _dbContext.Users.AnyAsync(x => x.Email == email);
         }
 
         /// <summary>
@@ -140,8 +111,14 @@ namespace ActivityTrackerApp.Services
         /// <param name="userPutDto">The user object.</param>
         /// </summary>
         /// <returns>The updated user.</returns>
-        public async Task<UserUpdateDto> UpdateUserAsync(Guid userId, UserUpdateDto userPutDto)
+        public async Task<UserUpdateDto> UpdateUserAsync(Guid currUserId, Guid userId, UserUpdateDto userPutDto)
         {
+            // Check permissions
+            if (currUserId != userId && !(await IsAdmin(currUserId)))
+            {
+                throw new UnauthorizedAccessException("The current user is not authorized to get this user");
+            }
+
             // Get active user with ID
             var user = await _getActiveUser(userId);
             
@@ -152,22 +129,22 @@ namespace ActivityTrackerApp.Services
             }
 
             // Update fields
-            if (user.FirstName != null)
+            if (userPutDto.FirstName != null)
             {
                 user.FirstName = userPutDto.FirstName;
             }
 
-            if (user.LastName != null)
+            if (userPutDto.LastName != null)
             {
                 user.LastName = userPutDto.LastName;
             }
 
-            if (user.Email != null)
+            if (userPutDto.Email != null)
             {
                 user.Email = userPutDto.Email;
             }
 
-            if (user.PasswordHash != null)
+            if (userPutDto.Password != null)
             {
                 user.PasswordHash = _hashPassword(userPutDto.Password);
             }
@@ -185,8 +162,14 @@ namespace ActivityTrackerApp.Services
         /// <returns>
         /// <c>true</c> if the delete was successful, <c>false</c> otherwise.
         /// </returns>
-        public async Task<bool> DeleteUserAsync(Guid userId)
+        public async Task<bool> DeleteUserAsync(Guid currUserId, Guid userId)
         {
+            // Check permissions
+            if (currUserId != userId && !(await IsAdmin(currUserId)))
+            {
+                throw new UnauthorizedAccessException("The current user is not authorized to get this user");
+            }
+
             // Get active user with ID
             var user = await _getActiveUser(userId);
 
@@ -201,7 +184,24 @@ namespace ActivityTrackerApp.Services
 
             // Save to DB
             // SaveChangesAsync returns the number of entries written to the DB
-            return await _dbContext.SaveChangesAsync() > 0;
+            await _dbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> IsAdmin(Guid userId)
+        {
+            return await _dbContext.Users
+                .AnyAsync(x => 
+                    x.Id == userId && 
+                    x.DateDeleted == null &&
+                    x.Role == Roles.ADMIN);
+        }
+
+        /// <remarks>This includes emails that are part of deactiviated users.</remarks>
+        public async Task<bool> IsEmailTaken(string email)
+        {
+            return await _dbContext.Users.AnyAsync(x => x.Email == email);
         }
 
         private async Task<User> _createUserAsync(UserRegisterDto userRegisterDto)
@@ -239,8 +239,7 @@ namespace ActivityTrackerApp.Services
 
         private string _hashPassword(string password)
         {
-            // TODO move this to env var
-            return BCrypt.Net.BCrypt.HashPassword(password, _config["PasswordHashSalt"]);
+            return BCrypt.Net.BCrypt.HashPassword(password, _config[GlobalConstants.PASSWORD_HASH_SALT_KEY_NAME]);
         }
     }
 }

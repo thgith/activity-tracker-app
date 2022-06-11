@@ -13,7 +13,7 @@ namespace ActivityTrackerApp.Controllers
         /// </summary>
         /// <returns>List of sessions.</returns>
         [HttpGet]
-        Task<ActionResult<IEnumerable<SessionDto>>> GetAllAsync();
+        Task<ActionResult<IEnumerable<SessionGetDto>>> GetAllAsync();
 
         /// <summary>
         /// Get the Session with the given ID.
@@ -21,7 +21,7 @@ namespace ActivityTrackerApp.Controllers
         /// <param name="sessionId">The ID of the session to get.</param>
         /// <returns>Task of the session.</returns>
         [HttpGet]
-        Task<ActionResult<SessionDto>> GetAsync(Guid sessionId);
+        Task<ActionResult<SessionGetDto>> GetAsync(Guid sessionId);
 
         /// <summary>
         /// Create the new session.
@@ -29,7 +29,7 @@ namespace ActivityTrackerApp.Controllers
         /// <param name="SessionPostDto">The session model for the create.</param>
         /// <returns>Task of the newly created session.</returns>
         [HttpPost]
-        Task<ActionResult> PostAsync(SessionPostDto sessionPostDto);
+        Task<ActionResult> PostAsync(SessionCreateDto sessionPostDto);
 
         /// <summary>
         /// Update the session.
@@ -37,7 +37,7 @@ namespace ActivityTrackerApp.Controllers
         /// <param name="SessionPutDto">The session model for the update.</param>
         /// <returns>Task of the updated session.</returns>
         [HttpPut("{sessionId}")]
-        Task<IActionResult> PutAsync(Guid sessionId, SessionPutDto sessionPutDto);
+        Task<IActionResult> PutAsync(Guid sessionId, SessionUpdateDto sessionPutDto);
 
         /// <summary>
         /// Delete the Session with the given ID.

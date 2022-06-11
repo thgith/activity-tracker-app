@@ -6,7 +6,7 @@ namespace ActivityTrackerApp.Dtos
     /// <summary>
     /// A timed session.
     /// </summary>
-    public class SessionDto
+    public class SessionGetDto
     {
         /// <summary>
         /// The ID of the activity the session is associated with.

@@ -29,5 +29,7 @@ namespace ActivityTrackerApp.Entities
 
         [MaxLength(1024)]
         public string Description { get; set; }
+        
+        public DateTime? DateDeleted { get; set; }
     }
 }

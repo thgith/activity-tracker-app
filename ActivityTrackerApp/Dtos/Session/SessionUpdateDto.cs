@@ -5,7 +5,7 @@ namespace ActivityTrackerApp.Dtos
     /// <summary>
     /// A timed session.
     /// </summary>
-    public class SessionPutDto
+    public class SessionUpdateDto
     {
         [Required]
         public DateTime? StartDateUtc { get; set; }

@@ -16,9 +16,9 @@ namespace ActivityTrackerApp.Controllers
         private readonly IHelperService _helperService;
 
         public AuthController(
+            IHelperService helperService,
             IUserService userService,
             IJwtService jwtService,
-            IHelperService helperService,
             ILogger<AuthController> logger) : base(userService, jwtService, logger)
         {
             _helperService = helperService ?? throw new ArgumentNullException(nameof(helperService));
@@ -69,30 +69,30 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> LoginAsync([FromBody] UserUpdateDto userPutDto)
+        public async Task<ActionResult> LoginAsync([FromBody] UserLoginDto userLoginDto)
         {
             try
             {
                 // Note: model annotation handle error checking for requirements
-                if (!_helperService.IsEmailValid(userPutDto.Email))
+                if (!_helperService.IsEmailValid(userLoginDto.Email))
                 {
                     BadRequest("Invalid Email");
                 }
 
-                if (await userService.IsEmailTaken(userPutDto.Email))
+                if (await userService.IsEmailTaken(userLoginDto.Email))
                 {
                     BadRequest("Email already taken");
                 }
 
-                var userPutDtoWithToken = await userService.AuthenticateUserAsync(userPutDto);
+                var userLoginDtoWithToken = await userService.AuthenticateUserAsync(userLoginDto);
 
-                if (userPutDtoWithToken == null)
+                if (userLoginDtoWithToken == null)
                 {
                     return BadRequest("Incorrect username/password combination");
                 }
 
                 // Add token to user's cookies
-                Response.Cookies.Append(GlobalConstants.JWT_TOKEN_COOKIE_NAME, userPutDtoWithToken.Token, new CookieOptions
+                Response.Cookies.Append(GlobalConstants.JWT_TOKEN_COOKIE_NAME, userLoginDtoWithToken.Token, new CookieOptions
                 {
                     HttpOnly = true
                 });

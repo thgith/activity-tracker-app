@@ -7,21 +7,21 @@ namespace ActivityTrackerApp.Services
     /// </summary>
     public interface IUserService
     {
-        Task<bool> IsCurrentUserAuthorized(Guid currUserId, Guid? userIdOfResource, bool allowIfSameUser = true);
+        // Task<bool> IsCurrentUserAuthorized(Guid currUserId, Guid? userIdOfResource, bool allowIfSameUser = true);
 
         Task<bool> IsAdmin(Guid userId);
 
-        Task<EntityWithToken<UserUpdateDto>> AuthenticateUserAsync(UserUpdateDto userPutDto);
+        Task<EntityWithToken<UserLoginDto>> AuthenticateUserAsync(UserLoginDto userLoginDto);
 
         Task<EntityWithToken<UserRegisterDto>> RegisterUserAsync(UserRegisterDto userPostDto);
 
-        Task<IEnumerable<UserGetDto>> GetAllUsersAsync();
+        Task<IEnumerable<UserGetDto>> GetAllUsersAsync(Guid currUserId);
 
-        Task<UserGetDto> GetUserAsync(Guid userId);
+        Task<UserGetDto> GetUserAsync(Guid currUserId, Guid userId);
 
-        Task<UserUpdateDto> UpdateUserAsync(Guid userId, UserUpdateDto user);
+        Task<UserUpdateDto> UpdateUserAsync(Guid currUserId, Guid userId, UserUpdateDto user);
 
-        Task<bool> DeleteUserAsync(Guid userId);
+        Task<bool> DeleteUserAsync(Guid currUserId, Guid userId);
 
         Task<bool> IsEmailTaken(string email);
     }

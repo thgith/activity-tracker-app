@@ -1,3 +1,6 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +17,9 @@ namespace ActivityTrackerApp.Controllers
         private readonly IHelperService _helperService;
 
         public UserController(
+            IHelperService helperService,
             IUserService userService,
             IJwtService jwtService,
-            IHelperService helperService,
             ILogger<UserController> logger) : base(userService, jwtService, logger)
         {
             _helperService = helperService ?? throw new ArgumentNullException(nameof(helperService));
@@ -32,15 +35,32 @@ namespace ActivityTrackerApp.Controllers
         {
             try
             {
-                // Check permissions
-                var authErr = await checkAuthenticatedAndAuthorized(Request, null);
-                if (authErr != null)
+                // -- Verify the user authenticated --
+                // Get JWT info from cookie. Should be stored from login/registration
+                var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
+                if (jwtCookie == null)
                 {
-                    return authErr;
+                    return Unauthorized("You are not properly authenticated");
                 }
 
-                // Get all users
-                var usersDtos = await userService.GetAllUsersAsync();
+                // Verify that the token is still valid
+                JwtSecurityToken token;
+                try
+                {
+                    token = jwtService.Verify(jwtCookie);
+                }
+                catch (Exception e)
+                {
+                    return Unauthorized("You are not properly authenticated");
+                }
+                
+                // -- Get current user --
+                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var currUserId);
+                var currUserIdStr = currUserId as string;
+                Guid.TryParse(currUserIdStr, out var currUserGuid);
+
+                // -- Get all users --
+                var usersDtos = await userService.GetAllUsersAsync(currUserGuid);
                 return Ok(usersDtos);
             }
             catch (Exception e)
@@ -62,15 +82,32 @@ namespace ActivityTrackerApp.Controllers
         {
             try
             {
-                // Check permissions
-                var authErr = await checkAuthenticatedAndAuthorized(Request, userId);
-                if (authErr != null)
+                // -- Verify the user is authenticated --
+                // Get JWT info from cookie. Should be stored from login/registration
+                var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
+                if (jwtCookie == null)
                 {
-                    return authErr;
+                    return Unauthorized("You are not properly authenticated");
                 }
 
-                // Get user
-                var user = await userService.GetUserAsync(userId);
+                // Verify that the token is still valid
+                JwtSecurityToken token;
+                try
+                {
+                    token = jwtService.Verify(jwtCookie);
+                }
+                catch (Exception e)
+                {
+                    return Unauthorized("You are not properly authenticated");
+                }
+
+                // -- Get current user --
+                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var currUserId);
+                var currUserIdStr = currUserId as string;
+                Guid.TryParse(currUserIdStr, out var currUserGuid);
+
+                // -- Get user --
+                var user = await userService.GetUserAsync(currUserGuid, userId);
                 if (user == null)
                 {
                     return NotFound();
@@ -99,14 +136,24 @@ namespace ActivityTrackerApp.Controllers
         {
             try
             {
-                // Check permissions
-                var authErr = await checkAuthenticatedAndAuthorized(
-                                        Request,
-                                        userId,
-                                        allowIfSameUser: true);
-                if (authErr != null)
+                // TODO separate this out
+                // -- Verify the user is authenticated --
+                // Get JWT info from cookie. Should be stored from login/registration
+                var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
+                if (jwtCookie == null)
                 {
-                    return authErr;
+                    return Unauthorized("You are not properly authenticated");
+                }
+
+                // Verify that the token is still valid
+                JwtSecurityToken token;
+                try
+                {
+                    token = jwtService.Verify(jwtCookie);
+                }
+                catch (Exception e)
+                {
+                    return Unauthorized("You are not properly authenticated");
                 }
 
                 // Check email
@@ -115,13 +162,18 @@ namespace ActivityTrackerApp.Controllers
                     return BadRequest("Invalid Email");
                 }
 
-                // Update user
-                var res = await userService.UpdateUserAsync(userId, userPutDto);
-                if (res == null)
+                // -- Get current user --
+                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var currUserId);
+                var currUserIdStr = currUserId as string;
+                Guid.TryParse(currUserIdStr, out var currUserGuid);
+
+                // -- Update user --
+                var user = await userService.UpdateUserAsync(currUserGuid, userId, userPutDto);
+                if (user == null)
                 {
                     return NotFound($"The user with the ID {userId} does not exist");
                 }
-                return Ok(res);
+                return Ok(user);
             }
             catch (Exception e)
             {
@@ -142,18 +194,32 @@ namespace ActivityTrackerApp.Controllers
         {
             try
             {
-                // Check permissions
-                var authErr = await checkAuthenticatedAndAuthorized(
-                                        Request,
-                                        userId,
-                                        allowIfSameUser: true);
-                if (authErr != null)
+                // -- Verify the user is authenticated --
+                // Get JWT info from cookie. Should be stored from login/registration
+                var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
+                if (jwtCookie == null)
                 {
-                    return authErr;
+                    return Unauthorized("You are not properly authenticated");
                 }
 
-                // Delete user
-                var result = await userService.DeleteUserAsync(userId);
+                // Verify that the token is still valid
+                JwtSecurityToken token;
+                try
+                {
+                    token = jwtService.Verify(jwtCookie);
+                }
+                catch (Exception e)
+                {
+                    return Unauthorized("You are not properly authenticated");
+                }
+
+                // -- Get current user --
+                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var currentUserId);
+                var currentUserIdStr = currentUserId as string;
+                Guid.TryParse(currentUserIdStr, out var currUserGuid);
+
+                // -- Delete user --
+                var result = await userService.DeleteUserAsync(currUserGuid, userId);
                 if (result)
                 {
                     return Ok($"Successfully deleted user {userId}");

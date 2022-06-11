@@ -1,3 +1,6 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,30 +17,35 @@ namespace ActivityTrackerApp.Controllers
         private readonly ISessionService _sessionService;
 
         public SessionController(
+            ISessionService sessionService,
             IUserService userService,
             IJwtService jwtService,
-            ISessionService sessionService,
             ILogger<SessionController> logger) : base(userService, jwtService, logger)
         {
             _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));
         }
 
-        public Task<ActionResult<IEnumerable<SessionDto>>> GetAllSessionsAsync()
+        /// <summary>
+        /// Get all sessions associated with the user and activity
+        /// </summary>
+        public async Task<ActionResult<IEnumerable<SessionGetDto>>> GetAllSessionsAsync(
+            Guid activityId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ActionResult<SessionDto>> GetSessionAsync(Guid sessionId)
+        public Task<ActionResult<SessionGetDto>> GetSessionAsync(
+            Guid sessionId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ActionResult> CreateSessionAsync(SessionPostDto sessionPostDto)
+        public Task<ActionResult> CreateSessionAsync(SessionCreateDto sessionPostDto)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IActionResult> UpdateSessionAsync(Guid sessionId, SessionPutDto sessionPutDto)
+        public Task<IActionResult> UpdateSessionAsync(Guid sessionId, SessionUpdateDto sessionPutDto)
         {
             throw new NotImplementedException();
         }

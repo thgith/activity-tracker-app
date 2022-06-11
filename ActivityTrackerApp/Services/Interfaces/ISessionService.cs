@@ -1,3 +1,4 @@
+using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
 
 namespace ActivityTrackerApp.Services
@@ -7,12 +8,6 @@ namespace ActivityTrackerApp.Services
     /// </summary>
     public interface ISessionService
     {
-        Task<Session> GetSessionAsync(Guid sessionId);
-        
-        Task<Session> CreateSessionAsync(Session newSession);
-        
-        Task<Session> UpdateSessionAsync(Session updatedSession);
 
-        Task<bool> DeleteSessionAsync(Guid sessionId);
     }
 }

@@ -13,7 +13,7 @@ namespace ActivityTrackerApp.Controllers
         /// </summary>
         /// <returns>List of activities.</returns>
         [HttpGet]
-        Task<ActionResult<IEnumerable<ActivityDto>>> GetAllAsync();
+        Task<ActionResult<IEnumerable<ActivityGetDto>>> GetAllAsync();
 
         /// <summary>
         /// Get the activity with the given ID.
@@ -21,7 +21,7 @@ namespace ActivityTrackerApp.Controllers
         /// <param name="activityId">The ID of the activity to get.</param>
         /// <returns>Task of the activity.</returns>
         [HttpGet]
-        Task<ActionResult<ActivityDto>> GetAsync(Guid activityId);
+        Task<ActionResult<ActivityGetDto>> GetActivityAsync(Guid activityId);
 
         /// <summary>
         /// Create the new activity.
@@ -29,7 +29,7 @@ namespace ActivityTrackerApp.Controllers
         /// <param name="activityPostDto">The activity model for the create.</param>
         /// <returns>Task of the newly created activity.</returns>
         [HttpPost]
-        Task<ActionResult> PostAsync(ActivityPostDto activityPostDto);
+        Task<ActionResult> PostAsync(ActivityCreateDto activityPostDto);
 
         /// <summary>
         /// Update the activity.
@@ -37,7 +37,7 @@ namespace ActivityTrackerApp.Controllers
         /// <param name="activityPutDto">The activity model for the update.</param>
         /// <returns>Task of the updated activity.</returns>
         [HttpPut("{activityId}")]
-        Task<IActionResult> PutAsync(Guid activityId, ActivityPutDto activityPutDto);
+        Task<IActionResult> PutAsync(Guid activityId, ActivityUpdateDto activityPutDto);
 
         /// <summary>
         /// Delete the activity with the given ID.

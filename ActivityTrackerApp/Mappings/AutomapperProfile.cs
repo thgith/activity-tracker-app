@@ -28,24 +28,24 @@ namespace ActivityTrackerApp.Mappings
         
         private void _mapActivity()
         {
-            CreateMap<Activity, ActivityDto>();
-            CreateMap<Activity, ActivityPutDto>();
-            CreateMap<Activity, ActivityPostDto>();
+            CreateMap<Activity, ActivityGetDto>();
+            CreateMap<Activity, ActivityUpdateDto>();
+            CreateMap<Activity, ActivityCreateDto>();
 
-            CreateMap<ActivityDto, Activity>();
-            CreateMap<ActivityPutDto, Activity>();
-            CreateMap<ActivityPostDto, Activity>();
+            CreateMap<ActivityGetDto, Activity>();
+            CreateMap<ActivityUpdateDto, Activity>();
+            CreateMap<ActivityCreateDto, Activity>();
         }
 
         private void _mapSession()
         {
-            CreateMap<Session, SessionDto>();
-            CreateMap<Session, SessionPutDto>();
-            CreateMap<Session, SessionPostDto>();
+            CreateMap<Session, SessionGetDto>();
+            CreateMap<Session, SessionUpdateDto>();
+            CreateMap<Session, SessionCreateDto>();
 
-            CreateMap<SessionDto, Session>();
-            CreateMap<SessionPutDto, Session>();
-            CreateMap<SessionPostDto, Session>();
+            CreateMap<SessionGetDto, Session>();
+            CreateMap<SessionUpdateDto, Session>();
+            CreateMap<SessionCreateDto, Session>();
         }
     }
 }
