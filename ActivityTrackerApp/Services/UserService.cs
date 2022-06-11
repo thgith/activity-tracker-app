@@ -1,6 +1,7 @@
 using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
+using ActivityTrackerApp.Exceptions;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -72,7 +73,7 @@ namespace ActivityTrackerApp.Services
             // Check permissions
             if (!(await IsAdmin(currUserId)))
             {
-                throw new UnauthorizedAccessException("The current user is not authorized to get all users");
+                throw new ForbiddenException();
             }
 
             // Excludes deleted users
@@ -95,7 +96,7 @@ namespace ActivityTrackerApp.Services
             // Check permissions
             if (currUserId != userId && !(await IsAdmin(currUserId)))
             {
-                throw new UnauthorizedAccessException("The current user is not authorized to get this user");
+                throw new ForbiddenException();
             }
 
             var user = await _getActiveUser(userId);
@@ -116,7 +117,7 @@ namespace ActivityTrackerApp.Services
             // Check permissions
             if (currUserId != userId && !(await IsAdmin(currUserId)))
             {
-                throw new UnauthorizedAccessException("The current user is not authorized to get this user");
+                throw new ForbiddenException();
             }
 
             // Get active user with ID
@@ -167,7 +168,7 @@ namespace ActivityTrackerApp.Services
             // Check permissions
             if (currUserId != userId && !(await IsAdmin(currUserId)))
             {
-                throw new UnauthorizedAccessException("The current user is not authorized to get this user");
+                throw new ForbiddenException();
             }
 
             // Get active user with ID

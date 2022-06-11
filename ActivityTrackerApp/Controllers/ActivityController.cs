@@ -1,7 +1,7 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
+using ActivityTrackerApp.Exceptions;
 using ActivityTrackerApp.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -28,29 +28,14 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<ActivityGetDto>>> GetAllActivitiesForUserAsync([FromBody] Guid userId)
         {
             try
             {
                 // -- Verify the user is authenticated --
                 var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                
-                if (jwtCookie == null)
-                {
-                    return Unauthorized("You are not properly authenticated");
-                }
-
-                // Verify that the token is still valid
-                JwtSecurityToken token;
-                try
-                {
-                    token = jwtService.Verify(jwtCookie);
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e.Message);
-                    return Unauthorized("You are not properly authenticated");
-                }
+                var token = jwtService.CheckAuthenticated(jwtCookie);
 
                 // -- Get current user from token --
                 // We verified token above, so this data should be correct
@@ -62,7 +47,11 @@ namespace ActivityTrackerApp.Controllers
                 var activities = await _activityService.GetAllActivitiesForUserAsync(currUserGuid, currUserGuid);
                 return Ok(activities);
             }
-            catch (UnauthorizedAccessException e)
+            catch (UnauthenticatedException e)
+            {
+                return Unauthorized(e.Message);
+            }
+            catch (ForbiddenException e)
             {
                 return Forbid(e.Message);
             }
@@ -73,30 +62,14 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
+        [HttpGet("{activityId}")]
         public async Task<ActionResult<ActivityGetDto>> GetActivityAsync(Guid activityId)
         {
             try
             {
                 // -- Verify the user is authenticated --
                 var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                
-                if (jwtCookie == null)
-                {
-                    return Unauthorized("You are not properly authenticated");
-                }
-
-                // Verify that the token is still valid
-                JwtSecurityToken token;
-                try
-                {
-                    token = jwtService.Verify(jwtCookie);
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e.Message);
-                    return Unauthorized("You are not properly authenticated");
-                }
-
+                var token = jwtService.CheckAuthenticated(jwtCookie);
 
                 // -- Get current user from token --
                 // We verified token above, so this data should be correct
@@ -108,7 +81,11 @@ namespace ActivityTrackerApp.Controllers
                 var activityGetDto = await _activityService.GetActivityAsync(currUserGuid, activityId);
                 return Ok(activityGetDto);
             }
-            catch (UnauthorizedAccessException e)
+            catch (UnauthenticatedException e)
+            {
+                return Unauthorized(e.Message);
+            }
+            catch (ForbiddenException e)
             {
                 return Forbid(e.Message);
             }
@@ -119,29 +96,14 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
-        public async Task<ActionResult> CreateActivityAsync(ActivityCreateDto activityPostDto)
+        [HttpPost]
+        public async Task<ActionResult> CreateActivityAsync([FromBody] ActivityCreateDto activityPostDto)
         {
             try
             {
                 // -- Verify the user is authenticated --
                 var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                
-                if (jwtCookie == null)
-                {
-                    return Unauthorized("You are not properly authenticated");
-                }
-
-                // Verify that the token is still valid
-                JwtSecurityToken token;
-                try
-                {
-                    token = jwtService.Verify(jwtCookie);
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e.Message);
-                    return Unauthorized("You are not properly authenticated");
-                }
+                var token = jwtService.CheckAuthenticated(jwtCookie);
 
                 // -- Get current user from token --
                 // We verified token above, so this data should be correct
@@ -153,7 +115,11 @@ namespace ActivityTrackerApp.Controllers
                 await _activityService.CreateActivityAsync(currUserGuid, currUserGuid, activityPostDto);
                 return Ok(activityPostDto);
             }
-            catch (UnauthorizedAccessException e)
+            catch (UnauthenticatedException e)
+            {
+                return Unauthorized(e.Message);
+            }
+            catch (ForbiddenException e)
             {
                 return Forbid(e.Message);
             }
@@ -164,29 +130,16 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
-        public async Task<IActionResult> UpdateActivityAsync(Guid activityId, ActivityUpdateDto activityPutDto)
+        [HttpPut("{activityId}")]
+        public async Task<IActionResult> UpdateActivityAsync(
+            Guid activityId,
+            [FromBody] ActivityUpdateDto activityPutDto)
         {
             try
             {
                 // -- Verify the user is authenticated --
                 var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                
-                if (jwtCookie == null)
-                {
-                    return Unauthorized("You are not properly authenticated");
-                }
-
-                // Verify that the token is still valid
-                JwtSecurityToken token;
-                try
-                {
-                    token = jwtService.Verify(jwtCookie);
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e.Message);
-                    return Unauthorized("You are not properly authenticated");
-                }
+                var token = jwtService.CheckAuthenticated(jwtCookie);
 
                 // -- Get current user from token --
                 // We verified token above, so this data should be correct
@@ -198,7 +151,11 @@ namespace ActivityTrackerApp.Controllers
                 await _activityService.UpdateActivityAsync(currUserGuid, activityId, activityPutDto);
                 return Ok(activityPutDto);
             }
-            catch (UnauthorizedAccessException e)
+            catch (UnauthenticatedException e)
+            {
+                return Unauthorized(e.Message);
+            }
+            catch (ForbiddenException e)
             {
                 return Forbid(e.Message);
             }
@@ -207,31 +164,16 @@ namespace ActivityTrackerApp.Controllers
                 return Problem($"There was a problem deleting the activity {activityId}", statusCode: 500);
             }
         }
-    
 
         /// <inheritdoc/>
+        [HttpDelete("{activityId}")]
         public async Task<IActionResult> DeleteActivityAsync(Guid activityId)
         {
             try
             {
+                // -- Verify the user is authenticated --
                 var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                
-                if (jwtCookie == null)
-                {
-                    return Unauthorized("You are not properly authenticated");
-                }
-
-                // Verify that the token is still valid
-                JwtSecurityToken token;
-                try
-                {
-                    token = jwtService.Verify(jwtCookie);
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e.Message);
-                    return Unauthorized("You are not properly authenticated");
-                }
+                var token = jwtService.CheckAuthenticated(jwtCookie);                
 
                 // -- Get current user from token --
                 // We verified token above, so this data should be correct
@@ -243,7 +185,11 @@ namespace ActivityTrackerApp.Controllers
                 await _activityService.DeleteActivityAsync(currUserGuid, activityId);
                 return Ok("Successfully deleted activity");
             }
-            catch (UnauthorizedAccessException e)
+            catch (UnauthenticatedException e)
+            {
+                return Unauthorized(e.Message);
+            }
+            catch (ForbiddenException e)
             {
                 return Forbid(e.Message);
             }

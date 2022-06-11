@@ -1,7 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Entities;
+using ActivityTrackerApp.Exceptions;
 using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 
@@ -26,10 +28,34 @@ namespace ActivityTrackerApp.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public string GenerateJwtToken(User user)
+        public JwtSecurityToken CheckAuthenticated(string jwtCookie)
+        {
+            if (jwtCookie == null)
+            {
+                throw new UnauthenticatedException("You are not properly authenticated");
+            }
+
+            // Verify that the token is still valid
+            JwtSecurityToken token;
+            try
+            {
+                token = Verify(jwtCookie);
+            }
+            catch (Exception e)
+            {
+                throw new UnauthenticatedException("You are not properly authenticated");
+            }
+
+            return token;
+        }
+
+        // Default expiration to 5 hours
+        // Prob not the best, but this is a time tracking application, so we don't want to
+        // log them out mid session
+        public string GenerateJwtToken(User user, int expirationMinutes = 300)
         {
             // Get key in config
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtConfig:Secret"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config[GlobalConstants.JWT_SECRET_KEY_NAME]));
             
             // Create credentials with key and selected signing algorithm
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -39,17 +65,13 @@ namespace ActivityTrackerApp.Services
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                // new Claim(ClaimTypes.Email, user.Email),
-                // new Claim(ClaimTypes.GivenName, user.FirstName),
-                // new Claim(ClaimTypes.Surname, user.LastName),
-                new Claim(ClaimTypes.Role, user.Role)
             };
 
             var token = new JwtSecurityToken(
-                _config["JwtConfig:Issuer"],
-                _config["JwtConfig:Audience"],
+                _config[GlobalConstants.JWT_ISSUER_KEY_NAME],
+                _config[GlobalConstants.JWT_AUDIENCE_KEY_NAME],
                 claims,
-                expires: DateTime.UtcNow.AddMinutes(15),
+                expires: DateTime.UtcNow.AddMinutes(expirationMinutes),
                 signingCredentials: credentials);
             
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -58,7 +80,7 @@ namespace ActivityTrackerApp.Services
         public JwtSecurityToken Verify(string jwt)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_config["JwtConfig:Secret"]);
+            var key = Encoding.UTF8.GetBytes(_config[GlobalConstants.JWT_SECRET_KEY_NAME]);
             tokenHandler.ValidateToken(jwt, new TokenValidationParameters
             {
                 IssuerSigningKey = new SymmetricSecurityKey(key),

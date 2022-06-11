@@ -1,6 +1,7 @@
 using System.Linq;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
+using ActivityTrackerApp.Exceptions;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +33,7 @@ namespace ActivityTrackerApp.Services
             // Regular users can get their own activities. Admins can get everyone's activities.
             if (currUserId != ownerId && !(await _userService.IsAdmin(currUserId)))
             {
-                throw new UnauthorizedAccessException("The user is not authorized to create an activity for another user");
+                throw new ForbiddenException();
             }
 
             var activities = await _dbContext.Activities
@@ -50,15 +51,15 @@ namespace ActivityTrackerApp.Services
         {
             var activity = await _getActiveActivity(activityId);
 
-            // Regular users can get their own activities. Admins can get everyone's activities.
-            if (currUserId != activity.OwnerId && !(await _userService.IsAdmin(currUserId)))
-            {
-                throw new UnauthorizedAccessException("The user is not authorized to get an activity of another user");
-            }
-
             if (activity == null)
             {
                 return null;
+            }
+
+            // Regular users can get their own activities. Admins can get everyone's activities.
+            if (currUserId != activity.OwnerId && !(await _userService.IsAdmin(currUserId)))
+            {
+                throw new ForbiddenException();
             }
 
             // Convert entity to DTO and return
@@ -73,7 +74,7 @@ namespace ActivityTrackerApp.Services
             // Regular users can create their own activities. Admins can create activities for anyone.
             if (currUserId != ownerId && !(await _userService.IsAdmin(currUserId)))
             {
-                throw new UnauthorizedAccessException("The user is not authorized to create an activity for another user");
+                throw new ForbiddenException();
             }
 
             // Convert DTO to entity
@@ -99,16 +100,16 @@ namespace ActivityTrackerApp.Services
             // Get active activity with ID
             var activity = await _getActiveActivity(activityId);
             
-            // Regular users can update their own activities. Admins can update anyone's activities.
-            if (currUserId != activity.OwnerId && !(await _userService.IsAdmin(currUserId)))
-            {
-                throw new UnauthorizedAccessException("The user is not authorized to update this activity");
-            }
-
             // Return if activity doesn't exist (or the user was soft deleted)
             if (activity == null)
             {
                 return null;
+            }
+
+            // Regular users can update their own activities. Admins can update anyone's activities.
+            if (currUserId != activity.OwnerId && !(await _userService.IsAdmin(currUserId)))
+            {
+                throw new ForbiddenException();
             }
 
             // Update fields
@@ -156,16 +157,16 @@ namespace ActivityTrackerApp.Services
             // Get active activity with ID
             var activity = await _getActiveActivity(activityId);
 
+            // Return if activity doesn't exist (or the activity was already soft deleted)
+            if (activity == null)
+            {
+                return false;
+            }
+
             // Regular users can delete their own activities. Admins can delete anyone's activities.
             if (currUserId != activity.OwnerId && !(await _userService.IsAdmin(currUserId)))
             {
-                throw new UnauthorizedAccessException("The user is not authorized to delete this activity");
-            }
-
-            // Return if session doesn't exist (or the session was already soft deleted)
-            if (activityId == null)
-            {
-                return false;
+                throw new ForbiddenException("The user is not authorized to delete this activity");
             }
 
             // Soft delete the activity

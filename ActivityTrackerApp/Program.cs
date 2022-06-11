@@ -37,7 +37,7 @@ try
     })
     .AddJwtBearer(jwt => {
         // Used to encrypt our JWT tokens
-        var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Secret"]);
+        var key = Encoding.UTF8.GetBytes(builder.Configuration[GlobalConstants.JWT_SECRET_KEY_NAME]);
 
         // Set up encryption settings
         jwt.SaveToken = true;
