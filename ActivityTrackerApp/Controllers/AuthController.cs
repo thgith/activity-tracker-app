@@ -53,7 +53,13 @@ namespace ActivityTrackerApp.Controllers
                 }
 
                 var userRegisterDtoWithToken = await _userService.RegisterUserAsync(userRegisterDto);
-        
+                
+                // Add token to user's cookies
+                Response.Cookies.Append("jwt", userRegisterDtoWithToken.Token, new CookieOptions
+                {
+                    HttpOnly = true
+                });
+
                 return Ok(userRegisterDtoWithToken.Token);
             }
             catch (Exception e)
@@ -92,11 +98,36 @@ namespace ActivityTrackerApp.Controllers
                     return BadRequest("Incorrect username/password combination");
                 }
 
+                // Add token to user's cookies
+                Response.Cookies.Append("jwt", userPutDtoWithToken.Token, new CookieOptions
+                {
+                    HttpOnly = true
+                });
+
+                // TODO prob not return token
                 return Ok(userPutDtoWithToken.Token);
             }
             catch (Exception e)
             {
                 var message = $"There was an error logging in: {e.Message}";
+                _logger.LogError(message, e.StackTrace);
+                return Problem(message, statusCode: 500);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("logout")]
+        public async Task<ActionResult> Logout()
+        {
+            try
+            {
+                // Remove token from user's cookies
+                Response.Cookies.Delete("jwt");
+                return Ok("Successfully logged out");
+            }
+            catch (Exception e)
+            {
+                var message = $"There was an error logging out: {e.Message}";
                 _logger.LogError(message, e.StackTrace);
                 return Problem(message, statusCode: 500);
             }
