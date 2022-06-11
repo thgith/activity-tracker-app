@@ -40,8 +40,7 @@ namespace ActivityTrackerApp.Controllers
             try
             {
                 // Check permissions
-                var jwt = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                var authErr = await _checkAuthenticationAndAuthorization(jwt, null);
+                var authErr = await _checkAuthenticatedAndAuthorized(Request, null);
                 if (authErr != null)
                 {
                     return authErr;
@@ -53,8 +52,8 @@ namespace ActivityTrackerApp.Controllers
             }
             catch (Exception e)
             {
-                var message = $"There was an error getting the users: {e.Message}";
-                _logger.LogError(message, e.StackTrace);
+                var message = $"There was an error getting the users";
+                _logger.LogError(message, e.Message, e.StackTrace);
                 return Problem(message, statusCode: 500);
             }
         }
@@ -69,8 +68,7 @@ namespace ActivityTrackerApp.Controllers
             try
             {
                 // Check permissions
-                var jwt = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                var authErr = await _checkAuthenticationAndAuthorization(jwt, userId);
+                var authErr = await _checkAuthenticatedAndAuthorized(Request, userId);
                 if (authErr != null)
                 {
                     return authErr;
@@ -86,42 +84,10 @@ namespace ActivityTrackerApp.Controllers
             }
             catch (Exception e)
             {
-                var message = $"There was an error getting the user with ID {userId}: {e.Message}";
-                _logger.LogError(message, e.StackTrace);
+                var message = $"There was an error getting the user with ID {userId}";
+                _logger.LogError(message, e.Message, e.StackTrace);
                 return Problem(message);
             }
-        }
-
-        private async Task<ActionResult> _checkAuthenticationAndAuthorization(string jwt, Guid? userId, bool allowIfSameUser = true)
-        {
-            if (jwt == null)
-            {
-                return Unauthorized("You are not properly authenticated");
-            }
-
-            // Verify that the token is still valid
-            JwtSecurityToken token;
-            try
-            {
-                token = _jwtService.Verify(jwt);
-            }
-            catch (Exception e)
-            {
-                return Unauthorized("You are not properly authenticated");
-            }
-
-            // Check if user has permission
-            token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var currentUserId);
-            var currentUserIdStr = currentUserId as string;
-            Guid.TryParse(currentUserIdStr, out var currentUserGuid);
-
-            var isCurrUserAuthorized = await _userService.IsCurrentUserAuthorized(currentUserGuid, userId, allowIfSameUser);
-            if (!isCurrUserAuthorized)
-            {
-                return Forbid("You are not authorized to access this");
-            }
-            
-            return null;
         }
 
         /// <inheritdoc/>
@@ -130,13 +96,17 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateUserAsync(Guid userId, [FromBody] UserUpdateDto userPutDto)
+        public async Task<IActionResult> UpdateUserAsync(
+            Guid userId,
+            [FromBody] UserUpdateDto userPutDto)
         {
             try
             {
                 // Check permissions
-                var jwt = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                var authErr = await _checkAuthenticationAndAuthorization(jwt, userId, allowIfSameUser: true);
+                var authErr = await _checkAuthenticatedAndAuthorized(
+                                        Request,
+                                        userId,
+                                        allowIfSameUser: true);
                 if (authErr != null)
                 {
                     return authErr;
@@ -158,8 +128,8 @@ namespace ActivityTrackerApp.Controllers
             }
             catch (Exception e)
             {
-                var message = $"There was an error creating the user: {e.Message}";
-                _logger.LogError(message, e.StackTrace);
+                var message = "There was an error creating the user";
+                _logger.LogError(message, e.Message, e.StackTrace);
                 return Problem(message, statusCode: 500);
             }
         }
@@ -174,8 +144,10 @@ namespace ActivityTrackerApp.Controllers
             try
             {
                 // Check permissions
-                var jwt = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                var authErr = await _checkAuthenticationAndAuthorization(jwt, userId, allowIfSameUser: true);
+                var authErr = await _checkAuthenticatedAndAuthorized(
+                                        Request,
+                                        userId,
+                                        allowIfSameUser: true);
                 if (authErr != null)
                 {
                     return authErr;
@@ -191,10 +163,48 @@ namespace ActivityTrackerApp.Controllers
             }
             catch (Exception e)
             {
-                var message = $"There was a problem deleting the user with ID {userId}: {e.Message}";
-                _logger.LogError(message, e.StackTrace);
+                var message = $"There was a problem deleting the user with ID {userId}";
+                _logger.LogError(message, e.Message, e.StackTrace);
                 return Problem(message, statusCode: 500);
             }
+        }
+        
+        private async Task<ActionResult> _checkAuthenticatedAndAuthorized(
+            HttpRequest request,
+            Guid? userIdOfResource,
+            bool allowIfSameUser = true)
+        {
+            // Get JWT info from cookie. Should be stored from login/registration
+            var jwtCookie = request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
+            if (jwtCookie == null)
+            {
+                return Unauthorized("You are not properly authenticated");
+            }
+
+            // Verify that the token is still valid
+            JwtSecurityToken token;
+            try
+            {
+                token = _jwtService.Verify(jwtCookie);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                return Unauthorized("You are not properly authenticated");
+            }
+
+            // Check if user has permission
+            token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var currentUserId);
+            var currentUserIdStr = currentUserId as string;
+            Guid.TryParse(currentUserIdStr, out var currentUserGuid);
+
+            var isCurrUserAuthorized = await _userService.IsCurrentUserAuthorized(currentUserGuid, userIdOfResource, allowIfSameUser);
+            if (!isCurrUserAuthorized)
+            {
+                return Forbid("You are not authorized to access this");
+            }
+            
+            return null;
         }
     }
 }
