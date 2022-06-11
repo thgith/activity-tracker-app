@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using System.Text;
+using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Database;
 using ActivityTrackerApp.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -62,6 +64,7 @@ try
     services.AddScoped<IActivityService, ActivityService>();
     services.AddScoped<ISessionService, SessionService>();
     services.AddScoped<IUserService, UserService>();
+    services.AddScoped<IJwtService, JwtService>();
     services.AddScoped<IHelperMethods, HelperMethods>();
 
     services.AddControllers();

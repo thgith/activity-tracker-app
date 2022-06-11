@@ -1,12 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace ActivityTrackerApp.Services
 {
@@ -16,17 +12,29 @@ namespace ActivityTrackerApp.Services
     public class UserService : IUserService
     {
         private readonly IDataContext _dbContext;
+        private readonly IJwtService _jwtService;
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
 
         public UserService(
             IDataContext dataContext,
+            IJwtService jwtService,
             IConfiguration config,
             IMapper mapper)
         {
             _dbContext = dataContext ?? throw new ArgumentNullException(nameof(dataContext));
+            _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
+
+        public async Task<bool> IsAdmin(Guid userId)
+        {
+            return await _dbContext.Users
+                .AnyAsync(x => 
+                x.Id == userId && 
+                x.DateDeleted == null &&
+                x.Role == Roles.ADMIN);
         }
 
         public async Task<EntityWithToken<UserRegisterDto>> RegisterUserAsync(UserRegisterDto userRegisterDto)
@@ -35,7 +43,7 @@ namespace ActivityTrackerApp.Services
             return new EntityWithToken<UserRegisterDto>()
             {
                 Entity = userRegisterDto,
-                Token = _generateJwtToken(user)
+                Token = _jwtService.GenerateJwtToken(user)
             };
         }
 
@@ -60,7 +68,7 @@ namespace ActivityTrackerApp.Services
             return new EntityWithToken<UserUpdateDto>()
             {
                 Entity = userPutDto,
-                Token = _generateJwtToken(user)
+                Token = _jwtService.GenerateJwtToken(user)
             };
         }
 
@@ -93,30 +101,6 @@ namespace ActivityTrackerApp.Services
 
             // Convert entity to DTO and return
             return _mapper.Map<UserGetDto>(user);
-        }
-
-        private async Task<User> _createUserAsync(UserRegisterDto userRegisterDto)
-        {
-            // Convert DTO to entity
-            var user =  _mapper.Map<User>(userRegisterDto);
-
-            // Auto set join date
-            user.DateJoined = DateTime.UtcNow;
-
-            // Hash password for security
-            // TODO add salt
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userRegisterDto.Password);
-
-            // TODO make Roles class
-            user.Role = Roles.MEMBER;
-
-            // Add user
-            await _dbContext.Users.AddAsync(user);
-
-            // Save to DB
-            await _dbContext.SaveChangesAsync();
-
-            return user;
         }
 
         public async Task<bool> IsEmailTaken(string email)
@@ -160,7 +144,7 @@ namespace ActivityTrackerApp.Services
 
             if (user.PasswordHash != null)
             {
-                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(userPutDto.Password);
+                user.PasswordHash = _hashPassword(userPutDto.Password);
             }
 
             // Save to DB
@@ -195,6 +179,28 @@ namespace ActivityTrackerApp.Services
             return await _dbContext.SaveChangesAsync() > 0;
         }
 
+        private async Task<User> _createUserAsync(UserRegisterDto userRegisterDto)
+        {
+            // Convert DTO to entity
+            var user =  _mapper.Map<User>(userRegisterDto);
+
+            // Auto set join date
+            user.DateJoined = DateTime.UtcNow;
+
+            // Hash password for security
+            user.PasswordHash = _hashPassword(userRegisterDto.Password);
+
+            user.Role = Roles.MEMBER;
+
+            // Add user
+            await _dbContext.Users.AddAsync(user);
+
+            // Save to DB
+            await _dbContext.SaveChangesAsync();
+
+            return user;
+        }
+
         /// <summary>
         /// Gets the active user with the ID.
         /// </summary>
@@ -206,32 +212,10 @@ namespace ActivityTrackerApp.Services
                 .FirstOrDefaultAsync(x => x.Id == userId && x.DateDeleted == null);
         }
 
-        private string _generateJwtToken(User user)
+        private string _hashPassword(string password)
         {
-            // Get key in config
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("JwtConfig:Secret"));
-            
-            // Create credentials with key and selected signing algorithm
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            // Claims are to store data about user/process
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.GivenName, user.FirstName),
-                new Claim(ClaimTypes.Surname, user.LastName),
-                new Claim(ClaimTypes.Role, user.Role)
-            };
-
-            var token = new JwtSecurityToken(
-                _config["JwtConfig:Issuer"],
-                _config["JwtConfig:Audience"],
-                claims,
-                expires: DateTime.UtcNow.AddMinutes(15),
-                signingCredentials: credentials);
-            
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            // TODO move this to env var
+            return BCrypt.Net.BCrypt.HashPassword(password, _config["PasswordHashSalt"]);
         }
     }
 }

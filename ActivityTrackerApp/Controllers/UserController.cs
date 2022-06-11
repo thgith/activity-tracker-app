@@ -1,8 +1,13 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ActivityTrackerApp.Controllers
 {
@@ -14,21 +19,23 @@ namespace ActivityTrackerApp.Controllers
     public class UserController : ApiControllerBase, IUserController
     {
         private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
         private readonly IHelperMethods _helperService;
-        private readonly ILogger _logger;
+        private readonly ILogger<UserController> _logger;
 
         public UserController(
             IUserService userService,
+            IJwtService jwtService,
             IHelperMethods helperService,
-            ILogger logger)
+            ILogger<UserController> logger)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
             _helperService = helperService ?? throw new ArgumentNullException(nameof(helperService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc/>
-        [Authorize]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -36,6 +43,31 @@ namespace ActivityTrackerApp.Controllers
         {
             try
             {
+                // Get the JWT cookie
+                var jwt = Request.Cookies["jwt"];
+
+                // The user has not logged in yet
+                if (jwt == null)
+                {
+                    return Unauthorized("You are unauthorized to access this endpoint");
+                }
+
+                // Verify that the token is still valid
+                var token = _jwtService.Verify(jwt);
+
+                // Make sure the current user has access to the requested user
+                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var storedUserId);
+                var currentUserIdStr = storedUserId as string;
+
+                // If the user is neither an admin or getting their info
+                Guid.TryParse(currentUserIdStr, out var currentUserGuid);
+
+                var isAdmin = await _userService.IsAdmin(currentUserGuid);
+                if (!isAdmin)
+                {
+                    return Unauthorized("The current user is not authorized to get this user");
+                }
+
                 var usersDtos = await _userService.GetAllUsersAsync();
                 return Ok(usersDtos);
             }
@@ -48,7 +80,6 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
-        [Authorize]
         [HttpGet("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -57,6 +88,31 @@ namespace ActivityTrackerApp.Controllers
         {
             try
             {
+                // Get the JWT cookie
+                var jwt = Request.Cookies["jwt"];
+
+                // The user has not logged in yet
+                if (jwt == null)
+                {
+                    return Unauthorized("You are unauthorized to access this endpoint");
+                }
+
+                // Verify that the token is still valid
+                var token = _jwtService.Verify(jwt);
+
+                // Make sure the current user has access to the requested user
+                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var storedUserId);
+                var currentUserIdStr = storedUserId as string;
+
+                // If the user is neither an admin or getting their info
+                Guid.TryParse(currentUserIdStr, out var currentUserGuid);
+
+                var isAdmin = await _userService.IsAdmin(currentUserGuid);
+                if (!isAdmin && currentUserIdStr != userId.ToString())
+                {
+                    return Unauthorized("The current user is not authorized to get this user");
+                }
+
                 var user = await _userService.GetUserAsync(userId);
                 if (user == null)
                 {
@@ -73,7 +129,6 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
-        [Authorize]
         [HttpPut("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -81,6 +136,31 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutAsync(Guid userId, [FromBody] UserUpdateDto userPutDto)
         {
+            // Get the JWT cookie
+            var jwt = Request.Cookies["jwt"];
+
+            // The user has not logged in yet
+            if (jwt == null)
+            {
+                return Unauthorized("You are unauthorized to access this endpoint");
+            }
+            
+            // Verify that the token is still valid
+            var token = _jwtService.Verify(jwt);
+
+            // Make sure the current user has access to the requested user
+            token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var storedUserId);
+            var currentUserIdStr = storedUserId as string;
+
+            Guid.TryParse(currentUserIdStr, out var currentUserGuid);
+            var isAdmin = await _userService.IsAdmin(currentUserGuid);
+
+            // If the user is neither an admin or getting their info, return
+            if (!isAdmin && currentUserIdStr != userId.ToString())
+            {
+                return Unauthorized("The current user is not authorized to get this user");
+            }
+
             if (userPutDto.Email != null && !_helperService.IsEmailValid(userPutDto.Email))
             {
                 return BadRequest("Invalid Email");
@@ -104,7 +184,6 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
-        [Authorize]
         [HttpDelete("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

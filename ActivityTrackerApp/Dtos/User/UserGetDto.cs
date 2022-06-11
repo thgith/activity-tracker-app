@@ -8,8 +8,6 @@ namespace ActivityTrackerApp.Dtos
 
         public string Email { get; set; }
 
-        public string Password { get; set; }
-
         public DateTime? DateJoined { get; set; }
 
         public DateTime? DateDeleted { get; set; }
