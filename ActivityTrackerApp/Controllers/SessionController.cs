@@ -9,45 +9,46 @@ namespace ActivityTrackerApp.Controllers
     /// Session endpoints.
     /// </summary>
     [Route("api/v1/[controller]")]
-    public class SessionController : ApiControllerBase, ISessiController
+    public class SessionController : ApiControllerBase<SessionController>
     {
         private readonly ISessionService _sessionService;
-        private readonly ILogger _logger;
 
         public SessionController(
+            IUserService userService,
+            IJwtService jwtService,
             ISessionService sessionService,
-            ILogger logger)
+            ILogger<SessionController> logger) : base(userService, jwtService, logger)
         {
             _sessionService = sessionService ?? throw new ArgumentNullException(nameof(sessionService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        [Authorize]
-        public Task<IActionResult> DeleteAsync(Guid sessionId)
+        public Task<ActionResult<IEnumerable<SessionDto>>> GetAllSessionsAsync()
         {
             throw new NotImplementedException();
         }
 
-        [Authorize]
-        public Task<ActionResult<IEnumerable<SessionDto>>> GetAllAsync()
+        public Task<ActionResult<SessionDto>> GetSessionAsync(Guid sessionId)
         {
             throw new NotImplementedException();
         }
 
-        [Authorize]
-        public Task<ActionResult<SessionDto>> GetAsync(Guid sessionId)
+        public Task<ActionResult> CreateSessionAsync(SessionPostDto sessionPostDto)
         {
             throw new NotImplementedException();
         }
 
-        [Authorize]
-        public Task<ActionResult> PostAsync(SessionPostDto sessionPostDto)
+        public Task<IActionResult> UpdateSessionAsync(Guid sessionId, SessionPutDto sessionPutDto)
         {
             throw new NotImplementedException();
         }
 
-        [Authorize]
-        public Task<IActionResult> PutAsync(Guid sessionId, SessionPutDto sessionPutDto)
+        [HttpDelete("{sessionId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public Task<IActionResult> DeleteSessionAsync(Guid sessionId)
         {
             throw new NotImplementedException();
         }

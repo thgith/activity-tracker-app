@@ -1,7 +1,6 @@
 using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Services;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,23 +11,17 @@ namespace ActivityTrackerApp.Controllers
     /// Endpoint will be: api/v1/Auth
     /// </summary>
     [Route("api/v1/[controller]")]
-    public class AuthController : ApiControllerBase
+    public class AuthController : ApiControllerBase<AuthController>
     {
-        private readonly IUserService _userService;
         private readonly IHelperService _helperService;
-        private readonly IMapper _mapper;
-        private readonly ILogger<AuthController> _logger;
 
         public AuthController(
             IUserService userService,
+            IJwtService jwtService,
             IHelperService helperService,
-            IMapper mapper,
-            ILogger<AuthController> logger)
+            ILogger<AuthController> logger) : base(userService, jwtService, logger)
         {
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _helperService = helperService ?? throw new ArgumentNullException(nameof(helperService));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc/>
@@ -47,12 +40,12 @@ namespace ActivityTrackerApp.Controllers
                     return BadRequest("Invalid Email");
                 }
 
-                if (await _userService.IsEmailTaken(userRegisterDto.Email))
+                if (await userService.IsEmailTaken(userRegisterDto.Email))
                 {
                     return BadRequest("Email already taken");
                 }
 
-                var userRegisterDtoWithToken = await _userService.RegisterUserAsync(userRegisterDto);
+                var userRegisterDtoWithToken = await userService.RegisterUserAsync(userRegisterDto);
                 
                 // Add token to user's cookies
                 Response.Cookies.Append(GlobalConstants.JWT_TOKEN_COOKIE_NAME, userRegisterDtoWithToken.Token, new CookieOptions
@@ -64,8 +57,8 @@ namespace ActivityTrackerApp.Controllers
             }
             catch (Exception e)
             {
-                var message = $"There was an error logging in: {e.Message}";
-                _logger.LogError(message, e.StackTrace);
+                var message = $"There was an error registering";
+                logger.LogError(message, e.Message, e.StackTrace);
                 return Problem(message, statusCode: 500);
             }
         }
@@ -86,12 +79,12 @@ namespace ActivityTrackerApp.Controllers
                     BadRequest("Invalid Email");
                 }
 
-                if (await _userService.IsEmailTaken(userPutDto.Email))
+                if (await userService.IsEmailTaken(userPutDto.Email))
                 {
                     BadRequest("Email already taken");
                 }
 
-                var userPutDtoWithToken = await _userService.AuthenticateUserAsync(userPutDto);
+                var userPutDtoWithToken = await userService.AuthenticateUserAsync(userPutDto);
 
                 if (userPutDtoWithToken == null)
                 {
@@ -108,8 +101,8 @@ namespace ActivityTrackerApp.Controllers
             }
             catch (Exception e)
             {
-                var message = $"There was an error logging in: {e.Message}";
-                _logger.LogError(message, e.StackTrace);
+                var message = $"There was an error logging in";
+                logger.LogError(message, e.Message, e.StackTrace);
                 return Problem(message, statusCode: 500);
             }
         }
@@ -128,8 +121,8 @@ namespace ActivityTrackerApp.Controllers
             }
             catch (Exception e)
             {
-                var message = $"There was an error logging out: {e.Message}";
-                _logger.LogError(message, e.StackTrace);
+                var message = $"There was an error logging out";
+                logger.LogError(message, e.Message, e.StackTrace);
                 return Problem(message, statusCode: 500);
             }
         }

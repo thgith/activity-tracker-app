@@ -12,49 +12,44 @@ namespace ActivityTrackerApp.Controllers
     /// </summary>
     [Route("api/v1/[controller]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class ActivityController : ApiControllerBase, IActivityController
+    public class ActivityController : ApiControllerBase<ActivityController>, IActivityController
     {        
         private readonly IActivityService _activityService;
-        private readonly ILogger _logger;
 
         public ActivityController(
+            IUserService userService,
+            IJwtService jwtService,
             IActivityService activityService,
-            ILogger logger)
+            ILogger<ActivityController> logger) : base(userService, jwtService, logger)
         {
             _activityService = activityService ?? throw new ArgumentNullException(nameof(activityService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <inheritdoc/>
-        [Authorize]
         public Task<IActionResult> DeleteAsync(Guid activityId)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        [Authorize]
         public Task<ActionResult<IEnumerable<ActivityDto>>> GetAllAsync()
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        [Authorize]
         public Task<ActionResult<ActivityDto>> GetAsync(Guid activityId)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        [Authorize]
         public Task<ActionResult> PostAsync(ActivityPostDto activityPostDto)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
-        [Authorize]
         public Task<IActionResult> PutAsync(Guid activityId, ActivityPutDto activityPutDto)
         {
             throw new NotImplementedException();
