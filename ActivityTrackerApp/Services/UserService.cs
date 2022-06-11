@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
@@ -26,6 +28,46 @@ namespace ActivityTrackerApp.Services
             _jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
+
+        public async Task<bool> IsCurrentUserAuthenticated(string jwt)
+        {
+            // The user has not logged in yet
+            if (jwt == null)
+            {
+                return false;
+            }
+
+            // Verify that the token is still valid
+            // TODO prob fix this return
+            var token = _jwtService.Verify(jwt);
+
+            return true;
+        }
+
+        public async Task<bool> IsCurrentUserAuthorized(
+            Guid currentUserId, 
+            Guid? userIdOfResource,
+            bool allowIfSameUser)
+        {
+            // Admin always allowed
+            if (await IsAdmin(currentUserId))
+            {
+                return true;
+            }
+
+            if (userIdOfResource == null)
+            {
+                return false;
+            }
+
+            // Same user acting on their info
+            if (allowIfSameUser && currentUserId.ToString() == userIdOfResource.ToString())
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public async Task<bool> IsAdmin(Guid userId)

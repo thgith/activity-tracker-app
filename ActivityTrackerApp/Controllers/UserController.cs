@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
@@ -15,13 +16,13 @@ namespace ActivityTrackerApp.Controllers
     {
         private readonly IUserService _userService;
         private readonly IJwtService _jwtService;
-        private readonly IHelperMethods _helperService;
+        private readonly IHelperService _helperService;
         private readonly ILogger<UserController> _logger;
 
         public UserController(
             IUserService userService,
             IJwtService jwtService,
-            IHelperMethods helperService,
+            IHelperService helperService,
             ILogger<UserController> logger)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -34,35 +35,19 @@ namespace ActivityTrackerApp.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<UserGetDto>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<UserGetDto>>> GetAllUsersAsync()
         {
             try
             {
-                // Get the JWT cookie
+                // Check permissions
                 var jwt = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-
-                // The user has not logged in yet
-                if (jwt == null)
+                var authErr = await _checkAuthenticationAndAuthorization(jwt, null);
+                if (authErr != null)
                 {
-                    return Unauthorized("You are unauthorized to access this endpoint");
+                    return authErr;
                 }
 
-                // Verify that the token is still valid
-                var token = _jwtService.Verify(jwt);
-
-                // Make sure the current user has access to the requested user
-                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var storedUserId);
-                var currentUserIdStr = storedUserId as string;
-
-                // If the user is neither an admin or getting their info
-                Guid.TryParse(currentUserIdStr, out var currentUserGuid);
-
-                var isAdmin = await _userService.IsAdmin(currentUserGuid);
-                if (!isAdmin)
-                {
-                    return Unauthorized("The current user is not authorized to access this endpoint");
-                }
-
+                // Get all users
                 var usersDtos = await _userService.GetAllUsersAsync();
                 return Ok(usersDtos);
             }
@@ -79,35 +64,19 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UserGetDto>> GetAsync(Guid userId)
+        public async Task<ActionResult<UserGetDto>> GetUserAsync(Guid userId)
         {
             try
             {
-                // Get the JWT cookie
+                // Check permissions
                 var jwt = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-
-                // The user has not logged in yet
-                if (jwt == null)
+                var authErr = await _checkAuthenticationAndAuthorization(jwt, userId);
+                if (authErr != null)
                 {
-                    return Unauthorized("You are unauthorized to access this endpoint");
+                    return authErr;
                 }
 
-                // Verify that the token is still valid
-                var token = _jwtService.Verify(jwt);
-
-                // Make sure the current user has access to the requested user
-                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var storedUserId);
-                var currentUserIdStr = storedUserId as string;
-
-                // If the user is neither an admin or getting their info
-                Guid.TryParse(currentUserIdStr, out var currentUserGuid);
-
-                var isAdmin = await _userService.IsAdmin(currentUserGuid);
-                if (!isAdmin && currentUserIdStr != userId.ToString())
-                {
-                    return Unauthorized("The current user is not authorized to access this endpoint");
-                }
-
+                // Get user
                 var user = await _userService.GetUserAsync(userId);
                 if (user == null)
                 {
@@ -123,46 +92,63 @@ namespace ActivityTrackerApp.Controllers
             }
         }
 
+        private async Task<ActionResult> _checkAuthenticationAndAuthorization(string jwt, Guid? userId, bool allowIfSameUser = true)
+        {
+            if (jwt == null)
+            {
+                return Unauthorized("You are not properly authenticated");
+            }
+
+            // Verify that the token is still valid
+            JwtSecurityToken token;
+            try
+            {
+                token = _jwtService.Verify(jwt);
+            }
+            catch (Exception e)
+            {
+                return Unauthorized("You are not properly authenticated");
+            }
+
+            // Check if user has permission
+            token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var currentUserId);
+            var currentUserIdStr = currentUserId as string;
+            Guid.TryParse(currentUserIdStr, out var currentUserGuid);
+
+            var isCurrUserAuthorized = await _userService.IsCurrentUserAuthorized(currentUserGuid, userId, allowIfSameUser);
+            if (!isCurrUserAuthorized)
+            {
+                return Forbid("You are not authorized to access this");
+            }
+            
+            return null;
+        }
+
         /// <inheritdoc/>
         [HttpPut("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutAsync(Guid userId, [FromBody] UserUpdateDto userPutDto)
+        public async Task<IActionResult> UpdateUserAsync(Guid userId, [FromBody] UserUpdateDto userPutDto)
         {
             try
             {
-                // Get the JWT cookie
+                // Check permissions
                 var jwt = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-
-                // The user has not logged in yet
-                if (jwt == null)
+                var authErr = await _checkAuthenticationAndAuthorization(jwt, userId, allowIfSameUser: true);
+                if (authErr != null)
                 {
-                    return Unauthorized("You are unauthorized to access this endpoint");
-                }
-                
-                // Verify that the token is still valid
-                var token = _jwtService.Verify(jwt);
-
-                // Make sure the current user has access to the requested user
-                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var storedUserId);
-                var currentUserIdStr = storedUserId as string;
-
-                Guid.TryParse(currentUserIdStr, out var currentUserGuid);
-                var isAdmin = await _userService.IsAdmin(currentUserGuid);
-
-                // If the user is neither an admin or getting their info, return
-                if (!isAdmin && currentUserIdStr != userId.ToString())
-                {
-                    return Unauthorized("The current user is not authorized to access this endpoint");
+                    return authErr;
                 }
 
+                // Check email
                 if (userPutDto.Email != null && !_helperService.IsEmailValid(userPutDto.Email))
                 {
                     return BadRequest("Invalid Email");
                 }
 
+                // Update user
                 var res = await _userService.UpdateUserAsync(userId, userPutDto);
                 if (res == null)
                 {
@@ -183,35 +169,19 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteAsync(Guid userId)
+        public async Task<IActionResult> DeleteUserAsync(Guid userId)
         {
             try
             {
-                // Get the JWT cookie
+                // Check permissions
                 var jwt = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-
-                // The user has not logged in yet
-                if (jwt == null)
+                var authErr = await _checkAuthenticationAndAuthorization(jwt, userId, allowIfSameUser: true);
+                if (authErr != null)
                 {
-                    return Unauthorized("You are unauthorized to access this endpoint");
-                }
-                
-                // Verify that the token is still valid
-                var token = _jwtService.Verify(jwt);
-
-                // Make sure the current user has access to the requested user
-                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var storedUserId);
-                var currentUserIdStr = storedUserId as string;
-
-                Guid.TryParse(currentUserIdStr, out var currentUserGuid);
-                var isAdmin = await _userService.IsAdmin(currentUserGuid);
-
-                // If the user is neither an admin or getting their info, return
-                if (!isAdmin && currentUserIdStr != userId.ToString())
-                {
-                    return Unauthorized("The current user is not authorized to access this endpoint");
+                    return authErr;
                 }
 
+                // Delete user
                 var result = await _userService.DeleteUserAsync(userId);
                 if (result)
                 {

@@ -1,6 +1,6 @@
 namespace ActivityTrackerApp.Services
 {
-    public interface IHelperMethods
+    public interface IHelperService
     {
         /// <summary>
         /// Determines whether the email is valid.

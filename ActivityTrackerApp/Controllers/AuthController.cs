@@ -15,15 +15,15 @@ namespace ActivityTrackerApp.Controllers
     public class AuthController : ApiControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IHelperMethods _helperService;
+        private readonly IHelperService _helperService;
         private readonly IMapper _mapper;
-        private readonly ILogger<UserController> _logger;
+        private readonly ILogger<AuthController> _logger;
 
         public AuthController(
             IUserService userService,
-            IHelperMethods helperService,
+            IHelperService helperService,
             IMapper mapper,
-            ILogger<UserController> logger)
+            ILogger<AuthController> logger)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _helperService = helperService ?? throw new ArgumentNullException(nameof(helperService));

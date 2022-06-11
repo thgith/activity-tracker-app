@@ -5,7 +5,7 @@ namespace ActivityTrackerApp.Services
     /// <summary>
     /// Helper methods class.
     /// </summary>
-    public class HelperMethods : IHelperMethods
+    public class HelperMethods : IHelperService
     {
         public HelperMethods()
         {
