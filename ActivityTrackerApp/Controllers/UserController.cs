@@ -1,13 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
+using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Services;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace ActivityTrackerApp.Controllers
 {
@@ -44,7 +39,7 @@ namespace ActivityTrackerApp.Controllers
             try
             {
                 // Get the JWT cookie
-                var jwt = Request.Cookies["jwt"];
+                var jwt = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
 
                 // The user has not logged in yet
                 if (jwt == null)
@@ -65,7 +60,7 @@ namespace ActivityTrackerApp.Controllers
                 var isAdmin = await _userService.IsAdmin(currentUserGuid);
                 if (!isAdmin)
                 {
-                    return Unauthorized("The current user is not authorized to get this user");
+                    return Unauthorized("The current user is not authorized to access this endpoint");
                 }
 
                 var usersDtos = await _userService.GetAllUsersAsync();
@@ -89,7 +84,7 @@ namespace ActivityTrackerApp.Controllers
             try
             {
                 // Get the JWT cookie
-                var jwt = Request.Cookies["jwt"];
+                var jwt = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
 
                 // The user has not logged in yet
                 if (jwt == null)
@@ -110,7 +105,7 @@ namespace ActivityTrackerApp.Controllers
                 var isAdmin = await _userService.IsAdmin(currentUserGuid);
                 if (!isAdmin && currentUserIdStr != userId.ToString())
                 {
-                    return Unauthorized("The current user is not authorized to get this user");
+                    return Unauthorized("The current user is not authorized to access this endpoint");
                 }
 
                 var user = await _userService.GetUserAsync(userId);
@@ -136,38 +131,38 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> PutAsync(Guid userId, [FromBody] UserUpdateDto userPutDto)
         {
-            // Get the JWT cookie
-            var jwt = Request.Cookies["jwt"];
-
-            // The user has not logged in yet
-            if (jwt == null)
-            {
-                return Unauthorized("You are unauthorized to access this endpoint");
-            }
-            
-            // Verify that the token is still valid
-            var token = _jwtService.Verify(jwt);
-
-            // Make sure the current user has access to the requested user
-            token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var storedUserId);
-            var currentUserIdStr = storedUserId as string;
-
-            Guid.TryParse(currentUserIdStr, out var currentUserGuid);
-            var isAdmin = await _userService.IsAdmin(currentUserGuid);
-
-            // If the user is neither an admin or getting their info, return
-            if (!isAdmin && currentUserIdStr != userId.ToString())
-            {
-                return Unauthorized("The current user is not authorized to get this user");
-            }
-
-            if (userPutDto.Email != null && !_helperService.IsEmailValid(userPutDto.Email))
-            {
-                return BadRequest("Invalid Email");
-            }
-
             try
             {
+                // Get the JWT cookie
+                var jwt = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
+
+                // The user has not logged in yet
+                if (jwt == null)
+                {
+                    return Unauthorized("You are unauthorized to access this endpoint");
+                }
+                
+                // Verify that the token is still valid
+                var token = _jwtService.Verify(jwt);
+
+                // Make sure the current user has access to the requested user
+                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var storedUserId);
+                var currentUserIdStr = storedUserId as string;
+
+                Guid.TryParse(currentUserIdStr, out var currentUserGuid);
+                var isAdmin = await _userService.IsAdmin(currentUserGuid);
+
+                // If the user is neither an admin or getting their info, return
+                if (!isAdmin && currentUserIdStr != userId.ToString())
+                {
+                    return Unauthorized("The current user is not authorized to access this endpoint");
+                }
+
+                if (userPutDto.Email != null && !_helperService.IsEmailValid(userPutDto.Email))
+                {
+                    return BadRequest("Invalid Email");
+                }
+
                 var res = await _userService.UpdateUserAsync(userId, userPutDto);
                 if (res == null)
                 {
@@ -192,6 +187,31 @@ namespace ActivityTrackerApp.Controllers
         {
             try
             {
+                // Get the JWT cookie
+                var jwt = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
+
+                // The user has not logged in yet
+                if (jwt == null)
+                {
+                    return Unauthorized("You are unauthorized to access this endpoint");
+                }
+                
+                // Verify that the token is still valid
+                var token = _jwtService.Verify(jwt);
+
+                // Make sure the current user has access to the requested user
+                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var storedUserId);
+                var currentUserIdStr = storedUserId as string;
+
+                Guid.TryParse(currentUserIdStr, out var currentUserGuid);
+                var isAdmin = await _userService.IsAdmin(currentUserGuid);
+
+                // If the user is neither an admin or getting their info, return
+                if (!isAdmin && currentUserIdStr != userId.ToString())
+                {
+                    return Unauthorized("The current user is not authorized to access this endpoint");
+                }
+
                 var result = await _userService.DeleteUserAsync(userId);
                 if (result)
                 {

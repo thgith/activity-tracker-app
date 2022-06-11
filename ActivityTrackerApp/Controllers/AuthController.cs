@@ -1,5 +1,5 @@
+using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
-using ActivityTrackerApp.Entities;
 using ActivityTrackerApp.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -32,8 +32,8 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
-        [AllowAnonymous]
         [HttpPost("register")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -55,12 +55,12 @@ namespace ActivityTrackerApp.Controllers
                 var userRegisterDtoWithToken = await _userService.RegisterUserAsync(userRegisterDto);
                 
                 // Add token to user's cookies
-                Response.Cookies.Append("jwt", userRegisterDtoWithToken.Token, new CookieOptions
+                Response.Cookies.Append(GlobalConstants.JWT_TOKEN_COOKIE_NAME, userRegisterDtoWithToken.Token, new CookieOptions
                 {
                     HttpOnly = true
                 });
 
-                return Ok(userRegisterDtoWithToken.Token);
+                return Ok("Successfully registered!");
             }
             catch (Exception e)
             {
@@ -71,8 +71,8 @@ namespace ActivityTrackerApp.Controllers
         }
 
         /// <inheritdoc/>
-        [AllowAnonymous]
         [HttpPost("login")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -99,13 +99,12 @@ namespace ActivityTrackerApp.Controllers
                 }
 
                 // Add token to user's cookies
-                Response.Cookies.Append("jwt", userPutDtoWithToken.Token, new CookieOptions
+                Response.Cookies.Append(GlobalConstants.JWT_TOKEN_COOKIE_NAME, userPutDtoWithToken.Token, new CookieOptions
                 {
                     HttpOnly = true
                 });
 
-                // TODO prob not return token
-                return Ok(userPutDtoWithToken.Token);
+                return Ok("Successfully logged in!");
             }
             catch (Exception e)
             {
@@ -115,14 +114,16 @@ namespace ActivityTrackerApp.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("logout")]
-        public async Task<ActionResult> Logout()
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public ActionResult Logout()
         {
             try
             {
                 // Remove token from user's cookies
-                Response.Cookies.Delete("jwt");
+                Response.Cookies.Delete(GlobalConstants.JWT_TOKEN_COOKIE_NAME);
                 return Ok("Successfully logged out");
             }
             catch (Exception e)
