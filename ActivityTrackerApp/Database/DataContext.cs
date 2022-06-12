@@ -30,18 +30,6 @@ namespace ActivityTrackerApp.Database
               .Entity<Activity>()
               .Property(e => e.Tags)
               .HasConversion(strListConverter).Metadata.SetValueComparer(strValueComparer);
-
-            // Convert the list of tags to a comma separated string to store in DB column
-            var intListConverter = new IntListToStringValueConverter();
-            var intValueComparer = new ValueComparer<IList<int>>(
-                (c1, c2) => c1.SequenceEqual(c2),
-                c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                c => c.ToList());
-
-            modelBuilder
-              .Entity<User>()
-              .Property(e => e.ActivityIds)
-              .HasConversion(intListConverter).Metadata.SetValueComparer(intValueComparer);
         }
     }
 }

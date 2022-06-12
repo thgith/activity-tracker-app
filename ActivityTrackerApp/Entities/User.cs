@@ -31,13 +31,14 @@ namespace ActivityTrackerApp.Entities
 
         public DateTime? DateDeleted { get; set; }
 
-        /// <summary>
-        /// The IDs of the user's activities.
-        /// </summary>
-        public IList<int> ActivityIds { get; set; }
-
         [Required]
         [MaxLength(50)]
         public string Role { get; set; }
+
+        /// <summary>
+        /// The IDs of the user's activities.
+        /// </summary>
+        [NotMapped]
+        public IList<int> ActivityIds { get; set; }
     }
 }

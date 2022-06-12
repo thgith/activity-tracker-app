@@ -65,16 +65,17 @@ namespace ActivityTrackerApp.Entities
 
         public DateTime? DateDeleted { get; set; }
 
-        /// <summary>
-        /// The sessions associated with the Activity
-        /// </summary>
-        public virtual IList<Session> Sessions { get; set; }
-
         [Required]
         public Guid OwnerId { get; set; }
 
         [ForeignKey("UserId")]
         public virtual User User { get; set; }
+
+        /// <summary>
+        /// The sessions associated with the Activity
+        /// </summary>
+        [NotMapped]
+        public IList<Session> Sessions { get; set; }
 
     }
 }
