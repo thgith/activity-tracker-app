@@ -13,13 +13,16 @@ namespace ActivityTrackerApp.Services
 
         Task<EntityWithToken<UserLoginDto>> AuthenticateUserAsync(UserLoginDto userLoginDto);
 
-        Task<EntityWithToken<UserRegisterDto>> RegisterUserAsync(UserRegisterDto userPostDto);
+        Task<EntityWithToken<UserRegisterDto>> RegisterUserAsync(UserRegisterDto newUserDto);
 
         Task<IEnumerable<UserGetDto>> GetAllUsersAsync(Guid currUserId);
 
         Task<UserGetDto> GetUserAsync(Guid currUserId, Guid userId);
 
-        Task<UserUpdateDto> UpdateUserAsync(Guid currUserId, Guid userId, UserUpdateDto user);
+        Task<UserUpdateDto> UpdateUserAsync(
+            Guid currUserId,
+            Guid userId,
+            UserUpdateDto updatedUserDto);
 
         Task<bool> DeleteUserAsync(Guid currUserId, Guid userId);
 
