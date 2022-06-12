@@ -240,7 +240,7 @@ namespace ActivityTrackerApp.Services
 
         private string _hashPassword(string password)
         {
-            return BCrypt.Net.BCrypt.HashPassword(password, _config[GlobalConstants.PASSWORD_HASH_SALT_KEY_NAME]);
+            return BCrypt.Net.BCrypt.HashPassword(password);
         }
     }
 }

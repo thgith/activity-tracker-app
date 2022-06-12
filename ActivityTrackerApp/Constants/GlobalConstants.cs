@@ -7,6 +7,5 @@ namespace ActivityTrackerApp.Constants
         public const string JWT_SECRET_KEY_NAME = "JwtConfig:Secret";
         public const string JWT_ISSUER_KEY_NAME = "JwtConfig:Issuer";
         public const string JWT_AUDIENCE_KEY_NAME = "JwtConfig:Audience";
-        public const string PASSWORD_HASH_SALT_KEY_NAME = "PasswordHashSalt";
     }
 }
