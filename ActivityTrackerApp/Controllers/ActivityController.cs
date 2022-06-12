@@ -65,11 +65,16 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateActivityAsync([FromBody] ActivityCreateDto activityPostDto)
+        public async Task<IActionResult> CreateActivityAsync(
+            [FromQuery] Guid userId,
+            [FromBody] ActivityCreateDto activityPostDto)
         {
             async Task<IActionResult> CreateActivityPartialAsync(Guid currUserGuid)
             {
-                await _activityService.CreateActivityAsync(currUserGuid, currUserGuid, activityPostDto);
+                await _activityService.CreateActivityAsync(
+                                            currUserGuid,
+                                            userId != null ? userId : currUserGuid,
+                                            activityPostDto);
                 return Ok(activityPostDto);
             }
             return await checkAuthAndPerformAction(Request, CreateActivityPartialAsync);

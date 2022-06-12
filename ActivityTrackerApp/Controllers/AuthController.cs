@@ -34,7 +34,7 @@ namespace ActivityTrackerApp.Controllers
         {
             try
             {
-                // Note: model annotation handle error checking for requirements
+                // Note: model annotations handle a lot of basic error checking
                 if (!_helperService.IsEmailValid(userRegisterDto.Email))
                 {
                     return BadRequest("Invalid Email");
@@ -59,7 +59,7 @@ namespace ActivityTrackerApp.Controllers
             {
                 var message = $"There was an error registering";
                 logger.LogError(message, e.Message, e.StackTrace);
-                return Problem(message, statusCode: 500);
+                return Problem(message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -73,7 +73,7 @@ namespace ActivityTrackerApp.Controllers
         {
             try
             {
-                // Note: model annotation handle error checking for requirements
+                // Note: model annotations handle a lot of error checking for requirements
                 if (!_helperService.IsEmailValid(userLoginDto.Email))
                 {
                     BadRequest("Invalid Email");
@@ -101,9 +101,9 @@ namespace ActivityTrackerApp.Controllers
             }
             catch (Exception e)
             {
-                var message = $"There was an error logging in";
+                var message = "There was an error logging in";
                 logger.LogError(message, e.Message, e.StackTrace);
-                return Problem(message, statusCode: 500);
+                return Problem(message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
 
@@ -121,9 +121,9 @@ namespace ActivityTrackerApp.Controllers
             }
             catch (Exception e)
             {
-                var message = $"There was an error logging out";
+                var message = "There was an error logging out";
                 logger.LogError(message, e.Message, e.StackTrace);
-                return Problem(message, statusCode: 500);
+                return Problem(message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
     }
