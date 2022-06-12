@@ -37,7 +37,7 @@ namespace ActivityTrackerApp.Services
             }
 
             var activities = await _dbContext.Activities
-                .Where(x => x.OwnerId == ownerId && x.DateDeleted == null)
+                .Where(x => x.OwnerId == ownerId && x.DateDeletedUtc == null)
                 .OrderBy(x => x.StartDateUtc)
                 .ToListAsync();       
             
@@ -83,6 +83,12 @@ namespace ActivityTrackerApp.Services
             // Set the owner of the activity
             activity.OwnerId = ownerId;
 
+            // Set default start date if not specified
+            if (newActivityDto.StartDateUtc == null || newActivityDto.StartDateUtc == DateTime.MinValue)
+            {
+                activity.StartDateUtc = DateTime.UtcNow;
+            }
+
             // Add activity
             await _dbContext.Activities.AddAsync(activity);
 
@@ -121,15 +127,15 @@ namespace ActivityTrackerApp.Services
             {
                 activity.Description = updatedActivityDto.Description;
             }
-            if (updatedActivityDto.DueDateUtc != null)
+            if (updatedActivityDto.DueDateUtc != null && updatedActivityDto.DueDateUtc != DateTime.MinValue)
             {
                 activity.DueDateUtc = updatedActivityDto.DueDateUtc;
             }
-            if (updatedActivityDto.CompleteDateUtc != null)
+            if (updatedActivityDto.CompleteDateUtc != null && updatedActivityDto.CompleteDateUtc != DateTime.MinValue)
             {
                 activity.CompleteDateUtc = updatedActivityDto.CompleteDateUtc;
             }
-            if (updatedActivityDto.ArchiveDateUtc != null)
+            if (updatedActivityDto.ArchiveDateUtc != null  && updatedActivityDto.ArchiveDateUtc != DateTime.MinValue)
             {
                 activity.ArchiveDateUtc = updatedActivityDto.ArchiveDateUtc;
             }
@@ -170,7 +176,7 @@ namespace ActivityTrackerApp.Services
             }
 
             // Soft delete the activity
-            activity.DateDeleted = DateTime.UtcNow;
+            activity.DateDeletedUtc = DateTime.UtcNow;
 
             // Now, delete the sessions associated with the activity
             if (activity.Sessions != null && activity.Sessions.Count() > 0)
@@ -179,12 +185,12 @@ namespace ActivityTrackerApp.Services
                 var sessionsToDelete = _dbContext.Sessions.Where(x => 
                                             activity.Sessions.Select(x => x.Id)
                                             .Contains(x.Id) && 
-                                            x.DateDeleted == null);
+                                            x.DateDeletedUtc == null);
 
                 // Soft delete each session
                 foreach (var session in sessionsToDelete)
                 {
-                    session.DateDeleted = DateTime.UtcNow;
+                    session.DateDeletedUtc = DateTime.UtcNow;
                 }
             }
 
@@ -197,7 +203,7 @@ namespace ActivityTrackerApp.Services
         private async Task<Activity> _getActiveActivity(Guid activityId)
         {
             return await _dbContext.Activities
-                .FirstOrDefaultAsync(x => x.Id == activityId && x.DateDeleted == null);
+                .FirstOrDefaultAsync(x => x.Id == activityId && x.DateDeletedUtc == null);
         }
     }
 }

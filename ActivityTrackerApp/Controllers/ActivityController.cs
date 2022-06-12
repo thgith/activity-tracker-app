@@ -1,10 +1,5 @@
-using System.Security.Claims;
-using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
-using ActivityTrackerApp.Exceptions;
 using ActivityTrackerApp.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ActivityTrackerApp.Controllers
@@ -13,7 +8,6 @@ namespace ActivityTrackerApp.Controllers
     /// Activity endpoints.
     /// </summary>
     [Route("api/v1/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ActivityController : ApiControllerBase<ActivityController>
     {        
         private readonly IActivityService _activityService;
@@ -29,174 +23,100 @@ namespace ActivityTrackerApp.Controllers
 
         /// <inheritdoc/>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ActivityGetDto>>> GetAllActivitiesForUserAsync([FromBody] Guid userId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAllActivitiesForUserAsync([FromQuery] Guid userId)
         {
-            try
+            async Task<IActionResult> GetAllActivitiesForUserPartialAsync(Guid currUserGuid)
             {
-                // -- Verify the user is authenticated --
-                var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                var token = jwtService.CheckAuthenticated(jwtCookie);
-
-                // -- Get current user from token --
-                // We verified token above, so this data should be correct
-                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var currUserId);
-                var currUserIdStr = currUserId as string;
-                Guid.TryParse(currUserIdStr, out var currUserGuid);
-
-                // -- Try to get all activities  --
-                var activities = await _activityService.GetAllActivitiesForUserAsync(currUserGuid, currUserGuid);
+                var activities = await _activityService.GetAllActivitiesForUserAsync(currUserGuid, userId);
                 return Ok(activities);
             }
-            catch (UnauthenticatedException e)
-            {
-                return Unauthorized(e.Message);
-            }
-            catch (ForbiddenException e)
-            {
-                return Forbid(e.Message);
-            }
-            catch (Exception e)
-            {
-                return Problem($"There was a problem getting all the activities for {userId}", statusCode: 500);
-            }
+            return await checkAuthAndPerformAction(Request, GetAllActivitiesForUserPartialAsync);
         }
 
         /// <inheritdoc/>
         [HttpGet("{activityId}")]
-        public async Task<ActionResult<ActivityGetDto>> GetActivityAsync(Guid activityId)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetActivityAsync(Guid activityId)
         {
-            try
+            async Task<IActionResult> GetActivityPartialAsync(Guid currUserGuid)
             {
-                // -- Verify the user is authenticated --
-                var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                var token = jwtService.CheckAuthenticated(jwtCookie);
-
-                // -- Get current user from token --
-                // We verified token above, so this data should be correct
-                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var currUserId);
-                var currUserIdStr = currUserId as string;
-                Guid.TryParse(currUserIdStr, out var currUserGuid);
-
-                // -- Try to get --
                 var activityGetDto = await _activityService.GetActivityAsync(currUserGuid, activityId);
+                if (activityGetDto == null)
+                {
+                    return NotFound($"The activity with the ID {activityId} does not exist");
+                }
                 return Ok(activityGetDto);
             }
-            catch (UnauthenticatedException e)
-            {
-                return Unauthorized(e.Message);
-            }
-            catch (ForbiddenException e)
-            {
-                return Forbid(e.Message);
-            }
-            catch (Exception e)
-            {
-                return Problem($"There was a problem getting the activity {activityId}", statusCode: 500);
-            }
+            return await checkAuthAndPerformAction(Request, GetActivityPartialAsync);
         }
 
         /// <inheritdoc/>
         [HttpPost]
-        public async Task<ActionResult> CreateActivityAsync([FromBody] ActivityCreateDto activityPostDto)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CreateActivityAsync([FromBody] ActivityCreateDto activityPostDto)
         {
-            try
+            async Task<IActionResult> CreateActivityPartialAsync(Guid currUserGuid)
             {
-                // -- Verify the user is authenticated --
-                var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                var token = jwtService.CheckAuthenticated(jwtCookie);
-
-                // -- Get current user from token --
-                // We verified token above, so this data should be correct
-                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var currUserId);
-                var currUserIdStr = currUserId as string;
-                Guid.TryParse(currUserIdStr, out var currUserGuid);
-
-                // -- Try to create --
                 await _activityService.CreateActivityAsync(currUserGuid, currUserGuid, activityPostDto);
                 return Ok(activityPostDto);
             }
-            catch (UnauthenticatedException e)
-            {
-                return Unauthorized(e.Message);
-            }
-            catch (ForbiddenException e)
-            {
-                return Forbid(e.Message);
-            }
-            catch (Exception e)
-            {
-                return Problem("There was a problem creating the activity", statusCode: 500);
-            }
+            return await checkAuthAndPerformAction(Request, CreateActivityPartialAsync);
         }
 
         /// <inheritdoc/>
         [HttpPut("{activityId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateActivityAsync(
             Guid activityId,
-            [FromBody] ActivityUpdateDto activityPutDto)
+            [FromBody] ActivityUpdateDto activityUpdateDto)
         {
-            try
+            async Task<IActionResult> UpdateActivityPartialAsync(Guid currUserGuid)
             {
-                // -- Verify the user is authenticated --
-                var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                var token = jwtService.CheckAuthenticated(jwtCookie);
-
-                // -- Get current user from token --
-                // We verified token above, so this data should be correct
-                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var currUserId);
-                var currUserIdStr = currUserId as string;
-                Guid.TryParse(currUserIdStr, out var currUserGuid);
-
-                // -- Try to update --
-                await _activityService.UpdateActivityAsync(currUserGuid, activityId, activityPutDto);
-                return Ok(activityPutDto);
+                var activity = await _activityService.UpdateActivityAsync(currUserGuid, activityId, activityUpdateDto);
+                if (activity == null)
+                {
+                    return NotFound($"The activity with the ID {activityId} does not exist");
+                }
+                return Ok(activityUpdateDto);
             }
-            catch (UnauthenticatedException e)
-            {
-                return Unauthorized(e.Message);
-            }
-            catch (ForbiddenException e)
-            {
-                return Forbid(e.Message);
-            }
-            catch (Exception e)
-            {
-                return Problem($"There was a problem deleting the activity {activityId}", statusCode: 500);
-            }
+            return await checkAuthAndPerformAction(Request, UpdateActivityPartialAsync);
         }
 
         /// <inheritdoc/>
         [HttpDelete("{activityId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteActivityAsync(Guid activityId)
         {
-            try
+            async Task<IActionResult> DeleteActivityPartialAsync(Guid currUserGuid)
             {
-                // -- Verify the user is authenticated --
-                var jwtCookie = Request.Cookies[GlobalConstants.JWT_TOKEN_COOKIE_NAME];
-                var token = jwtService.CheckAuthenticated(jwtCookie);                
-
-                // -- Get current user from token --
-                // We verified token above, so this data should be correct
-                token.Payload.TryGetValue(ClaimTypes.NameIdentifier, out var currUserId);
-                var currUserIdStr = currUserId as string;
-                Guid.TryParse(currUserIdStr, out var currUserGuid);
-
-                // -- Try to delete --
-                await _activityService.DeleteActivityAsync(currUserGuid, activityId);
-                return Ok("Successfully deleted activity");
+                var isSuccess = await _activityService.DeleteActivityAsync(currUserGuid, activityId);
+                if (!isSuccess)
+                {
+                    return NotFound($"The activity with the ID {activityId} does not exist");
+                }
+                return Ok($"Successfully deleted activity {activityId}");
             }
-            catch (UnauthenticatedException e)
-            {
-                return Unauthorized(e.Message);
-            }
-            catch (ForbiddenException e)
-            {
-                return Forbid(e.Message);
-            }
-            catch (Exception e)
-            {
-                return Problem($"There was a problem deleting the activity {activityId}", statusCode: 500);
-            }
+            return await checkAuthAndPerformAction(Request, DeleteActivityPartialAsync);
         }    
     }
 }

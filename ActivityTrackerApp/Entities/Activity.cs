@@ -63,7 +63,7 @@ namespace ActivityTrackerApp.Entities
         [MaxLength(10)]
         public IList<string> Tags { get; set; }
 
-        public DateTime? DateDeleted { get; set; }
+        public DateTime? DateDeletedUtc { get; set; }
 
         [Required]
         public Guid OwnerId { get; set; }

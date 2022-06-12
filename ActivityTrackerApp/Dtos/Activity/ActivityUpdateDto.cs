@@ -21,6 +21,11 @@ namespace ActivityTrackerApp.Dtos
         public string? Description { get; set; }
 
         /// <summary>
+        /// The date the activity was started.
+        /// </summary>
+        public DateTime? StartDateUtc { get; set; }
+
+        /// <summary>
         /// The deadline the user set for the activity.
         /// </summary>
         public DateTime? DueDateUtc { get; set; }

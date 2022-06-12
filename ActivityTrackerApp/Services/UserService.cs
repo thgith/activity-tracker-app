@@ -43,7 +43,7 @@ namespace ActivityTrackerApp.Services
         {
             var user = await _dbContext.Users.SingleOrDefaultAsync(x => 
                 x.Email == userLoginDto.Email &&
-                x.DateDeleted == null);
+                x.DateDeletedUtc == null);
 
             // User with email doesn't exist
             if (user == null)
@@ -78,8 +78,8 @@ namespace ActivityTrackerApp.Services
 
             // Excludes deleted users
             var users = await _dbContext.Users
-                .Where(x => x.DateDeleted == null)
-                .OrderBy(x => x.DateJoined)
+                .Where(x => x.DateDeletedUtc == null)
+                .OrderBy(x => x.DateJoinedUtc)
                 .ToListAsync();       
             
             // Convert entity to DTO and return
@@ -181,7 +181,7 @@ namespace ActivityTrackerApp.Services
             }
 
             // Soft delete the user
-            user.DateDeleted = DateTime.UtcNow;
+            user.DateDeletedUtc = DateTime.UtcNow;
 
             // Save to DB
             // SaveChangesAsync returns the number of entries written to the DB
@@ -195,7 +195,7 @@ namespace ActivityTrackerApp.Services
             return await _dbContext.Users
                 .AnyAsync(x => 
                     x.Id == userId && 
-                    x.DateDeleted == null &&
+                    x.DateDeletedUtc == null &&
                     x.Role == Roles.ADMIN);
         }
 
@@ -211,7 +211,7 @@ namespace ActivityTrackerApp.Services
             var user =  _mapper.Map<User>(userRegisterDto);
 
             // Auto set join date
-            user.DateJoined = DateTime.UtcNow;
+            user.DateJoinedUtc = DateTime.UtcNow;
 
             // Hash password for security
             user.PasswordHash = _hashPassword(userRegisterDto.Password);
@@ -235,7 +235,7 @@ namespace ActivityTrackerApp.Services
         private async Task<User> _getActiveUser(Guid userId)
         {
             return await _dbContext.Users
-                .FirstOrDefaultAsync(x => x.Id == userId && x.DateDeleted == null);
+                .FirstOrDefaultAsync(x => x.Id == userId && x.DateDeletedUtc == null);
         }
 
         private string _hashPassword(string password)
