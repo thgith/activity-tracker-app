@@ -60,7 +60,7 @@ public class UserServiceTests
             FirstName = JANE_FIRST_NAME,
             LastName = COMMON_LAST_NAME,
             Email = JANE_EMAIL,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("oldpassword"),
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(COMMON_OLD_PASSWORD),
             JoinDateUtc = JANE_JOIN_DATE_UTC,
             DeletedDateUtc = null,
             Role = Roles.ADMIN
@@ -71,7 +71,7 @@ public class UserServiceTests
             FirstName = JOHN_FIRST_NAME,
             LastName = COMMON_LAST_NAME,
             Email = JOHN_EMAIL,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("oldpassword"),
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(COMMON_OLD_PASSWORD),
             // To make this user's join date later than the first user's
             JoinDateUtc = JOHN_JOIN_DATE_UTC,
             DeletedDateUtc = null,
@@ -84,7 +84,7 @@ public class UserServiceTests
                 FirstName = JUDY_FIRST_NAME,
                 LastName = COMMON_LAST_NAME,
                 Email = JUDY_EMAIL,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("oldpassword"),
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(COMMON_OLD_PASSWORD),
                 JoinDateUtc = JUDY_JOIN_DATE_UTC,
                 DeletedDateUtc = DateTime.UtcNow,
                 Role = Roles.MEMBER
@@ -305,7 +305,7 @@ public class UserServiceTests
                             FirstName = LILA_FIRST_NAME,
                             LastName = COMMON_LAST_NAME,
                             Email = LILA_EMAIL,
-                            PasswordHash = BCrypt.Net.BCrypt.HashPassword("oldpassword"),
+                            PasswordHash = BCrypt.Net.BCrypt.HashPassword(COMMON_OLD_PASSWORD),
                             // Technically we do more with this date, but this is close enough
                             JoinDateUtc = DateTime.UtcNow,
                             DeletedDateUtc = null,
@@ -334,7 +334,7 @@ public class UserServiceTests
                 FirstName = LILA_FIRST_NAME,
                 LastName = COMMON_LAST_NAME,
                 Email = LILA_EMAIL,
-                Password = "oldpassword"
+                Password = COMMON_OLD_PASSWORD
             };
 
         // Add the user that is actually saved to our test data to check against later
@@ -359,7 +359,7 @@ public class UserServiceTests
         Assert.AreEqual(LILA_FIRST_NAME, newUserLila.FirstName);
         Assert.AreEqual(COMMON_LAST_NAME, newUserLila.LastName);
         Assert.AreEqual(LILA_EMAIL, newUserLila.Email);
-        BCrypt.Net.BCrypt.Verify("oldpassword", newUserLila.PasswordHash);
+        BCrypt.Net.BCrypt.Verify(COMMON_OLD_PASSWORD, newUserLila.PasswordHash);
         Assert.IsTrue(_datesEqualWithinSeconds((DateTime) newUserLila.JoinDateUtc, DateTime.UtcNow, 60));
         Assert.IsNull(newUserLila.DeletedDateUtc);
         Assert.AreEqual(Roles.MEMBER, newUserLila.Role);
@@ -527,7 +527,7 @@ public class UserServiceTests
         Assert.AreEqual(JOHN_FIRST_NAME, _johnUser.FirstName);
         Assert.AreEqual(COMMON_LAST_NAME, _johnUser.LastName);
         Assert.AreEqual(JOHN_EMAIL, _johnUser.Email);
-        BCrypt.Net.BCrypt.Verify("oldpassword", _johnUser.PasswordHash);
+        BCrypt.Net.BCrypt.Verify(COMMON_OLD_PASSWORD, _johnUser.PasswordHash);
     }
 
     [TestMethod]
@@ -583,7 +583,7 @@ public class UserServiceTests
         Assert.AreEqual(JUDY_FIRST_NAME, _judyUser.FirstName);
         Assert.AreEqual(COMMON_LAST_NAME, _judyUser.LastName);
         Assert.AreEqual(JUDY_EMAIL, _judyUser.Email);
-        BCrypt.Net.BCrypt.Verify("oldpassword", _judyUser.PasswordHash);
+        BCrypt.Net.BCrypt.Verify(COMMON_OLD_PASSWORD, _judyUser.PasswordHash);
     }
     #endregion
 
