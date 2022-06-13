@@ -1,6 +1,8 @@
 using ActivityTrackerApp.Entities;
 using Microsoft.EntityFrameworkCore;
 
+namespace ActivityTrackerApp.Database;
+
 public interface IDataContext
 {
     DbSet<User> Users { get; set; }

@@ -1,18 +1,17 @@
-namespace ActivityTrackerApp.Exceptions
+namespace ActivityTrackerApp.Exceptions;
+
+[Serializable]
+class UnauthenticatedException : Exception
 {
-    [Serializable]
-    class UnauthenticatedException : Exception
+    public UnauthenticatedException()
+        : base("The current user is not properly authenticated")
     {
-        public UnauthenticatedException()
-            : base("The current user is not properly authenticated")
-        {
 
-        }
+    }
 
-        public UnauthenticatedException(string message)
-            : base(message)
-        {
+    public UnauthenticatedException(string message)
+        : base(message)
+    {
 
-        }
     }
 }

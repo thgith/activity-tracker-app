@@ -1,26 +1,24 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ActivityTrackerApp.Dtos
+namespace ActivityTrackerApp.Dtos;
+
+/// <summary>
+/// A timed session.
+/// </summary>
+public class SessionCreateDto
 {
     /// <summary>
-    /// A timed session.
+    /// The ID of the activity the session is associated with.
     /// </summary>
-    public class SessionCreateDto
-    {
-        /// <summary>
-        /// The ID of the activity the session is associated with.
-        /// </summary>
-        [Required]
-        public Guid ActivityId { get; set; }
+    [Required]
+    public Guid ActivityId { get; set; }
 
-        [Required]
-        public DateTime? StartDateUtc { get; set; }
+    [Required]
+    public DateTime? StartDateUtc { get; set; }
 
-        [Required]
-        public uint DurationSeconds { get; set; } = 0;
+    [Required]
+    public uint DurationSeconds { get; set; } = 0;
 
-        [MaxLength(1024)]
-        public string Description { get; set; }
-    }
+    [MaxLength(1024)]
+    public string Description { get; set; }
 }

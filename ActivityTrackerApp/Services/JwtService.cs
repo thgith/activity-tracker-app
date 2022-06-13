@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ActivityTrackerApp.Constants;
+using ActivityTrackerApp.Database;
 using ActivityTrackerApp.Entities;
 using ActivityTrackerApp.Exceptions;
 using AutoMapper;
