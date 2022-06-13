@@ -1,8 +1,13 @@
 namespace ActivityTrackerAppTests;
 
 [TestClass]
-public class UserServiceTests
+public class ActivityServiceTests
 {
+    public ActivityServiceTests()
+    {
+        
+    }
+
     [TestMethod]
     public void TestMethod1()
     {
