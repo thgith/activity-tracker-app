@@ -65,7 +65,7 @@ try
     services.AddScoped<ISessionService, SessionService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IJwtService, JwtService>();
-    services.AddScoped<IHelperService, HelperMethods>();
+    services.AddScoped<IHelperService, HelperService>();
 
     services.AddControllers();
 
