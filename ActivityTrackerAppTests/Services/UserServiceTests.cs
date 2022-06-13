@@ -1,8 +1,8 @@
-using System.Globalization;
 using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Database;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
+using ActivityTrackerApp.Exceptions;
 using ActivityTrackerApp.Services;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -41,13 +41,13 @@ public class UserServiceTests
     [ClassInitialize()]
     public static void InitializeClass(TestContext context)
     {
-        JANE_USER_GUID = new Guid();
+        JANE_USER_GUID = Guid.NewGuid();
         JANE_JOIN_DATE_UTC = DateTime.UtcNow;
 
-        JOHN_USER_GUID = new Guid();
+        JOHN_USER_GUID = Guid.NewGuid();
         JOHN_JOIN_DATE_UTC = DateTime.UtcNow.AddSeconds(1);
 
-        JUDY_USER_GUID = new Guid();
+        JUDY_USER_GUID = Guid.NewGuid();
     }
 
     // Called before each test
@@ -105,8 +105,6 @@ public class UserServiceTests
         // -- Arrange --
         _dbContextMock.Setup(x => x.Users)
                         .Returns(_usersDbSetMock.Object);
-        _dbContextMock.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
-                        .Returns(Task.FromResult(1));
         _mapperMock.Setup(x => x.Map<UserGetDto>(_janeUser))
                     .Returns(
                         new UserGetDto
@@ -134,10 +132,10 @@ public class UserServiceTests
             _configMock.Object,
             _mapperMock.Object);
 
-        // Act
+        // -- Act --
         var users = await userService.GetAllUsersAsync(JANE_USER_GUID);
 
-        // Assert
+        // -- Assert --
         Assert.IsNotNull(users);
         Assert.AreEqual(users.Count(), 2);
         var usersList = users.ToList();
@@ -146,6 +144,24 @@ public class UserServiceTests
         // Didn't get deleted user
         _assertUsersSame(usersList[0], JANE_FIRST_NAME, COMMON_LAST_NAME, JANE_EMAIL);
         _assertUsersSame(usersList[1], JOHN_FIRST_NAME, COMMON_LAST_NAME, JOHN_EMAIL);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ForbiddenException))]
+    public async Task GetAllUsersAsync_NotAdmin_ThrowForbidden()
+    {
+        // -- Arrange --
+        _dbContextMock.Setup(x => x.Users)
+                        .Returns(_usersDbSetMock.Object);
+
+        var userService = new UserService(
+            _dbContextMock.Object,
+            _jwtServiceMock.Object,
+            _configMock.Object,
+            _mapperMock.Object);
+
+        // -- Act --
+        var users = await userService.GetAllUsersAsync(JOHN_USER_GUID);
     }
 
     private void _assertUsersSame(UserGetDto user, string firstName, string lastName, string email)

@@ -1,7 +1,7 @@
 namespace ActivityTrackerApp.Exceptions;
 
 [Serializable]
-class ForbiddenException : Exception
+public class ForbiddenException : Exception
 {
     public ForbiddenException()
         : base("The current user does not have permission to perform the action")
