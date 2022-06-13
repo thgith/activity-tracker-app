@@ -29,12 +29,12 @@ public class UserService : IUserService
     }
 
     /// <inheritdoc/>
-    public async Task<EntityWithToken<UserRegisterDto>> RegisterUserAsync(UserRegisterDto userRegisterDto)
+    public async Task<EntityWithToken<UserGetDto>> RegisterUserAsync(UserRegisterDto userRegisterDto)
     {
         var user = await _createUserAsync(userRegisterDto);
-        return new EntityWithToken<UserRegisterDto>()
+        return new EntityWithToken<UserGetDto>()
         {
-            Entity = userRegisterDto,
+            Entity = _mapper.Map<UserGetDto>(user),
             Token = _jwtService.GenerateJwtToken(user)
         };
     }
@@ -112,6 +112,11 @@ public class UserService : IUserService
     /// <returns>The updated user.</returns>
     public async Task<UserUpdateDto> UpdateUserAsync(Guid currUserId, Guid userId, UserUpdateDto userPutDto)
     {
+        if (userPutDto == null)
+        {
+            throw new InvalidDataException();
+        }
+
         // Check permissions
         if (currUserId != userId && !(await IsAdmin(currUserId)))
         {
@@ -127,29 +132,41 @@ public class UserService : IUserService
             return null;
         }
 
+        var hasChange = false;
         // Update fields
         if (userPutDto.FirstName != null)
         {
             user.FirstName = userPutDto.FirstName;
+            hasChange = true;
         }
 
         if (userPutDto.LastName != null)
         {
             user.LastName = userPutDto.LastName;
+            hasChange = true;
         }
 
         if (userPutDto.Email != null)
         {
+            if (await IsEmailTaken(userPutDto.Email))
+            {
+                throw new InvalidDataException("This email is already in use");
+            }
             user.Email = userPutDto.Email;
+            hasChange = true;
         }
 
         if (userPutDto.Password != null)
         {
             user.PasswordHash = _hashPassword(userPutDto.Password);
+            hasChange = true;
         }
 
         // Save to DB
-        await _dbContext.SaveChangesAsync();
+        if (hasChange)
+        {
+            await _dbContext.SaveChangesAsync();
+        }
 
         return userPutDto;
     }
@@ -206,6 +223,11 @@ public class UserService : IUserService
 
     private async Task<User> _createUserAsync(UserRegisterDto userRegisterDto)
     {
+        if (userRegisterDto == null)
+        {
+            throw new InvalidDataException("User registration object cannot be null");
+        }
+        
         // Convert DTO to entity
         var user =  _mapper.Map<User>(userRegisterDto);
 
