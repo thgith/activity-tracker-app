@@ -30,13 +30,23 @@ namespace ActivityTrackerApp.Services
         // </returns>
         public async Task<IEnumerable<SessionGetDto>> GetAllSessionsByActivityIdAsync(
             Guid currUserId,
-            Guid activityId)
+            Guid? activityId = null)
         {
+            var isAdmin = await _userService.IsAdmin(currUserId);
+
+            // No activityId means get all sessions. Only admins can do this
+            if (activityId == null && !isAdmin)
+            {
+                throw new ForbiddenException();
+            }
+
+            // Else there is an associated activity to filter by
             // Check if the activity exists first
             var activity = await _dbContext.Activities.FirstOrDefaultAsync(x => 
                                 x.Id == activityId && 
                                 x.DeletedDateUtc == null);
 
+            // Activity doesn't exist, so return
             if (activity == null)
             {
                 return null;
@@ -44,19 +54,26 @@ namespace ActivityTrackerApp.Services
 
             // Regular users can get sessions associated with their own activities.
             // Admins can get everyone's session.
-            if (currUserId != activity.OwnerId && !(await _userService.IsAdmin(currUserId)))
+            if (currUserId != activity.OwnerId && !isAdmin)
             {
                 throw new ForbiddenException();
             }
 
-            // Get all active sessions belonging to the user
-            var sessions = await _dbContext.Sessions
-                .Where(x => x.ActivityId == activityId && x.DateDeletedUtc == null)
-                .OrderBy(x => x.StartDateUtc)
-                .ToListAsync();       
+            // Get all active sessions
+            var sessionsQuery = _dbContext.Sessions
+                .Where(x => x.DeletedDateUtc == null);
             
+            // Add filter on activity if exists
+            if (activityId != null)
+            {
+                sessionsQuery = sessionsQuery.Where(x => x.ActivityId == activityId);
+            }
+            var sessions = await sessionsQuery
+                .OrderBy(x => x.StartDateUtc)
+                .ToListAsync();
+
             // Convert entity to DTO and return
-            return sessions.Select(x => _mapper.Map<SessionGetDto>(x)); 
+            return sessions.Select(x => _mapper.Map<SessionGetDto>(x));
         }
 
         public async Task<SessionGetDto> GetSessionAsync(Guid currUserId, Guid sessionId)
@@ -69,6 +86,7 @@ namespace ActivityTrackerApp.Services
                 return null;
             }
 
+            // Get the session's activity            
             var activity = await _dbContext.Activities.FirstOrDefaultAsync(x =>
                             x.Id == session.ActivityId &&
                             x.DateDeletedUtc == null);
@@ -90,33 +108,78 @@ namespace ActivityTrackerApp.Services
             return _mapper.Map<SessionGetDto>(session);
         }
 
-        public async Task<SessionCreateDto> CreateSessionAsync(Guid currUserId, Guid ownerId, SessionCreateDto newSessionDto)
+        public async Task<SessionCreateDto> CreateSessionAsync(
+            Guid currUserId,
+            SessionCreateDto newSessionDto)
         {
-            throw new NotImplementedException();
-            // Regular users can create their own activities. Admins can create activities for anyone.
-            // if (currUserId != ownerId && !(await _userService.IsAdmin(currUserId)))
-            // {
-            //     throw new ForbiddenException();
-            // }
+            // Get the session's activity            
+            var activity = await _dbContext.Activities.FirstOrDefaultAsync(x =>
+                            x.Id == newSessionDto.ActivityId &&
+                            x.DateDeletedUtc == null);
 
-            // // Convert DTO to entity
-            // var activity =  _mapper.Map<Activity>(newActivityDto);
+            // Activity we want to create the session for doesn't exist, return
+            if (activity == null)
+            {
+                return null;
+            }
 
-            // // Set the owner of the activity
-            // activity.OwnerId = ownerId;
+            // Regular users can create their own session. Admins can create sessions for anyone.
+            if (currUserId != activity.OwnerId && !(await _userService.IsAdmin(currUserId)))
+            {
+                throw new ForbiddenException();
+            }
 
-            // // Add activity
-            // await _dbContext.Activities.AddAsync(activity);
+            // Convert DTO to entity
+            var session =  _mapper.Map<Session>(newSessionDto);
 
-            // // Save to DB
-            // await _dbContext.SaveChangesAsync();
+            // Add session
+            await _dbContext.Sessions.AddAsync(session);
 
-            // return newActivityDto;
+            // Save to DB
+            await _dbContext.SaveChangesAsync();
+
+            return newSessionDto;
         }
 
-        public Task<SessionUpdateDto> UpdateSessionAsync(Guid currUserId, Guid sessionId, SessionUpdateDto updateSessionDto)
+        public async Task<SessionUpdateDto> UpdateSessionAsync(
+            Guid currUserId,
+            Guid sessionId,
+            SessionUpdateDto updateSessionDto)
         {
-            throw new NotImplementedException();
+            // Get active session with ID
+            var session = await _getActiveSession(sessionId);
+            
+            // Return if activity doesn't exist (or the user was soft deleted)
+            if (session == null)
+            {
+                return null;
+            }
+
+            // Get the session's activity            
+            var activity = await _dbContext.Activities.FirstOrDefaultAsync(x =>
+                            x.Id == session.ActivityId &&
+                            x.DateDeletedUtc == null);
+
+            // Regular users can update their own activities. Admins can update anyone's activities.
+            if (currUserId != activity.OwnerId && !(await _userService.IsAdmin(currUserId)))
+            {
+                throw new ForbiddenException();
+            }
+
+            // NOTE: You can't change the activity ID associated with a session once it's created
+            if (updateSessionDto.Description != null)
+            {
+                session.Description = updateSessionDto.Description;
+            }
+            if (updateSessionDto.DurationSeconds != null)
+            {
+                session.DurationSeconds = (uint) updateSessionDto.DurationSeconds;
+            }
+
+            // Save to DB
+            await _dbContext.SaveChangesAsync();
+
+            return updateSessionDto;
         }
 
         public async Task<bool> DeleteSessionAsync(Guid currUserid, Guid sessionId)
@@ -137,7 +200,9 @@ namespace ActivityTrackerApp.Services
             }
 
             // Soft delete the session
-            session.DateDeletedUtc = DateTime.UtcNow;
+            var utcNow = DateTime.UtcNow;
+            // TODO factor doing this out
+            session.DeletedDateUtc = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
 
             // Save to DB
             // SaveChangesAsync returns the number of entries written to the DB
@@ -148,7 +213,7 @@ namespace ActivityTrackerApp.Services
         private async Task<Session> _getActiveSession(Guid sessionId)
         {
             return await _dbContext.Sessions
-                .FirstOrDefaultAsync(x => x.Id == sessionId && x.DateDeletedUtc == null);
+                .FirstOrDefaultAsync(x => x.Id == sessionId && x.DeletedDateUtc == null);
         }
     }
 }

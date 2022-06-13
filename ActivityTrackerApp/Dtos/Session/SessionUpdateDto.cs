@@ -11,7 +11,7 @@ namespace ActivityTrackerApp.Dtos
         public DateTime? StartDateUtc { get; set; }
 
         [Required]
-        public DateTime? EndDateUtc { get; set; }
+        public uint? DurationSeconds { get; set; }
 
         [MaxLength(1024)]
         public string? Description { get; set; }

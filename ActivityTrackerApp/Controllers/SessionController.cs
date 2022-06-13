@@ -1,9 +1,5 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ActivityTrackerApp.Controllers
@@ -28,26 +24,54 @@ namespace ActivityTrackerApp.Controllers
         /// <summary>
         /// Get all sessions associated with the user and activity
         /// </summary>
-        public async Task<ActionResult<IEnumerable<SessionGetDto>>> GetAllSessionsAsync(
-            Guid activityId)
+        public async Task<IActionResult> GetAllSessionsForActivityAsync(
+            [FromQuery] Guid activityId)
         {
-            throw new NotImplementedException();
+            async Task<IActionResult> GetAllSessionsForActivityPartialAsync(Guid currUserGuid)
+            {
+                var activities = await _sessionService.GetAllSessionsByActivityIdAsync(currUserGuid, currUserGuid);
+                return Ok(activities);
+            }
+            return await checkAuthAndPerformAction(Request, GetAllSessionsForActivityPartialAsync);
         }
 
-        public Task<ActionResult<SessionGetDto>> GetSessionAsync(
-            Guid sessionId)
+        public async Task<IActionResult> GetSessionAsync(Guid sessionId)
         {
-            throw new NotImplementedException();
+            async Task<IActionResult> GetSessionPartialAsync(Guid currUserGuid)
+            {
+                var activities = await _sessionService.GetSessionAsync(currUserGuid, currUserGuid);
+                return Ok(activities);
+            }
+            return await checkAuthAndPerformAction(Request, GetSessionPartialAsync);
         }
 
-        public Task<ActionResult> CreateSessionAsync(SessionCreateDto sessionPostDto)
+        public async Task<IActionResult> CreateSessionAsync([FromBody] SessionCreateDto sessionCreateDto)
         {
-            throw new NotImplementedException();
+            async Task<IActionResult> CreateSessionPartialAsync(Guid currUserGuid)
+            {
+                var session = await _sessionService.CreateSessionAsync(currUserGuid, sessionCreateDto);
+                return Ok(session);
+            }
+            return await checkAuthAndPerformAction(Request, CreateSessionPartialAsync);
         }
 
-        public Task<IActionResult> UpdateSessionAsync(Guid sessionId, SessionUpdateDto sessionPutDto)
+        public async Task<IActionResult> UpdateSessionAsync(
+            Guid sessionId,
+            [FromBody] SessionUpdateDto sessionUpdateDto)
         {
-            throw new NotImplementedException();
+            async Task<IActionResult> UpdateSessionPartialAsync(Guid currUserGuid)
+            {
+                // -- Try to update --
+                var session = await _sessionService.UpdateSessionAsync(currUserGuid, sessionId, sessionUpdateDto);
+                if (session == null)
+                {
+                    return NotFound($"The session with the ID {sessionId} does not exist");
+                }
+
+                return Ok(sessionUpdateDto);
+            }
+
+            return await checkAuthAndPerformAction(Request, UpdateSessionPartialAsync);
         }
 
         [HttpDelete("{sessionId}")]
@@ -56,9 +80,18 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public Task<IActionResult> DeleteSessionAsync(Guid sessionId)
+        public async Task<IActionResult> DeleteSessionAsync(Guid sessionId)
         {
-            throw new NotImplementedException();
+            async Task<IActionResult> DeleteSessionPartialAsync(Guid currUserGuid)
+            {
+                var isSuccess = await _sessionService.DeleteSessionAsync(currUserGuid, sessionId);
+                if (!isSuccess)
+                {
+                    return NotFound($"Session with ID {sessionId} does not exist");
+                }
+                return Ok($"Successfully deleted session with ID {sessionId}");
+            }
+            return await checkAuthAndPerformAction(Request, DeleteSessionPartialAsync);
         }
     }
 }

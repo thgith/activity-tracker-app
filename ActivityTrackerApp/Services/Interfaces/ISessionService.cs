@@ -10,7 +10,7 @@ namespace ActivityTrackerApp.Services
     {        
         Task<IEnumerable<SessionGetDto>> GetAllSessionsByActivityIdAsync(
             Guid currUserId,
-            Guid activityId);
+            Guid? activityId);
 
         Task<SessionGetDto> GetSessionAsync(
             Guid currUserId,
@@ -18,7 +18,6 @@ namespace ActivityTrackerApp.Services
 
         Task<SessionCreateDto> CreateSessionAsync(
             Guid currUserId,
-            Guid ownerId,
             SessionCreateDto newSessionDto);
 
         Task<SessionUpdateDto> UpdateSessionAsync(

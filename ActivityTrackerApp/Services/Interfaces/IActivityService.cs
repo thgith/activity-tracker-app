@@ -9,7 +9,7 @@ namespace ActivityTrackerApp.Services
     {
         Task<IEnumerable<ActivityGetDto>> GetAllActivitiesForUserAsync(
             Guid currUserId,
-            Guid ownerId);
+            Guid? ownerId);
 
         Task<ActivityGetDto> GetActivityAsync(
             Guid currUserId,

@@ -15,10 +15,10 @@ namespace ActivityTrackerApp.Dtos
         public Guid ActivityId { get; set; }
 
         [Required]
-        public DateTime StartDateUtc { get; set; }
+        public DateTime? StartDateUtc { get; set; }
 
         [Required]
-        public DateTime? EndDateUtc { get; set; }
+        public uint DurationSeconds { get; set; } = 0;
 
         [MaxLength(1024)]
         public string Description { get; set; }

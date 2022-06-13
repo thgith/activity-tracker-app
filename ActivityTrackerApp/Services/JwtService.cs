@@ -39,7 +39,7 @@ namespace ActivityTrackerApp.Services
             JwtSecurityToken token;
             try
             {
-                token = Verify(jwtCookie);
+                token = _verify(jwtCookie);
             }
             catch (Exception e)
             {
@@ -77,7 +77,7 @@ namespace ActivityTrackerApp.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public JwtSecurityToken Verify(string jwt)
+        public JwtSecurityToken _verify(string jwt)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_config[GlobalConstants.JWT_SECRET_KEY_NAME]);

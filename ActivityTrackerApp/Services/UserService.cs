@@ -43,7 +43,7 @@ namespace ActivityTrackerApp.Services
         {
             var user = await _dbContext.Users.SingleOrDefaultAsync(x => 
                 x.Email == userLoginDto.Email &&
-                x.DateDeletedUtc == null);
+                x.DeletedDateUtc == null);
 
             // User with email doesn't exist
             if (user == null)
@@ -78,8 +78,8 @@ namespace ActivityTrackerApp.Services
 
             // Excludes deleted users
             var users = await _dbContext.Users
-                .Where(x => x.DateDeletedUtc == null)
-                .OrderBy(x => x.DateJoinedUtc)
+                .Where(x => x.DeletedDateUtc == null)
+                .OrderBy(x => x.JoinDateUtc)
                 .ToListAsync();       
             
             // Convert entity to DTO and return
@@ -181,7 +181,8 @@ namespace ActivityTrackerApp.Services
             }
 
             // Soft delete the user
-            user.DateDeletedUtc = DateTime.UtcNow;
+            var utcNow = DateTime.UtcNow;
+            user.DeletedDateUtc = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
 
             // Save to DB
             // SaveChangesAsync returns the number of entries written to the DB
@@ -195,7 +196,7 @@ namespace ActivityTrackerApp.Services
             return await _dbContext.Users
                 .AnyAsync(x => 
                     x.Id == userId && 
-                    x.DateDeletedUtc == null &&
+                    x.DeletedDateUtc == null &&
                     x.Role == Roles.ADMIN);
         }
 
@@ -210,8 +211,10 @@ namespace ActivityTrackerApp.Services
             // Convert DTO to entity
             var user =  _mapper.Map<User>(userRegisterDto);
 
-            // Auto set join date
-            user.DateJoinedUtc = DateTime.UtcNow;
+
+            // Auto set join date. Recreate to get rid of ms
+            var utcNow = DateTime.UtcNow;
+            user.JoinDateUtc = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
 
             // Hash password for security
             user.PasswordHash = _hashPassword(userRegisterDto.Password);
@@ -235,7 +238,7 @@ namespace ActivityTrackerApp.Services
         private async Task<User> _getActiveUser(Guid userId)
         {
             return await _dbContext.Users
-                .FirstOrDefaultAsync(x => x.Id == userId && x.DateDeletedUtc == null);
+                .FirstOrDefaultAsync(x => x.Id == userId && x.DeletedDateUtc == null);
         }
 
         private string _hashPassword(string password)

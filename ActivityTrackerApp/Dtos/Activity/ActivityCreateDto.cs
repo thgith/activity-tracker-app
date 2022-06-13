@@ -23,6 +23,11 @@ namespace ActivityTrackerApp.Dtos
         /// <summary>
         /// The date the activity was started.
         /// </summary>
+        /// <remarks>
+        /// NOTE: if you have type DateTime instead of DateTime?,
+        //        this will return as DateTime.MinValue even if
+        //        it isn't specified in the request unless you set default value
+        /// </remarks>
         public DateTime? StartDateUtc { get; set; }
 
         /// <summary>
@@ -33,7 +38,7 @@ namespace ActivityTrackerApp.Dtos
         /// <summary>
         /// The date the user manual set the activity as complete.
         /// </summary>
-        public DateTime? CompleteDateUtc { get; set; }
+        public DateTime? CompletedDateUtc { get; set; }
 
         /// <summary>
         /// The custom color of the activity for rendering.

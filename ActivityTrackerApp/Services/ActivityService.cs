@@ -1,4 +1,3 @@
-using System.Linq;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
 using ActivityTrackerApp.Exceptions;
@@ -26,18 +25,36 @@ namespace ActivityTrackerApp.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        // <inheritdoc/>
         public async Task<IEnumerable<ActivityGetDto>> GetAllActivitiesForUserAsync(
             Guid currUserId,
-            Guid ownerId)
+            Guid? ownerId = null)
         {
-            // Regular users can get their own activities. Admins can get everyone's activities.
-            if (currUserId != ownerId && !(await _userService.IsAdmin(currUserId)))
+            var isAdmin = await _userService.IsAdmin(currUserId);
+
+            // No owner means get all activities. Only admins can do this.
+            if (ownerId == null && !isAdmin)
             {
                 throw new ForbiddenException();
             }
 
-            var activities = await _dbContext.Activities
-                .Where(x => x.OwnerId == ownerId && x.DateDeletedUtc == null)
+            // Regular users can get their own activities. Admins can get everyone's activities.
+            if (currUserId != ownerId && !isAdmin)
+            {
+                throw new ForbiddenException();
+            }
+
+            // Get all active activities
+            var activitiesQuery = _dbContext.Activities
+                .Where(x => x.DateDeletedUtc == null);
+
+            // Add filter on owner if exists
+            if (ownerId != null)
+            {
+                activitiesQuery = activitiesQuery.Where(x => x.OwnerId == ownerId);
+            }
+
+            var activities = await activitiesQuery
                 .OrderBy(x => x.StartDateUtc)
                 .ToListAsync();       
             
@@ -45,12 +62,14 @@ namespace ActivityTrackerApp.Services
             return activities.Select(x => _mapper.Map<ActivityGetDto>(x));
         }
 
+        // <inheritdoc/>
         public async Task<ActivityGetDto> GetActivityAsync(
             Guid currUserId,
             Guid activityId)
         {
             var activity = await _getActiveActivity(activityId);
 
+            // Activity doesn't exist, return
             if (activity == null)
             {
                 return null;
@@ -66,6 +85,7 @@ namespace ActivityTrackerApp.Services
             return _mapper.Map<ActivityGetDto>(activity);
         }
 
+        // <inheritdoc/>
         public async Task<ActivityCreateDto> CreateActivityAsync(
             Guid currUserId,
             Guid ownerId,
@@ -82,11 +102,34 @@ namespace ActivityTrackerApp.Services
 
             // Set the owner of the activity
             activity.OwnerId = ownerId;
+            
+            // Autoset as not archived yet
+            activity.IsArchived = false;
 
             // Set default start date if not specified
-            if (newActivityDto.StartDateUtc == null || newActivityDto.StartDateUtc == DateTime.MinValue)
+            var startDateUtc = newActivityDto.StartDateUtc ?? DateTime.UtcNow;
+            var shortenedStartDateUtc = new DateTime(startDateUtc.Year, startDateUtc.Month, startDateUtc.Second, startDateUtc.Hour, startDateUtc.Minute, startDateUtc.Second, DateTimeKind.Utc);
+
+            if (newActivityDto.DueDateUtc != null)
             {
-                activity.StartDateUtc = DateTime.UtcNow;
+                if (shortenedStartDateUtc > newActivityDto.DueDateUtc)
+                {
+                    throw new InvalidDataException("Start date must occur before due date");
+                }
+
+                var dueDateUtc = (DateTime) newActivityDto.DueDateUtc;
+                activity.DueDateUtc = new DateTime(dueDateUtc.Year, dueDateUtc.Month, dueDateUtc.Second, dueDateUtc.Hour, dueDateUtc.Minute, dueDateUtc.Second, DateTimeKind.Utc);
+            }
+
+            if (newActivityDto.CompletedDateUtc != null)
+            {
+                if (shortenedStartDateUtc > newActivityDto.CompletedDateUtc)
+                {
+                    throw new InvalidDataException("Start date must occur before completed date");
+                }
+
+                var completeDateUtc = (DateTime) newActivityDto.CompletedDateUtc;
+                activity.CompletedDateUtc = new DateTime(completeDateUtc.Year, completeDateUtc.Month, completeDateUtc.Second, completeDateUtc.Hour, completeDateUtc.Minute, completeDateUtc.Second, DateTimeKind.Utc);
             }
 
             // Add activity
@@ -98,6 +141,7 @@ namespace ActivityTrackerApp.Services
             return newActivityDto;
         }
 
+        // <inheritdoc/>
         public async Task<ActivityUpdateDto> UpdateActivityAsync(
             Guid currUserId,
             Guid activityId,
@@ -123,28 +167,66 @@ namespace ActivityTrackerApp.Services
             {
                 activity.Name = updatedActivityDto.Name;
             }
+
             if (updatedActivityDto.Description != null)
             {
                 activity.Description = updatedActivityDto.Description;
             }
-            if (updatedActivityDto.DueDateUtc != null && updatedActivityDto.DueDateUtc != DateTime.MinValue)
+
+            // If start date is set in request, replace; otherwise, use current one stored.
+            // Technically, this should be auto set at creation, but just in case set if null
+            var startDateUtc = updatedActivityDto.StartDateUtc ?? activity.StartDateUtc ?? DateTime.UtcNow;
+            var shortenedStartDateUtc = new DateTime(startDateUtc.Year, startDateUtc.Month, startDateUtc.Second, startDateUtc.Hour, startDateUtc.Minute, startDateUtc.Second, DateTimeKind.Utc);
+
+            // This might still be null if never set
+            var dueDateUtc = updatedActivityDto.DueDateUtc ?? activity.DueDateUtc;
+            if (dueDateUtc != null)
             {
-                activity.DueDateUtc = updatedActivityDto.DueDateUtc;
+                if (shortenedStartDateUtc > dueDateUtc)
+                {
+                    throw new InvalidDataException("Start date must occur before due date");
+                }
+                var shortenedDueDateUtc =  new DateTime(
+                    ((DateTime) dueDateUtc).Year, 
+                    ((DateTime) dueDateUtc).Month, 
+                    ((DateTime) dueDateUtc).Second, 
+                    ((DateTime) dueDateUtc).Hour, 
+                    ((DateTime) dueDateUtc).Minute, 
+                    ((DateTime) dueDateUtc).Second, 
+                    DateTimeKind.Utc);
+                activity.DueDateUtc = shortenedDueDateUtc;
             }
-            if (updatedActivityDto.CompleteDateUtc != null && updatedActivityDto.CompleteDateUtc != DateTime.MinValue)
+
+            // This might still be null if never set
+            var completedDateUtc = updatedActivityDto.CompletedDateUtc ?? activity.CompletedDateUtc;
+            if (completedDateUtc != null)
             {
-                activity.CompleteDateUtc = updatedActivityDto.CompleteDateUtc;
+                if (shortenedStartDateUtc > completedDateUtc)
+                {
+                    throw new InvalidDataException("Start date must occur before completed date");
+                }
+                var shortenedCompletedDateUtc =  new DateTime(
+                    ((DateTime) completedDateUtc).Year, 
+                    ((DateTime) completedDateUtc).Month, 
+                    ((DateTime) completedDateUtc).Second, 
+                    ((DateTime) completedDateUtc).Hour, 
+                    ((DateTime) completedDateUtc).Minute, 
+                    ((DateTime) completedDateUtc).Second, 
+                    DateTimeKind.Utc);
+                activity.CompletedDateUtc = shortenedCompletedDateUtc;
             }
-            if (updatedActivityDto.ArchiveDateUtc != null  && updatedActivityDto.ArchiveDateUtc != DateTime.MinValue)
+
+            if (updatedActivityDto.IsArchived != null)
             {
-                activity.ArchiveDateUtc = updatedActivityDto.ArchiveDateUtc;
+                activity.IsArchived = updatedActivityDto.IsArchived;
             }
+
             if (updatedActivityDto.ColorHex != null)
             {
                 activity.ColorHex = updatedActivityDto.ColorHex;
             }
+
             // TODO process and concat long tags
-            // TODO prob change Tags to List
             if (updatedActivityDto.Tags != null)
             {
                 activity.Tags = updatedActivityDto.Tags;
@@ -156,6 +238,7 @@ namespace ActivityTrackerApp.Services
             return updatedActivityDto;
         }
 
+        // <inheritdoc/>
         public async Task<bool> DeleteActivityAsync(
             Guid currUserId,
             Guid activityId)
@@ -176,22 +259,19 @@ namespace ActivityTrackerApp.Services
             }
 
             // Soft delete the activity
-            activity.DateDeletedUtc = DateTime.UtcNow;
+            var utcNow = DateTime.UtcNow;
+            activity.DateDeletedUtc = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
 
             // Now, delete the sessions associated with the activity
-            if (activity.Sessions != null && activity.Sessions.Count() > 0)
-            {
-                // Get all of the active sessions in the provided list
-                var sessionsToDelete = _dbContext.Sessions.Where(x => 
-                                            activity.Sessions.Select(x => x.Id)
-                                            .Contains(x.Id) && 
-                                            x.DateDeletedUtc == null);
+            // Get all of the active sessions associated wtih the activity
+            var sessionsToDelete = _dbContext.Sessions.Where(x => 
+                                        x.ActivityId == activityId &&
+                                        x.DeletedDateUtc == null);
 
-                // Soft delete each session
-                foreach (var session in sessionsToDelete)
-                {
-                    session.DateDeletedUtc = DateTime.UtcNow;
-                }
+            // Soft delete each session
+            foreach (var session in sessionsToDelete)
+            {
+                session.DeletedDateUtc = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
             }
 
             // Save to DB
@@ -203,7 +283,9 @@ namespace ActivityTrackerApp.Services
         private async Task<Activity> _getActiveActivity(Guid activityId)
         {
             return await _dbContext.Activities
-                .FirstOrDefaultAsync(x => x.Id == activityId && x.DateDeletedUtc == null);
+                .FirstOrDefaultAsync(x => 
+                    x.Id == activityId && 
+                    x.DateDeletedUtc == null);
         }
     }
 }

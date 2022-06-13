@@ -33,13 +33,13 @@ namespace ActivityTrackerApp.Dtos
         /// <summary>
         /// The date the user manual set the activity as complete.
         /// </summary>
-        public DateTime? CompleteDateUtc { get; set; }
+        public DateTime? CompletedDateUtc { get; set; }
 
         /// <summary>
-        /// The date the activity was archived.
+        /// Whether the activity is archived.
         /// The user can still see it in archived activities.
         /// </summary>
-        public DateTime? ArchiveDateUtc { get; set; }
+        public bool? IsArchived { get; set; }
 
         /// <summary>
         /// The custom color of the activity for rendering.

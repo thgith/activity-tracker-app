@@ -27,9 +27,9 @@ namespace ActivityTrackerApp.Entities
         public string PasswordHash { get; set; }
         
         [Required]
-        public DateTime DateJoinedUtc { get; set; }
+        public DateTime JoinDateUtc { get; set; }
 
-        public DateTime? DateDeletedUtc { get; set; }
+        public DateTime? DeletedDateUtc { get; set; }
 
         [Required]
         [MaxLength(50)]

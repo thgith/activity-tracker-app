@@ -7,6 +7,6 @@ namespace ActivityTrackerApp.Services
     {
         public JwtSecurityToken CheckAuthenticated(string jwtCookie);
         public string GenerateJwtToken(User user, int expirationMinutes = 300);
-        public JwtSecurityToken Verify(string jwt);
+        public JwtSecurityToken _verify(string jwt);
     }
 }

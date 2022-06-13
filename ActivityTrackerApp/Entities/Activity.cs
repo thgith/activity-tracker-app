@@ -25,7 +25,7 @@ namespace ActivityTrackerApp.Entities
         /// The date the activity was started.
         /// </summary>
         [Required]
-        public DateTime StartDateUtc { get; set; }
+        public DateTime? StartDateUtc { get; set; }
 
         /// <summary>
         /// The deadline the user set for the activity.
@@ -35,13 +35,13 @@ namespace ActivityTrackerApp.Entities
         /// <summary>
         /// The date the user manual set the activity as complete.
         /// </summary>
-        public DateTime? CompleteDateUtc { get; set; }
+        public DateTime? CompletedDateUtc { get; set; }
 
         /// <summary>
-        /// The date the activity was archived.
+        /// Whether the activity is archived.
         /// The user can still see it in archived activities.
         /// </summary>
-        public DateTime? ArchiveDateUtc { get; set; }
+        public bool? IsArchived { get; set; }
 
         /// <summary>
         /// The date the activity was soft-deleted in the system.

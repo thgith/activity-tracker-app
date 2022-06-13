@@ -57,6 +57,11 @@ namespace ActivityTrackerApp.Controllers
                 logger.LogError(e.Message);
                 return Problem(e.Message, statusCode: StatusCodes.Status403Forbidden);
             }
+            catch (InvalidDataException e)
+            {
+                logger.LogError(e.Message);
+                return Problem(e.Message, statusCode: StatusCodes.Status400BadRequest);
+            }
             catch (Exception e)
             {
                 var message = "There was a problem performing the action";

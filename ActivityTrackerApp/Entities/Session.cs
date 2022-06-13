@@ -22,14 +22,15 @@ namespace ActivityTrackerApp.Entities
         public virtual Activity Activity { get; set; }
 
         [Required]
-        public DateTime StartDateUtc { get; set; }
+        public DateTime? StartDateUtc { get; set; }
 
         [Required]
-        public DateTime? EndDateUtc { get; set; }
+        [Column(TypeName="int")]
+        public uint DurationSeconds { get; set; }
 
         [MaxLength(1024)]
         public string Description { get; set; }
 
-        public DateTime? DateDeletedUtc { get; set; }
+        public DateTime? DeletedDateUtc { get; set; }
     }
 }
