@@ -9,9 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ActivityTrackerApp.Services
 {
-    /// <summary>
-    /// JWT service.
-    /// </summary>
+    /// <inheritdoc/>
     public class JwtService : IJwtService
     {
         private readonly IDataContext _dbContext;
@@ -28,6 +26,7 @@ namespace ActivityTrackerApp.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        /// <inheritdoc/>
         public JwtSecurityToken CheckAuthenticated(string jwtCookie)
         {
             if (jwtCookie == null)
@@ -49,9 +48,7 @@ namespace ActivityTrackerApp.Services
             return token;
         }
 
-        // Default expiration to 5 hours
-        // Prob not the best, but this is a time tracking application, so we don't want to
-        // log them out mid session
+        /// <inheritdoc/>
         public string GenerateJwtToken(User user, int expirationMinutes = 300)
         {
             // Get key in config
@@ -77,7 +74,7 @@ namespace ActivityTrackerApp.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public JwtSecurityToken _verify(string jwt)
+        private JwtSecurityToken _verify(string jwt)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_config[GlobalConstants.JWT_SECRET_KEY_NAME]);

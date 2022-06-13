@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ActivityTrackerApp.Controllers
 {
     /// <summary>
-    /// An activity. 
+    /// User endpoints. 
     /// Endpoint will be: api/v1/User
     /// </summary>
     [Route("api/v1/[controller]")]
@@ -22,7 +22,6 @@ namespace ActivityTrackerApp.Controllers
             _helperService = helperService ?? throw new ArgumentNullException(nameof(helperService));
         }
 
-        /// <inheritdoc/>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -32,14 +31,12 @@ namespace ActivityTrackerApp.Controllers
         {
             async Task<IActionResult> GetAllUsersPartialAsync(Guid currUserGuid)
             {
-                // -- Get all users --
                 var usersDtos = await userService.GetAllUsersAsync(currUserGuid);
                 return Ok(usersDtos);
             }
             return await checkAuthAndPerformAction(Request, GetAllUsersPartialAsync);            
         }
 
-        /// <inheritdoc/>
         [HttpGet("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -50,7 +47,6 @@ namespace ActivityTrackerApp.Controllers
         {
             async Task<IActionResult> GetUserPartialAsync(Guid currUserGuid)
             {
-                // -- Get user --
                 var user = await userService.GetUserAsync(currUserGuid, userId);
                 if (user == null)
                 {
@@ -61,7 +57,6 @@ namespace ActivityTrackerApp.Controllers
             return await checkAuthAndPerformAction(Request, GetUserPartialAsync);
         }
 
-        /// <inheritdoc/>
         [HttpPut("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -92,7 +87,6 @@ namespace ActivityTrackerApp.Controllers
             return await checkAuthAndPerformAction(Request, UpdateUserPartialAsync);
         }
 
-        /// <inheritdoc/>
         [HttpDelete("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -103,7 +97,6 @@ namespace ActivityTrackerApp.Controllers
         {
             async Task<IActionResult> DeleteUserPartialAsync(Guid currUserId)
             {
-                // -- Delete user --
                 var isSuccess = await userService.DeleteUserAsync(currUserId, userId);
                 if (!isSuccess)
                 {

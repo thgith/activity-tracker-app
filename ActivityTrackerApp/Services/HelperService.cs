@@ -2,12 +2,10 @@ using System.Net.Mail;
 
 namespace ActivityTrackerApp.Services
 {
-    /// <summary>
-    /// Helper methods class.
-    /// </summary>
-    public class HelperMethods : IHelperService
+    /// <inheritdocs/>
+    public class HelperService : IHelperService
     {
-        public HelperMethods()
+        public HelperService()
         {
 
         }

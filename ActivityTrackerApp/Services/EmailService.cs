@@ -4,6 +4,7 @@ using MimeKit;
 
 namespace ActivityTrackerApp.Services
 {
+    /// <inheritdoc/>
     public class EmailService : IEmailService
     {
         private readonly ISmtpClient _smtpClient;
@@ -17,6 +18,7 @@ namespace ActivityTrackerApp.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        /// <inheritdoc/>
         public void SendWelcomeEmail(User user)
         {
             // TODO update this later
@@ -24,7 +26,8 @@ namespace ActivityTrackerApp.Services
             var body = $"Hi, how are you {user.FirstName}";
             SendEmail(user, subject, body);
         }
-
+        
+        /// <inheritdoc/>
         public void SendEmail(User user, string subject, string body)
         {
             // TODO update this later

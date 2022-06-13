@@ -21,7 +21,11 @@ namespace ActivityTrackerApp.Controllers
             _activityService = activityService ?? throw new ArgumentNullException(nameof(activityService));
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the activities associated with the user.
+        /// </summary>
+        /// <param name="userId">The ID of the user to get.</param>
+        /// <returns>List of activities.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -37,7 +41,11 @@ namespace ActivityTrackerApp.Controllers
             return await checkAuthAndPerformAction(Request, GetAllActivitiesForUserPartialAsync);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the activity with the given ID.
+        /// </summary>
+        /// <param name="activityId">The ID of the activity to get.</param>
+        /// <returns>The activity.</returns>
         [HttpGet("{activityId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -58,7 +66,11 @@ namespace ActivityTrackerApp.Controllers
             return await checkAuthAndPerformAction(Request, GetActivityPartialAsync);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Creates a new activity.
+        /// </summary>
+        /// <param name="newActivityDto">The activity model for the create.</param>
+        /// <returns>The newly created activity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -67,20 +79,24 @@ namespace ActivityTrackerApp.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateActivityAsync(
             [FromQuery] Guid userId,
-            [FromBody] ActivityCreateDto activityPostDto)
+            [FromBody] ActivityCreateDto newActivityDto)
         {
             async Task<IActionResult> CreateActivityPartialAsync(Guid currUserGuid)
             {
                 await _activityService.CreateActivityAsync(
                                             currUserGuid,
                                             userId != null ? userId : currUserGuid,
-                                            activityPostDto);
-                return Ok(activityPostDto);
+                                            newActivityDto);
+                return Ok(newActivityDto);
             }
             return await checkAuthAndPerformAction(Request, CreateActivityPartialAsync);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Updates the activity.
+        /// </summary>
+        /// <param name="activityUpdateDto">The activity model for the update.</param>
+        /// <returns>The updated activity.</returns>
         [HttpPut("{activityId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -103,7 +119,10 @@ namespace ActivityTrackerApp.Controllers
             return await checkAuthAndPerformAction(Request, UpdateActivityPartialAsync);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Deletes the activity with the given ID.
+        /// <summary>
+        /// <param name="activityId">The ID of the activity to delete.</param>
         [HttpDelete("{activityId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

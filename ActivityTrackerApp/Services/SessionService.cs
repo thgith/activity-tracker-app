@@ -6,9 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ActivityTrackerApp.Services
 {
-    /// <summary>
-    /// Session service.
-    /// </summary>
+    /// <inheritdoc/>
     public class SessionService : ISessionService
     {
         private readonly IDataContext _dbContext;
@@ -25,9 +23,7 @@ namespace ActivityTrackerApp.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        // <returns>
-        // <c>null<c>if the activity doesn't exist
-        // </returns>
+        /// <inheritdoc/>
         public async Task<IEnumerable<SessionGetDto>> GetAllSessionsByActivityIdAsync(
             Guid currUserId,
             Guid? activityId = null)
@@ -76,6 +72,7 @@ namespace ActivityTrackerApp.Services
             return sessions.Select(x => _mapper.Map<SessionGetDto>(x));
         }
 
+        /// <inheritdoc/>
         public async Task<SessionGetDto> GetSessionAsync(Guid currUserId, Guid sessionId)
         {
             var session = await _getActiveSession(sessionId);
@@ -108,6 +105,7 @@ namespace ActivityTrackerApp.Services
             return _mapper.Map<SessionGetDto>(session);
         }
 
+        /// <inheritdoc/>
         public async Task<SessionCreateDto> CreateSessionAsync(
             Guid currUserId,
             SessionCreateDto newSessionDto)
@@ -141,6 +139,7 @@ namespace ActivityTrackerApp.Services
             return newSessionDto;
         }
 
+        /// <inheritdoc/>
         public async Task<SessionUpdateDto> UpdateSessionAsync(
             Guid currUserId,
             Guid sessionId,
@@ -182,6 +181,7 @@ namespace ActivityTrackerApp.Services
             return updateSessionDto;
         }
 
+        /// <inheritdoc/>
         public async Task<bool> DeleteSessionAsync(Guid currUserid, Guid sessionId)
         {
             // Get active session with ID

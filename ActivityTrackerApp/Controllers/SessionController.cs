@@ -24,6 +24,12 @@ namespace ActivityTrackerApp.Controllers
         /// <summary>
         /// Get all sessions associated with the user and activity
         /// </summary>
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllSessionsForActivityAsync(
             [FromQuery] Guid activityId)
         {
@@ -35,6 +41,12 @@ namespace ActivityTrackerApp.Controllers
             return await checkAuthAndPerformAction(Request, GetAllSessionsForActivityPartialAsync);
         }
 
+        [HttpGet("{sessionId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetSessionAsync(Guid sessionId)
         {
             async Task<IActionResult> GetSessionPartialAsync(Guid currUserGuid)
@@ -45,6 +57,13 @@ namespace ActivityTrackerApp.Controllers
             return await checkAuthAndPerformAction(Request, GetSessionPartialAsync);
         }
 
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateSessionAsync([FromBody] SessionCreateDto sessionCreateDto)
         {
             async Task<IActionResult> CreateSessionPartialAsync(Guid currUserGuid)
@@ -55,13 +74,19 @@ namespace ActivityTrackerApp.Controllers
             return await checkAuthAndPerformAction(Request, CreateSessionPartialAsync);
         }
 
+        [HttpPut("{sessionId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateSessionAsync(
             Guid sessionId,
             [FromBody] SessionUpdateDto sessionUpdateDto)
         {
             async Task<IActionResult> UpdateSessionPartialAsync(Guid currUserGuid)
             {
-                // -- Try to update --
                 var session = await _sessionService.UpdateSessionAsync(currUserGuid, sessionId, sessionUpdateDto);
                 if (session == null)
                 {

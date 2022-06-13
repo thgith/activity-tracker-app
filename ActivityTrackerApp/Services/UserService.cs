@@ -7,9 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ActivityTrackerApp.Services
 {
-    /// <summary>
-    /// User service.
-    /// </summary>
+    /// <inheritdoc/>
     public class UserService : IUserService
     {
         private readonly IDataContext _dbContext;
@@ -29,6 +27,7 @@ namespace ActivityTrackerApp.Services
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        /// <inheritdoc/>
         public async Task<EntityWithToken<UserRegisterDto>> RegisterUserAsync(UserRegisterDto userRegisterDto)
         {
             var user = await _createUserAsync(userRegisterDto);
@@ -39,6 +38,7 @@ namespace ActivityTrackerApp.Services
             };
         }
 
+        /// <inheritdoc/>
         public async Task<EntityWithToken<UserLoginDto>> AuthenticateUserAsync(UserLoginDto userLoginDto)
         {
             var user = await _dbContext.Users.SingleOrDefaultAsync(x => 
@@ -64,10 +64,7 @@ namespace ActivityTrackerApp.Services
             };
         }
 
-        /// <summary>
-        /// Gets all active users.
-        /// </summary>
-        /// <returns>All the active users.</returns>
+        /// <inheritdoc/>
         public async Task<IEnumerable<UserGetDto>> GetAllUsersAsync(Guid currUserId)
         {
             // Check permissions

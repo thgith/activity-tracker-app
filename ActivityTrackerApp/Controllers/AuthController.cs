@@ -1,13 +1,12 @@
 using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ActivityTrackerApp.Controllers
 {
     /// <summary>
-    /// An activity. 
+    /// Auth endpoints. 
     /// Endpoint will be: api/v1/Auth
     /// </summary>
     [Route("api/v1/[controller]")]
@@ -24,9 +23,7 @@ namespace ActivityTrackerApp.Controllers
             _helperService = helperService ?? throw new ArgumentNullException(nameof(helperService));
         }
 
-        /// <inheritdoc/>
         [HttpPost("register")]
-        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -57,15 +54,13 @@ namespace ActivityTrackerApp.Controllers
             }
             catch (Exception e)
             {
-                var message = $"There was an error registering";
+                var message = "There was an error registering";
                 logger.LogError(message, e.Message, e.StackTrace);
                 return Problem(message, statusCode: StatusCodes.Status500InternalServerError);
             }
         }
 
-        /// <inheritdoc/>
         [HttpPost("login")]
-        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -108,7 +103,6 @@ namespace ActivityTrackerApp.Controllers
         }
 
         [HttpPost("logout")]
-        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult Logout()
