@@ -50,7 +50,7 @@ namespace ActivityTrackerApp.Services
         /// <param name="userId">The ID of the user to update.</param>
         /// <param name="updatedUserDto">The update object.</param>
         /// <returns>The update object.</returns>
-        Task<UserUpdateDto> UpdateUserAsync(
+        Task<UserGetDto> UpdateUserAsync(
             Guid currUserId,
             Guid userId,
             UserUpdateDto updatedUserDto);

@@ -294,9 +294,10 @@ public class UserServiceTests
     [TestMethod]
     public async Task RegisterUserAsync_Ok()
     {
+        var dummyToken = "dummytoken";
         // -- Arrange --
         _jwtServiceMock.Setup(m => m.GenerateJwtToken(It.IsAny<User>(), 300))
-                        .Returns("dummytoken");
+                        .Returns(dummyToken);
         _mapperMock.Setup(m => m.Map<User>(It.IsAny<UserRegisterDto>()))
                     .Returns(
                         new User
@@ -344,11 +345,16 @@ public class UserServiceTests
         // -- Act --
         var returnedEntityWithToken = await userService.RegisterUserAsync(registerUserDto);
         var returnedEntity = ((EntityWithToken<UserGetDto>)returnedEntityWithToken).Entity;
-        var token = ((EntityWithToken<UserGetDto>)returnedEntityWithToken).Token;
+        var returnedToken = ((EntityWithToken<UserGetDto>)returnedEntityWithToken).Token;
 
         // -- Assert --
         Assert.IsNotNull(returnedEntityWithToken);
-        Assert.IsNotNull(token);
+        Assert.IsNotNull(returnedToken);
+
+        // Check that the returned object is as expected
+        _assertUsersSame(returnedEntity, LILA_FIRST_NAME, COMMON_LAST_NAME, LILA_EMAIL);
+        Assert.AreEqual(dummyToken, returnedToken);
+
         _usersDbSetMock.Verify(m => m.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Once);
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
         
@@ -356,6 +362,7 @@ public class UserServiceTests
         Assert.AreEqual(_usersData.Count(), 4);
         var newUserLila = _usersData.Last();
 
+        // Check that the data was saved to the DB correctly
         Assert.AreEqual(LILA_FIRST_NAME, newUserLila.FirstName);
         Assert.AreEqual(COMMON_LAST_NAME, newUserLila.LastName);
         Assert.AreEqual(LILA_EMAIL, newUserLila.Email);
@@ -376,10 +383,6 @@ public class UserServiceTests
             _configMock.Object,
             _mapperMock.Object);
 
-        // Add the user that is actually saved to our test data to check against later
-        _usersDbSetMock.Setup(m => m.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()))
-                        .Callback((User user, CancellationToken _) => { _usersData.Add(user); });
-
         // -- Act --
         var returnedEntityWithToken = await userService.RegisterUserAsync(null);
     }
@@ -390,70 +393,90 @@ public class UserServiceTests
     public async Task UpdateUserAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
+        _mapperMock.Setup(m => m.Map<UserGetDto>(It.IsAny<User>()))
+            .Returns(new UserGetDto
+            {
+                FirstName = NEW_FIRST_NAME,
+                LastName = NEW_LAST_NAME,
+                Email = NEW_EMAIL,
+                JoinDateUtc = _johnUser.JoinDateUtc
+            });
         var userService = new UserService(
             _dbContextMock.Object,
             _jwtServiceMock.Object,
             _configMock.Object,
             _mapperMock.Object);
 
-        var userUpdateDto = new UserUpdateDto
-            {
-                FirstName = "Johnny",
-                LastName = "Deer",
-                Email = "johnnydeer@test.com",
-                Password = "newpassword"
-            };
-
         // -- Act --
         var returnedDto = await userService.UpdateUserAsync(
             JANE_USER_GUID,
             JOHN_USER_GUID,
-            userUpdateDto
+            new UserUpdateDto
+            {
+                FirstName = NEW_FIRST_NAME,
+                LastName = NEW_LAST_NAME,
+                Email = NEW_EMAIL,
+                Password = NEW_PASSWORD
+            }
         );
 
         // -- Assert --
         Assert.IsNotNull(returnedDto);
-        Assert.AreEqual(userUpdateDto, returnedDto);
+
+        // Check that the returned user is as expected
+        _assertUsersSame(returnedDto, NEW_FIRST_NAME, NEW_LAST_NAME, NEW_EMAIL);
+
+        // Check that the returned user is as expected
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-        Assert.AreEqual("Johnny", _johnUser.FirstName);
-        Assert.AreEqual("Deer", _johnUser.LastName);
-        Assert.AreEqual("johnnydeer@test.com", _johnUser.Email);
-        BCrypt.Net.BCrypt.Verify("newpassword", _johnUser.PasswordHash);
+        Assert.AreEqual(NEW_FIRST_NAME, _johnUser.FirstName);
+        Assert.AreEqual(NEW_LAST_NAME, _johnUser.LastName);
+        Assert.AreEqual(NEW_EMAIL, _johnUser.Email);
+        BCrypt.Net.BCrypt.Verify(NEW_PASSWORD, _johnUser.PasswordHash);
     }
 
     [TestMethod]
     public async Task UpdateUserAsync_NonAdmin_SameUser_Ok()
     {
         // -- Arrange --
+        _mapperMock.Setup(m => m.Map<UserGetDto>(It.IsAny<User>()))
+                    .Returns(new UserGetDto
+                    {
+                        FirstName = NEW_FIRST_NAME,
+                        LastName = NEW_LAST_NAME,
+                        Email = NEW_EMAIL,
+                        JoinDateUtc = _johnUser.JoinDateUtc
+                    });
         var userService = new UserService(
             _dbContextMock.Object,
             _jwtServiceMock.Object,
             _configMock.Object,
             _mapperMock.Object);
 
-        var userUpdateDto = new UserUpdateDto
-            {
-                FirstName = "Johnny",
-                LastName = "Deer",
-                Email = "johnnydeer@test.com",
-                Password = "newpassword"
-            };
-
         // -- Act --
         var returnedDto = await userService.UpdateUserAsync(
             JOHN_USER_GUID,
             JOHN_USER_GUID,
-            userUpdateDto
+            new UserUpdateDto
+            {
+                FirstName = NEW_FIRST_NAME,
+                LastName = NEW_LAST_NAME,
+                Email = NEW_EMAIL,
+                Password = NEW_PASSWORD
+            }
         );
 
         // -- Assert --
         Assert.IsNotNull(returnedDto);
-        Assert.AreEqual(userUpdateDto, returnedDto);
+
+        // Check that the returned user is as expected
+        _assertUsersSame(returnedDto, NEW_FIRST_NAME, NEW_LAST_NAME, NEW_EMAIL);
+
+        // Check that the saved user is as expected
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-        Assert.AreEqual("Johnny", _johnUser.FirstName);
-        Assert.AreEqual("Deer", _johnUser.LastName);
-        Assert.AreEqual("johnnydeer@test.com", _johnUser.Email);
-        BCrypt.Net.BCrypt.Verify("newpassword", _johnUser.PasswordHash);
+        Assert.AreEqual(NEW_FIRST_NAME, _johnUser.FirstName);
+        Assert.AreEqual(NEW_LAST_NAME, _johnUser.LastName);
+        Assert.AreEqual(NEW_EMAIL, _johnUser.Email);
+        BCrypt.Net.BCrypt.Verify(NEW_PASSWORD, _johnUser.PasswordHash);
     }
 
     [TestMethod]
@@ -469,10 +492,10 @@ public class UserServiceTests
 
         var userUpdateDto = new UserUpdateDto
             {
-                FirstName = "Johnny",
-                LastName = "Deer",
-                Email = "johnnydeer@test.com",
-                Password = "newpassword"
+                FirstName = NEW_FIRST_NAME,
+                LastName = NEW_LAST_NAME,
+                Email = NEW_EMAIL,
+                Password = NEW_PASSWORD
             };
 
         // -- Act --
@@ -521,8 +544,8 @@ public class UserServiceTests
         );
 
         // -- Assert --
-        Assert.IsNotNull(returnedDto);
-        Assert.AreEqual(userUpdateDto, returnedDto);
+        Assert.IsNull(returnedDto);
+        // Check that the user in DB didn't change
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
         Assert.AreEqual(JOHN_FIRST_NAME, _johnUser.FirstName);
         Assert.AreEqual(COMMON_LAST_NAME, _johnUser.LastName);

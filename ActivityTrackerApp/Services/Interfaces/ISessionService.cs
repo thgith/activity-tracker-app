@@ -40,7 +40,7 @@ namespace ActivityTrackerApp.Services
         /// <param name="currUserId">The ID of the current user.</param>
         /// <param name="newSessionDto">The new session object.</param>
         /// <returns>The new session object.</returns>
-        Task<SessionCreateDto> CreateSessionAsync(
+        Task<SessionGetDto> CreateSessionAsync(
             Guid currUserId,
             SessionCreateDto newSessionDto);
 
@@ -51,7 +51,7 @@ namespace ActivityTrackerApp.Services
         /// <param name="sessionId">The ID of the session to delete.</param>
         /// <param name="updatedSessionDto">The update session object.</param>
         /// <returns>The update object.</returns>
-        Task<SessionUpdateDto> UpdateSessionAsync(
+        Task<SessionGetDto> UpdateSessionAsync(
             Guid currUserId,
             Guid sessionId,
             SessionUpdateDto updateSessionDto);

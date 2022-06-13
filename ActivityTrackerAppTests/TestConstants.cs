@@ -12,4 +12,8 @@ public static class TestConstants
     public const string JUDY_EMAIL = "judydoe@test.com";
     public const string LILA_EMAIL = "liladoe@test.com";
     public const string COMMON_OLD_PASSWORD = "oldpassword";
+    public const string NEW_FIRST_NAME = "Johnny";
+    public const string NEW_LAST_NAME = "Deer";
+    public const string NEW_EMAIL = "johnnydeer@test.com";
+    public const string NEW_PASSWORD = "newpassword";
 }

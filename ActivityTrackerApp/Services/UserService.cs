@@ -110,7 +110,7 @@ public class UserService : IUserService
     /// <param name="userPutDto">The user object.</param>
     /// </summary>
     /// <returns>The updated user.</returns>
-    public async Task<UserUpdateDto> UpdateUserAsync(Guid currUserId, Guid userId, UserUpdateDto userPutDto)
+    public async Task<UserGetDto> UpdateUserAsync(Guid currUserId, Guid userId, UserUpdateDto userPutDto)
     {
         if (userPutDto == null)
         {
@@ -168,7 +168,7 @@ public class UserService : IUserService
             await _dbContext.SaveChangesAsync();
         }
 
-        return userPutDto;
+        return _mapper.Map<UserGetDto>(user);
     }
 
     /// <summary>

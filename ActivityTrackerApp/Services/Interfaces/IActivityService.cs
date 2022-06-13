@@ -39,7 +39,7 @@ namespace ActivityTrackerApp.Services
         /// <param name="currUserId">The ID of the current user.</param>
         /// <param name="newActivityDto">The new activity object.</param>
         /// <returns>The new activity object.</returns>
-        Task<ActivityCreateDto> CreateActivityAsync(
+        Task<ActivityGetDto> CreateActivityAsync(
             Guid currUserId,
             Guid ownerId,
             ActivityCreateDto newActivityDto);
@@ -51,7 +51,7 @@ namespace ActivityTrackerApp.Services
         /// <param name="activityId">The ID of the activity to delete.</param>
         /// <param name="updatedActivityDto">The update activity object.</param>
         /// <returns>The update object.</returns>
-        Task<ActivityUpdateDto> UpdateActivityAsync(
+        Task<ActivityGetDto> UpdateActivityAsync(
             Guid currUserId,
             Guid activityId,
             ActivityUpdateDto updatedActivityDto);

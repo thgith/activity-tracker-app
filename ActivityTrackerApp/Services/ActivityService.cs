@@ -87,7 +87,7 @@ public class ActivityService : IActivityService
     }
 
     // <inheritdoc/>
-    public async Task<ActivityCreateDto> CreateActivityAsync(
+    public async Task<ActivityGetDto> CreateActivityAsync(
         Guid currUserId,
         Guid ownerId,
         ActivityCreateDto newActivityDto)
@@ -139,11 +139,11 @@ public class ActivityService : IActivityService
         // Save to DB
         await _dbContext.SaveChangesAsync();
 
-        return newActivityDto;
+        return _mapper.Map<ActivityGetDto>(activity);
     }
 
     // <inheritdoc/>
-    public async Task<ActivityUpdateDto> UpdateActivityAsync(
+    public async Task<ActivityGetDto> UpdateActivityAsync(
         Guid currUserId,
         Guid activityId,
         ActivityUpdateDto updatedActivityDto)
@@ -236,7 +236,7 @@ public class ActivityService : IActivityService
         // Save to DB
         await _dbContext.SaveChangesAsync();
 
-        return updatedActivityDto;
+        return _mapper.Map<ActivityGetDto>(activity);
     }
 
     // <inheritdoc/>

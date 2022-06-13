@@ -107,7 +107,7 @@ public class SessionService : ISessionService
     }
 
     /// <inheritdoc/>
-    public async Task<SessionCreateDto> CreateSessionAsync(
+    public async Task<SessionGetDto> CreateSessionAsync(
         Guid currUserId,
         SessionCreateDto newSessionDto)
     {
@@ -137,11 +137,11 @@ public class SessionService : ISessionService
         // Save to DB
         await _dbContext.SaveChangesAsync();
 
-        return newSessionDto;
+        return _mapper.Map<SessionGetDto>(newSessionDto);
     }
 
     /// <inheritdoc/>
-    public async Task<SessionUpdateDto> UpdateSessionAsync(
+    public async Task<SessionGetDto> UpdateSessionAsync(
         Guid currUserId,
         Guid sessionId,
         SessionUpdateDto updateSessionDto)
@@ -179,7 +179,7 @@ public class SessionService : ISessionService
         // Save to DB
         await _dbContext.SaveChangesAsync();
 
-        return updateSessionDto;
+        return _mapper.Map<SessionGetDto>(updateSessionDto);
     }
 
     /// <inheritdoc/>

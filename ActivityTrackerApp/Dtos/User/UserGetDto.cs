@@ -9,6 +9,4 @@ public class UserGetDto
     public string Email { get; set; }
 
     public DateTime? JoinDateUtc { get; set; }
-
-    public DateTime? DeletedDateUtc { get; set; }
 }
