@@ -4,6 +4,7 @@ using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
 using ActivityTrackerApp.Exceptions;
 using ActivityTrackerApp.Services;
+using static ActivityTrackerAppTests.Constants.TestConstants;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,15 +21,7 @@ public class UserServiceTests
     public static Guid JANE_USER_GUID;
     public static Guid JOHN_USER_GUID;
     public static Guid JUDY_USER_GUID;
-    public static readonly string JANE_FIRST_NAME = "Jane";
-    public static readonly string JOHN_FIRST_NAME = "John";
-    public static readonly string JUDY_FIRST_NAME = "Judy";
-    public static readonly string LILA_FIRST_NAME = "Lila";
-    public static readonly string COMMON_LAST_NAME = "Doe";
-    public static readonly string JANE_EMAIL = "janedoe@test.com";
-    public static readonly string JOHN_EMAIL = "johndoe@test.com";
-    public static readonly string JUDY_EMAIL = "judydoe@test.com";
-    public static readonly string LILA_EMAIL = "liladoe@test.com";
+
     public static DateTime JANE_JOIN_DATE_UTC;
     public static DateTime JOHN_JOIN_DATE_UTC;
     public static DateTime JUDY_JOIN_DATE_UTC;
@@ -445,7 +438,7 @@ public class UserServiceTests
                 Email = "johnnydeer@test.com",
                 Password = "newpassword"
             };
-            
+
         // -- Act --
         var returnedDto = await userService.UpdateUserAsync(
             JOHN_USER_GUID,
