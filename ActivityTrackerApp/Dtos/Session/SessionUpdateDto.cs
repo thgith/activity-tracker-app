@@ -14,5 +14,5 @@ public class SessionUpdateDto
     public uint? DurationSeconds { get; set; }
 
     [MaxLength(1024)]
-    public string? Description { get; set; }
+    public string? Notes { get; set; }
 }

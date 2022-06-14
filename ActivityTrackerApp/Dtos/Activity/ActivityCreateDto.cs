@@ -51,5 +51,5 @@ public class ActivityCreateDto
     /// Used for sorting and filtering.
     /// </summary>
     [MaxLength(10)]
-    public IList<string> Tags { get; set; }
+    public IList<string>? Tags { get; set; }
 }

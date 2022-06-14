@@ -4,7 +4,7 @@ using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
 using ActivityTrackerApp.Exceptions;
 using ActivityTrackerApp.Services;
-using static ActivityTrackerAppTests.Constants.TestConstants;
+using static ActivityTrackerAppTests.Fixtures.TestFixtures;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -18,14 +18,6 @@ namespace ActivityTrackerAppTests;
 [TestClass]
 public class UserServiceTests
 {
-    public static Guid JANE_USER_GUID;
-    public static Guid JOHN_USER_GUID;
-    public static Guid JUDY_USER_GUID;
-
-    public static DateTime JANE_JOIN_DATE_UTC;
-    public static DateTime JOHN_JOIN_DATE_UTC;
-    public static DateTime JUDY_JOIN_DATE_UTC;
-
     private static User _janeUser;
     private static User _johnUser;
     private static User _judyUser;
@@ -40,55 +32,17 @@ public class UserServiceTests
     [ClassInitialize()]
     public static void InitializeClass(TestContext context)
     {
-        JANE_USER_GUID = Guid.NewGuid();
-        JANE_JOIN_DATE_UTC = DateTime.UtcNow;
-
-        JOHN_USER_GUID = Guid.NewGuid();
-        JOHN_JOIN_DATE_UTC = DateTime.UtcNow.AddSeconds(1);
-
-        JUDY_USER_GUID = Guid.NewGuid();
-        JUDY_JOIN_DATE_UTC = DateTime.UtcNow.AddSeconds(2);
     }
 
     // Called before each test
     [TestInitialize]
     public void InitializeTests()
     {
-        _janeUser = new User
-        {
-            Id = JANE_USER_GUID,
-            FirstName = JANE_FIRST_NAME,
-            LastName = COMMON_LAST_NAME,
-            Email = JANE_EMAIL,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(COMMON_OLD_PASSWORD),
-            JoinDateUtc = JANE_JOIN_DATE_UTC,
-            DeletedDateUtc = null,
-            Role = Roles.ADMIN
-        };
-        _johnUser = new User
-        {
-            Id = JOHN_USER_GUID,
-            FirstName = JOHN_FIRST_NAME,
-            LastName = COMMON_LAST_NAME,
-            Email = JOHN_EMAIL,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(COMMON_OLD_PASSWORD),
-            // To make this user's join date later than the first user's
-            JoinDateUtc = JOHN_JOIN_DATE_UTC,
-            DeletedDateUtc = null,
-            Role = Roles.MEMBER
-        };
+        // Init users here b/c they may change throughout each user test
+        _janeUser = GenerateJaneUser();
+        _johnUser = GenerateJohnUser();
         // Deleted user
-        _judyUser = new User
-            {
-                Id = JUDY_USER_GUID,
-                FirstName = JUDY_FIRST_NAME,
-                LastName = COMMON_LAST_NAME,
-                Email = JUDY_EMAIL,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(COMMON_OLD_PASSWORD),
-                JoinDateUtc = JUDY_JOIN_DATE_UTC,
-                DeletedDateUtc = DateTime.UtcNow,
-                Role = Roles.MEMBER
-            };
+        _judyUser = GenerateJudyUser();
         _usersData = new List<User> { _janeUser, _johnUser, _judyUser };
 
         // Set up mock objects
@@ -367,7 +321,7 @@ public class UserServiceTests
         Assert.AreEqual(COMMON_LAST_NAME, newUserLila.LastName);
         Assert.AreEqual(LILA_EMAIL, newUserLila.Email);
         BCrypt.Net.BCrypt.Verify(COMMON_OLD_PASSWORD, newUserLila.PasswordHash);
-        Assert.IsTrue(_datesEqualWithinSeconds((DateTime) newUserLila.JoinDateUtc, DateTime.UtcNow, 60));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) newUserLila.JoinDateUtc, DateTime.UtcNow));
         Assert.IsNull(newUserLila.DeletedDateUtc);
         Assert.AreEqual(Roles.MEMBER, newUserLila.Role);
     }
@@ -611,6 +565,7 @@ public class UserServiceTests
     #endregion
 
     #region DeleteUserAsync
+    // TODO check deletes cascade for activities and sessions
     [TestMethod]
     public async Task DeleteUserAsync_Admin_AnotherUser_Ok()
     {
@@ -629,7 +584,7 @@ public class UserServiceTests
         Assert.IsNotNull(_johnUser.DeletedDateUtc);
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
         // Check that the dates are equal within a minute
-        Assert.IsTrue(_datesEqualWithinSeconds((DateTime) _johnUser.DeletedDateUtc, DateTime.UtcNow, 60));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) _johnUser.DeletedDateUtc, DateTime.UtcNow));
     }
 
     [TestMethod]
@@ -686,7 +641,7 @@ public class UserServiceTests
         Assert.IsNotNull(_johnUser.DeletedDateUtc);
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
         // Check that the dates are equal within a minute
-        Assert.IsTrue(_datesEqualWithinSeconds((DateTime) _johnUser.DeletedDateUtc, DateTime.UtcNow, 60));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) _johnUser.DeletedDateUtc, DateTime.UtcNow));
     }
 
     [TestMethod]
@@ -713,12 +668,6 @@ public class UserServiceTests
         Assert.AreEqual(email, user.Email);
 
         // Check that the dates are equal within a minute
-        Assert.IsTrue(_datesEqualWithinSeconds((DateTime) user.JoinDateUtc, DateTime.UtcNow, 60));
-    }
-
-    private bool _datesEqualWithinSeconds(DateTime date, DateTime laterDate, int seconds)
-    {
-        TimeSpan timeSpan = laterDate.Subtract(date);
-        return timeSpan.TotalMinutes < seconds;
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) user.JoinDateUtc, DateTime.UtcNow));
     }
 }

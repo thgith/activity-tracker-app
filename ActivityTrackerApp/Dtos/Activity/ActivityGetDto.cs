@@ -5,8 +5,9 @@ namespace ActivityTrackerApp.Dtos;
 /// <summary>
 /// An activity.
 /// </summary>
-public class ActivityGetDto
+public class ActivityGetDto : BaseEntity
 {
+    public Guid OwnerId { get; set; }
     /// <summary>
     /// Name of the activity.
     /// </summary>
@@ -47,7 +48,7 @@ public class ActivityGetDto
     /// A list of tags associated with the activity.
     /// Used for sorting and filtering.
     /// </summary>
-    public IList<string> Tags { get; set; }
+    public IList<string>? Tags { get; set; }
 
     public virtual IList<Session> Sessions { get; set; }
 }

@@ -41,7 +41,7 @@ public class Activity : BaseEntity
     /// Whether the activity is archived.
     /// The user can still see it in archived activities.
     /// </summary>
-    public bool? IsArchived { get; set; }
+    public bool IsArchived { get; set; }
 
     /// <summary>
     /// The date the activity was soft-deleted in the system.
@@ -61,9 +61,7 @@ public class Activity : BaseEntity
     /// </summary>
     /// <remarks>No more than 10 tags allowed.</remarks>
     [MaxLength(10)]
-    public IList<string> Tags { get; set; }
-
-    public DateTime? DateDeletedUtc { get; set; }
+    public IList<string>? Tags { get; set; }
 
     [Required]
     public Guid OwnerId { get; set; }

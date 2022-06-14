@@ -87,7 +87,7 @@ public class SessionService : ISessionService
         // Get the session's activity            
         var activity = await _dbContext.Activities.FirstOrDefaultAsync(x =>
                         x.Id == session.ActivityId &&
-                        x.DateDeletedUtc == null);
+                        x.DeletedDateUtc == null);
 
         // Activity owning session doesn't exist for some reason
         if (activity == null)
@@ -114,7 +114,7 @@ public class SessionService : ISessionService
         // Get the session's activity            
         var activity = await _dbContext.Activities.FirstOrDefaultAsync(x =>
                         x.Id == newSessionDto.ActivityId &&
-                        x.DateDeletedUtc == null);
+                        x.DeletedDateUtc == null);
 
         // Activity we want to create the session for doesn't exist, return
         if (activity == null)
@@ -158,7 +158,7 @@ public class SessionService : ISessionService
         // Get the session's activity            
         var activity = await _dbContext.Activities.FirstOrDefaultAsync(x =>
                         x.Id == session.ActivityId &&
-                        x.DateDeletedUtc == null);
+                        x.DeletedDateUtc == null);
 
         // Regular users can update their own activities. Admins can update anyone's activities.
         if (currUserId != activity.OwnerId && !(await _userService.IsAdmin(currUserId)))
@@ -167,9 +167,9 @@ public class SessionService : ISessionService
         }
 
         // NOTE: You can't change the activity ID associated with a session once it's created
-        if (updateSessionDto.Description != null)
+        if (updateSessionDto.Notes != null)
         {
-            session.Description = updateSessionDto.Description;
+            session.Notes = updateSessionDto.Notes;
         }
         if (updateSessionDto.DurationSeconds != null)
         {

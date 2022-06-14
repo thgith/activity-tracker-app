@@ -47,7 +47,7 @@ public class ActivityService : IActivityService
 
         // Get all active activities
         var activitiesQuery = _dbContext.Activities
-            .Where(x => x.DateDeletedUtc == null);
+            .Where(x => x.DeletedDateUtc == null);
 
         // Add filter on owner if exists
         if (ownerId != null)
@@ -219,7 +219,7 @@ public class ActivityService : IActivityService
 
         if (updatedActivityDto.IsArchived != null)
         {
-            activity.IsArchived = updatedActivityDto.IsArchived;
+            activity.IsArchived = (bool)updatedActivityDto.IsArchived;
         }
 
         if (updatedActivityDto.ColorHex != null)
@@ -261,7 +261,8 @@ public class ActivityService : IActivityService
 
         // Soft delete the activity
         var utcNow = DateTime.UtcNow;
-        activity.DateDeletedUtc = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
+        var deletedDateUtc = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
+        activity.DeletedDateUtc = deletedDateUtc;
 
         // Now, delete the sessions associated with the activity
         // Get all of the active sessions associated wtih the activity
@@ -272,7 +273,7 @@ public class ActivityService : IActivityService
         // Soft delete each session
         foreach (var session in sessionsToDelete)
         {
-            session.DeletedDateUtc = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
+            session.DeletedDateUtc = deletedDateUtc;
         }
 
         // Save to DB
@@ -286,6 +287,6 @@ public class ActivityService : IActivityService
         return await _dbContext.Activities
             .FirstOrDefaultAsync(x => 
                 x.Id == activityId && 
-                x.DateDeletedUtc == null);
+                x.DeletedDateUtc == null);
     }
 }

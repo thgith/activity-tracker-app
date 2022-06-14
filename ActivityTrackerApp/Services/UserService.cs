@@ -197,7 +197,21 @@ public class UserService : IUserService
 
         // Soft delete the user
         var utcNow = DateTime.UtcNow;
-        user.DeletedDateUtc = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
+        var deleteDateUtc = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
+        user.DeletedDateUtc = deleteDateUtc;
+
+        // Soft delete all the activities associated with the user
+        var activitiesToDelete = _dbContext.Activities.Where(x => x.OwnerId == userId && x.DeletedDateUtc == null);
+        foreach (var activity in activitiesToDelete)
+        {
+            // Soft delete all sessions associated with the activities
+            var sessionsToDelete = _dbContext.Sessions.Where(x => x.ActivityId == activity.Id && x.DeletedDateUtc == null);
+            foreach (var session in sessionsToDelete)
+            {
+                session.DeletedDateUtc = deleteDateUtc;
+            }
+            activity.DeletedDateUtc = deleteDateUtc;
+        }
 
         // Save to DB
         // SaveChangesAsync returns the number of entries written to the DB

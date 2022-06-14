@@ -20,5 +20,5 @@ public class SessionCreateDto
     public uint DurationSeconds { get; set; } = 0;
 
     [MaxLength(1024)]
-    public string Description { get; set; }
+    public string Notes { get; set; }
 }
