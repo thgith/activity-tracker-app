@@ -164,6 +164,7 @@ public static class TestFixtures
             Tags = null
         };
     }
+    // Belongs to a deleted user, so this is also deleted
     public static Activity GenerateBaseballActivity()
     {
         return new Activity
@@ -175,7 +176,8 @@ public static class TestFixtures
             StartDateUtc = DateTime.UtcNow,
             DueDateUtc = null,
             CompletedDateUtc = null,
-            DeletedDateUtc = null,
+            // When user is deleted, activity is also deleted
+            DeletedDateUtc = DateTime.UtcNow,
             IsArchived = true,
             ColorHex = null,
             Tags = null,

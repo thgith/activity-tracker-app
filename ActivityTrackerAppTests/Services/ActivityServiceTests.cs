@@ -250,12 +250,11 @@ public class ActivityServiceTests
     }
     
     [TestMethod]
-    [ExpectedException(typeof(ForbiddenException))]
-    public async Task GetAllActivitiesAsync_Admin_DeletedUser_ReturnNull()
+    public async Task GetAllActivitiesAsync_Admin_AnothersActivity_DeletedActivity_ReturnEmpty()
     {
         // -- Arrange --
-        _userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
+        _userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
+                            .Returns(Task.FromResult(true));
 
         var activityService = new ActivityService(
             _dbContextMock.Object,
@@ -263,7 +262,10 @@ public class ActivityServiceTests
             _mapperMock.Object);
 
         // -- Act --
-        var activities = await activityService.GetAllActivitiesForUserAsync(JOHN_USER_GUID, JUDY_USER_GUID);
+        var activities = await activityService.GetAllActivitiesForUserAsync(JANE_USER_GUID, JUDY_USER_GUID);
+        
+        // -- Assert --
+        Assert.AreEqual(activities.Count(), 0);
     }
     
     #endregion
