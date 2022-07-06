@@ -4,8 +4,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { REQUIRED_FIELD_MSG } from '../../../app/constants';
-import { getUserIdCookie } from '../../../app/helpers/helpers';
+import { getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
 import { Loader } from '../../../app/views/Loader';
+import { clearMessage } from '../../message/messageSlice';
+import { resetTimer } from '../../timer/timerSlice';
 import { IUserUpdate } from '../IUser';
 import { getUser, updateUser } from '../userSlice';
 
@@ -13,10 +15,17 @@ export const ProfileEdit = (props: any) => {
     const navigate = useNavigate();
     const dispatch = useDispatch()
     const [loading, setLoading] = useState(false);
+    const timerData = useSelector((state: any) => state.timer);
 
     const { user: currentUser } = useSelector((state: any) => state.userData);
 
     useEffect(() => {
+        dispatch(clearMessage());
+        clearInterval(timerData.intervalId);
+        dispatch(resetTimer({}));
+    }, [dispatch]);
+
+    useEffectSkipInitialRender(() => {
         const currUserId = getUserIdCookie();
         if (!currUserId) {
             // Redirect to login if not authenticated

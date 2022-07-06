@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
@@ -9,6 +9,8 @@ import { getUserIdCookie, onlyUnique, trimmedStrArray, useEffectSkipInitialRende
 import { IActivity } from '../IActivity';
 import { getUser } from '../../User/userSlice';
 import { addActivity } from '../activityMethods';
+import { clearMessage } from '../../message/messageSlice';
+import { resetTimer } from '../../timer/timerSlice';
 
 export const ActivityAdd = () => {
     const dispatch = useDispatch()
@@ -16,6 +18,13 @@ export const ActivityAdd = () => {
     const [loading, setLoading] = useState(false);
     const { user: currentUser } = useSelector((state: any) => state.userData);
     const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR);
+    const timerData = useSelector((state: any) => state.timer);
+
+    useEffect(() => {
+        dispatch(clearMessage());
+        clearInterval(timerData.intervalId);
+        dispatch(resetTimer({}));
+    }, [dispatch]);
 
     useEffectSkipInitialRender(() => {
         const currUserId = getUserIdCookie();

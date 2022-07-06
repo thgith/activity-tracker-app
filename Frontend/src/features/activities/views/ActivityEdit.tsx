@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Form, Formik, Field, ErrorMessage } from 'formik';
@@ -10,6 +10,8 @@ import { IActivity, IActivityEdit } from '../IActivity'
 import { getUser } from '../../User/userSlice'
 import { getActivity, editActivity, deleteActivity } from '../activityMethods';
 import { Loader } from '../../../app/views/Loader';
+import { clearMessage } from '../../message/messageSlice';
+import { resetTimer } from '../../timer/timerSlice';
 
 export const ActivityEdit = (props: any) => {
     // const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -17,6 +19,7 @@ export const ActivityEdit = (props: any) => {
     const [gotActivity, setGotActivity] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch()
+    const timerData = useSelector((state: any) => state.timer);
     const [activityFromGet, setActivityFromGet] = useState(null);
     const { user: currentUser } = useSelector((state: any) => state.userData);
     const { activityId } = useParams();
@@ -24,6 +27,12 @@ export const ActivityEdit = (props: any) => {
         state.activitiesData ? state.activitiesData.activities.find((activity: any) => activity.id === activityId) : null
     )
     let activity = activityFromList;
+
+    useEffect(() => {
+        dispatch(clearMessage());
+        clearInterval(timerData.intervalId);
+        dispatch(resetTimer({}));
+    }, [dispatch]);
 
     useEffectSkipInitialRender(() => {
         const currUserId = getUserIdCookie();

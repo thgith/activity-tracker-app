@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import moment from 'moment'
 import * as Yup from 'yup';
-import { BLUE_GREEN, DEFAULT_COLOR, PICKER_DATE_DISPLAY_FORMAT, REQUIRED_FIELD_MSG } from '../../../app/constants'
+import { DEFAULT_COLOR, PICKER_DATE_DISPLAY_FORMAT, REQUIRED_FIELD_MSG } from '../../../app/constants'
 import { getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers'
 import { ISessionNew } from '../ISession'
 import { getUser } from '../../User/userSlice'
@@ -12,6 +12,8 @@ import { IActivity } from '../../activities/IActivity';
 import { getActivity } from '../../activities/activityMethods';
 import { addSession } from '../sessionMethods';
 import { Loader } from '../../../app/views/Loader';
+import { clearMessage } from '../../message/messageSlice';
+import { resetTimer } from '../../timer/timerSlice';
 
 
 export const SessionAdd = () => {
@@ -23,7 +25,14 @@ export const SessionAdd = () => {
     const { user: currentUser } = useSelector((state: any) => state.userData);
     const [activityFromGet, setActivityFromGet] = useState(null);
     const [gotActivity, setGotActivity] = useState(false);
+    const timerData = useSelector((state: any) => state.timer);
 
+    useEffect(() => {
+        dispatch(clearMessage());
+        clearInterval(timerData.intervalId);
+        dispatch(resetTimer({}));
+    }, [dispatch]);
+    
     const activityFromList: IActivity = useSelector((state: any) =>
         state.activitiesData ? state.activitiesData.activities.find((activity: any) => activity.id === activityId) : null
     );

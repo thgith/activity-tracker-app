@@ -73,6 +73,7 @@ Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hove
 # Features
 - Login/registration with email and JWT token auth
 - Add/edit a user
+- Change user password when logged in
 - Add/edit/delete an activity
 - Manually add/edit/delete a session
 - Add session with stopwatch

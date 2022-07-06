@@ -44,8 +44,6 @@ public class AuthController : ApiControllerBase<AuthController>
 
             var userRegisterDtoWithToken = await userService.RegisterUserAsync(userRegisterDto);
 
-
-
             // Add token to user's cookies
             Response.Cookies.Append(
                 GlobalConstants.JWT_TOKEN_COOKIE_NAME,
@@ -81,7 +79,7 @@ public class AuthController : ApiControllerBase<AuthController>
             return Problem(message, statusCode: StatusCodes.Status500InternalServerError);
         }
     }
-
+    
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

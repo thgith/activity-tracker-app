@@ -28,6 +28,8 @@ namespace ActivityTrackerApp.Services
         /// <returns>An object of the new user with a JWT token.</param>
         Task<EntityWithToken<UserGetDto>> RegisterUserAsync(UserRegisterDto newUserDto);
 
+        Task<bool> ChangePassword(Guid currUserId, string newPassword);
+
         /// <summary>
         /// Gets all active users.
         /// </summary>

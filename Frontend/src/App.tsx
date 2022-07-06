@@ -25,6 +25,7 @@ import { Login } from './features/login/views/Login';
 import Register from './features/login/views/Register';
 import { ProfileEdit } from './features/User/views/ProfileEdit';
 import { NotFound } from './app/views/NotFound';
+import { ChangePassword } from './features/User/views/ChangePassword';
 
 function App() {
     return (
@@ -52,6 +53,7 @@ function App() {
 
                     <Route path="/profile/:userId" element={<Profile />}></Route>
                     <Route path="/profile/:userId/edit" element={<ProfileEdit />}></Route>
+                    <Route path="/profile/:userId/changePassword" element={<ChangePassword />}></Route>
                     <Route path="/404" element={<NotFound />}></Route>
                     <Route
                         path="*"

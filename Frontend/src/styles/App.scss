@@ -39,10 +39,12 @@ hr {
         }
     }
 }
+
 .mandatory-field {
     color: red;
     font-size: 1em;
 }
+
 .readonly:hover {
     cursor: not-allowed;
 }

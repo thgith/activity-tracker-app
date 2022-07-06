@@ -47,6 +47,17 @@ const updateUser = (
         });
 };
 
+const changePassword = (userId: string, email: string, oldPassword: string, newPassword: string) => {
+    return axios
+        .put(`${USER_API_URL}${userId}/changePassword`, {
+            'Email': email,
+            'OldPassword': oldPassword,
+            'NewPassword': newPassword
+        })
+        .then((response: any) => {
+            return response.data;
+        });
+};
 
 const deleteUser = (userId: string) => {
     return axios
@@ -55,11 +66,12 @@ const deleteUser = (userId: string) => {
         });
 };
 
-const authService = {
+const userService = {
     getUser,
     addUser,
     updateUser,
+    changePassword,
     deleteUser,
 };
 
-export default authService;
+export default userService;

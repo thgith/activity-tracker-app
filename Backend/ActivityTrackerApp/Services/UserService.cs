@@ -65,6 +65,22 @@ public class UserService : IUserService
         };
     }
 
+    public async Task<bool> ChangePassword(Guid currUserId, string newPassword)
+    {
+        var user = await _getActiveUser(currUserId);
+
+        // Return if user doesn't exist (or the user was soft deleted)
+        if (user == null)
+        {
+            return false;
+        }
+
+        user.PasswordHash = _hashPassword(newPassword);
+        
+        await _dbContext.SaveChangesAsync();
+        return true;
+    }
+
     /// <inheritdoc/>
     public async Task<IEnumerable<UserGetDto>> GetAllUsersAsync(Guid currUserId)
     {

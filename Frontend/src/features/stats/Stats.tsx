@@ -1,10 +1,20 @@
-import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { getUserIdCookie } from '../../app/helpers/helpers';
+import { clearMessage } from '../message/messageSlice';
+import { resetTimer } from '../timer/timerSlice';
 
 export const Stats = () => {
+    const dispatch = useDispatch()
     const navigate = useNavigate();
+    const timerData = useSelector((state: any) => state.timer);
+    
+    useEffect(() => {
+        dispatch(clearMessage());
+        clearInterval(timerData.intervalId);
+        dispatch(resetTimer({}));
+    }, [dispatch]);
 
     useEffect(() => {
         // Redirect to login if not authenticated

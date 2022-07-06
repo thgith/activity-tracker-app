@@ -34,7 +34,7 @@ public class UserController : ApiControllerBase<UserController>
             var usersDtos = await userService.GetAllUsersAsync(currUserGuid);
             return Ok(usersDtos);
         }
-        return await checkAuthAndPerformAction(Request, GetAllUsersPartialAsync);            
+        return await checkAuthAndPerformAction(Request, GetAllUsersPartialAsync);
     }
 
     [HttpGet("{userId}")]
@@ -105,6 +105,36 @@ public class UserController : ApiControllerBase<UserController>
             return Ok($"Successfully deleted user {userId}");
         }
         return await checkAuthAndPerformAction(Request, DeleteUserPartialAsync);
+    }
 
+
+    [HttpPut("{userId}/changePassword")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> ChangePasswordAsync(Guid userId, [FromBody] UserChangePasswordDto userDto)
+    {
+        async Task<IActionResult> ChangePasswordPartialAsync(Guid currUserGuid)
+        {
+            // Make sure the old password is correct
+            var useGetDtoWithToken = await userService.AuthenticateUserAsync(new UserLoginDto()
+            {
+                Email = userDto.Email,
+                Password = userDto.OldPassword
+            });
+
+            if (useGetDtoWithToken == null)
+            {
+                return Problem("Incorrect credentials", statusCode: StatusCodes.Status400BadRequest);
+            }
+
+            var successful = await userService.ChangePassword(currUserGuid, userDto.NewPassword);
+            if (!successful)
+            {
+                return Problem($"There was a problem changing passwords for user {currUserGuid}");
+            }
+            return Ok(successful);
+        }
+        return await checkAuthAndPerformAction(Request, ChangePasswordPartialAsync);
     }
 }

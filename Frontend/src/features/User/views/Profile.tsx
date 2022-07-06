@@ -3,13 +3,23 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { getUserIdCookie } from '../../../app/helpers/helpers';
 import { Loader } from '../../../app/views/Loader';
+import { clearMessage } from '../../message/messageSlice';
+import { resetTimer } from '../../timer/timerSlice';
 import { getUser } from '../userSlice';
 
 export const Profile = (props: any) => {
     const navigate = useNavigate();
     const dispatch = useDispatch()
+    const timerData = useSelector((state: any) => state.timer);
 
     const { user: currentUser } = useSelector((state: any) => state.userData);
+
+    useEffect(() => {
+        dispatch(clearMessage());
+        clearInterval(timerData.intervalId);
+        dispatch(resetTimer({}));
+    }, [dispatch]);
+
 
     useEffect(() => {
         const currUserId = getUserIdCookie();

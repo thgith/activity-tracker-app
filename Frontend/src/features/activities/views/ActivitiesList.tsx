@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom'
 import { calculateActivityHours, calculateTotalActivityHours, displayTags, getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
@@ -6,6 +6,8 @@ import { getUser } from '../../User/userSlice';
 import { IActivity } from '../IActivity';
 import { Loader } from '../../../app/views/Loader';
 import { listActivities } from '../activityMethods';
+import { clearMessage } from '../../message/messageSlice';
+import { resetTimer } from '../../timer/timerSlice';
 
 export const ActivitiesList = () => {
     const dispatch = useDispatch();
@@ -15,6 +17,13 @@ export const ActivitiesList = () => {
     const activities = useSelector((state: any) => state.activitiesData.activities);
     const [stringFilter, setStringFilter] = useState('');
     const activityIdToSessions = useSelector((state: any) => state.activitiesData.activityIdToSessions);
+    const timerData = useSelector((state: any) => state.timer);
+    
+    useEffect(() => {
+        dispatch(clearMessage());
+        clearInterval(timerData.intervalId);
+        dispatch(resetTimer({}));
+    }, [dispatch]);
 
     useEffectSkipInitialRender(() => {
         const currUserId = getUserIdCookie();

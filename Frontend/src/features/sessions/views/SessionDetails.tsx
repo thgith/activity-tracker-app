@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"; // This is syntax that changed with v6
 import moment from 'moment';
@@ -9,6 +9,8 @@ import { getUser } from '../../User/userSlice';
 import { listSessionsForActivity } from '../sessionMethods';
 import { Loader } from '../../../app/views/Loader';
 import { SessionNotFound } from './SessionNotFound';
+import { clearMessage } from '../../message/messageSlice';
+import { resetTimer } from '../../timer/timerSlice';
 
 export const SessionDetails = () => {
     const dispatch = useDispatch()
@@ -21,6 +23,13 @@ export const SessionDetails = () => {
     const { user: currentUser } = useSelector((state: any) => state.userData);
     const [gotSessions, setGotSessions] = useState(false);
     var activityIdToSessions = useSelector((state: any) => state.activitiesData.activityIdToSessions)
+    const timerData = useSelector((state: any) => state.timer);
+
+    useEffect(() => {
+        dispatch(clearMessage());
+        clearInterval(timerData.intervalId);
+        dispatch(resetTimer({}));
+    }, [dispatch]);
 
     let sessions: any = null;
     // Try to get session from dictionary
@@ -67,7 +76,7 @@ export const SessionDetails = () => {
         if (!gotSessions) {
             return <Loader />
         }
-        
+
         return <SessionNotFound />
     }
 

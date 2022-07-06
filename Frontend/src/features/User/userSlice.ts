@@ -45,6 +45,22 @@ export const logOut = createAsyncThunk(
         await AuthService.logOut();
     });
 
+export const changePassword = createAsyncThunk(
+    'user/changePassword',
+    async ({ userId, email, oldPassword, newPassword }: { userId: string, email: string, oldPassword: string, newPassword: string }, thunkAPI) => {
+        try {
+            const data = await UserService.changePassword(userId, email, oldPassword, newPassword);
+            return data;
+        } catch (error: any) {
+            const message =
+                (error.response && error.response.data && error.response.data.detail) ||
+                error.message ||
+                error.toString();
+            thunkAPI.dispatch(setMessage(message));
+            return thunkAPI.rejectWithValue(message);
+        }
+    });
+
 export const getUser = createAsyncThunk(
     'user/get',
     async (userId: string, thunkAPI) => {
@@ -67,7 +83,7 @@ export const updateUser = createAsyncThunk(
     async ({ firstName, lastName, email, password }: any, thunkAPI) => {
         try {
             const data = await UserService.updateUser(firstName, lastName, email, password);
-            return { user: {...data.entity} };
+            return { user: { ...data.entity } };
         } catch (error: any) {
             const message =
                 (error.response && error.response.data && error.response.data.detail) ||

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'; // This is syntax that changed with v6
 import { Field, Form, Formik } from 'formik';
@@ -11,6 +11,8 @@ import { SessionNotFound } from './SessionNotFound';
 import { ISession } from '../ISession';
 import { getUser } from '../../User/userSlice';
 import { listSessionsForActivity, deleteSession, addSession, editSession } from '../sessionMethods';
+import { clearMessage } from '../../message/messageSlice';
+import { resetTimer } from '../../timer/timerSlice';
 
 export const SessionEdit = () => {
     const dispatch = useDispatch()
@@ -23,6 +25,13 @@ export const SessionEdit = () => {
     const { user: currentUser } = useSelector((state: any) => state.userData);
     const [gotSessions, setGotSessions] = useState(false);
     var activityIdToSessions = useSelector((state: any) => state.activitiesData.activityIdToSessions)
+    const timerData = useSelector((state: any) => state.timer);
+
+    useEffect(() => {
+        dispatch(clearMessage());
+        clearInterval(timerData.intervalId);
+        dispatch(resetTimer({}));
+    }, [dispatch]);
 
     let sessions: any = null;
     // Try to get session from dictionary
