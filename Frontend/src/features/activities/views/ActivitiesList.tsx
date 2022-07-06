@@ -18,7 +18,7 @@ export const ActivitiesList = () => {
     const [stringFilter, setStringFilter] = useState('');
     const activityIdToSessions = useSelector((state: any) => state.activitiesData.activityIdToSessions);
     const timerData = useSelector((state: any) => state.timer);
-    
+
     useEffect(() => {
         dispatch(clearMessage());
         clearInterval(timerData.intervalId);
@@ -100,7 +100,7 @@ export const ActivitiesList = () => {
             <div className="fa fa-sticky-note-o fa-5x"></div>
             <h5 className="no-activities-body">No Activities. <Link to="/activities/new">Create one now!</Link></h5>
         </div>
-    )
+    );
 
     const renderedActivities = activities.map((activity: IActivity) => (
         isActivityIncludedInFilter(activity) ?

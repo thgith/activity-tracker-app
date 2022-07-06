@@ -79,7 +79,7 @@ public class AuthController : ApiControllerBase<AuthController>
             return Problem(message, statusCode: StatusCodes.Status500InternalServerError);
         }
     }
-    
+
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -151,8 +151,22 @@ public class AuthController : ApiControllerBase<AuthController>
         try
         {
             // Remove token from user's cookies
-            Response.Cookies.Delete(GlobalConstants.JWT_TOKEN_COOKIE_NAME);
-            Response.Cookies.Delete(GlobalConstants.CURR_USER_ID_COOKIE_NAME);
+            Response.Cookies.Delete(
+                GlobalConstants.JWT_TOKEN_COOKIE_NAME,
+                // These options are so the cookies clear in Chrome
+                new CookieOptions()
+                {
+                    SameSite = SameSiteMode.None,
+                    Secure = true
+                });
+            Response.Cookies.Delete(
+                GlobalConstants.CURR_USER_ID_COOKIE_NAME,
+                // These options are so the cookies clear in Chrome
+                new CookieOptions()
+                {
+                    SameSite = SameSiteMode.None,
+                    Secure = true
+                });
             return Ok("Successfully logged out");
         }
         catch (Exception e)

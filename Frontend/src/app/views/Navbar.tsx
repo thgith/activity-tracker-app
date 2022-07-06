@@ -1,11 +1,11 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { getUserIdCookie } from '../helpers/helpers';
 import { logOut } from '../../features/User/userSlice';
 
 export const Navbar = () => {
     const dispatch = useDispatch();
-    const currUserId = getUserIdCookie();
+    const { user: currentUser } = useSelector((state: any) => state.userData);
 
     const handleLogout = () => {
         dispatch<any>(logOut())
@@ -44,22 +44,22 @@ export const Navbar = () => {
                                 <span className="sr-only">(current)</span>
                             </Link>
                         </li>
-                        {currUserId ? <li className="nav-item">
+                        {currentUser ? <li className="nav-item">
                             <Link to="/stats" className="nav-link">
                                 <span className="fa fa-bar-chart"></span>
                                 <span>Stats</span>
                             </Link>
                         </li> : null}
-                        {currUserId ? <li className="nav-item">
-                            <Link to={`/profile/${currUserId}`} className="nav-link">
+                        {currentUser ? <li className="nav-item">
+                            <Link to={`/profile/${currentUser}`} className="nav-link">
                                 <span className="fa fa-user-circle"></span>
                                 <span>Profile</span>
                             </Link>
                         </li> : null}
-                        {!currUserId ? <li className="nav-item">
+                        {!currentUser ? <li className="nav-item">
                             <Link to="/register" className="nav-link">Register</Link>
                         </li> : null}
-                        {currUserId ? (<li className="nav-item" onClick={handleLogout}>
+                        {currentUser ? (<li className="nav-item" onClick={handleLogout}>
                             <Link to="/login" className="nav-link">
                                 <span className="fa fa-sign-out"></span>
                                 Log Out
