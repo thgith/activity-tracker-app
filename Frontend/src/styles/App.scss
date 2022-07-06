@@ -1,0 +1,266 @@
+@import './vars.scss';
+
+// -- General --
+body {
+    background-color: $LIGHT-GREY;
+}
+
+.App {
+    margin: 1em 2em 1em 2em;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-left {
+    text-align: left;
+}
+
+hr {
+    margin: 1em -2em;
+    color: $DARK_GREY;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+.action-button-group {
+    display: inline-block !important;
+    padding-top: 1.5em;
+
+    button {
+        margin: 0 0.5em;
+
+        // To make the icons stay on same line
+        span {
+            display: inline-block !important;
+        }
+    }
+}
+.mandatory-field {
+    color: red;
+    font-size: 1em;
+}
+.readonly:hover {
+    cursor: not-allowed;
+}
+
+.form-message {
+    margin-top: 1em;
+}
+
+.search-bar {
+    background-color: white !important;
+}
+
+.form-control {
+    background-color: $LIGHT-GREY;
+}
+
+nav .fa,
+button .fa,
+.fa-clock-o {
+    padding-right: 5px;
+}
+
+// -- Panel --
+.colored-header {
+    color: white;
+    border-radius: $RECT_BORDER_RADIUS $RECT_BORDER_RADIUS 0 0;
+    background-color: $BLUE_GREEN;
+    padding: 0.5em;
+}
+
+.panel-container {
+    margin: auto;
+    border: 1px solid $MED_GREY;
+    border-radius: $RECT_BORDER_RADIUS;
+    background-color: white;
+    padding: 0;
+    max-width: $MAX_PANEL_WIDTH;
+}
+
+.panel-body-container {
+    padding: 0.5em 2em 1.5em 2em;
+}
+
+.panel-lg {
+    max-width: 1000px !important;
+}
+
+// -- Color picker --
+.color-picker {
+    padding: 0.5em 0;
+
+    .color-circle {
+        margin: auto;
+        border-radius: 50%;
+        width: 2em;
+        height: 2em;
+        padding: 0;
+
+        .fa-check {
+            padding: 0;
+        }
+
+        &.selected {
+            color: white;
+        }
+
+        &.color-black {
+            background-color: BLACK;
+        }
+
+        &.color-grey {
+            background-color: $DARK_GREY;
+        }
+
+        &.color-yellow {
+            background-color: $YELLOW;
+        }
+
+        &.color-orange {
+            background-color: $ORANGE;
+        }
+
+        &.color-red {
+            background-color: $CORAL;
+        }
+
+        &.color-pink {
+            background-color: $PINK;
+        }
+
+        &.color-purple {
+            background-color: $PURPLE;
+        }
+
+        &.color-blue {
+            background-color: $BLUE;
+        }
+
+        &.color-blue-green {
+            background-color: $BLUE_GREEN;
+        }
+
+        &.color-green {
+            background-color: $GREEN;
+        }
+    }
+
+    .color-circle:hover {
+        opacity: 0.8;
+        cursor: pointer;
+    }
+}
+
+// -- Timer --
+.timer-container {
+    display: block;
+    margin: auto;
+    border: 1px solid $MED_GREY;
+    border-radius: $RECT_BORDER_RADIUS;
+    background-color: $LIGHT-GREY;
+    padding: 1em;
+    max-width:400px;
+}
+
+// -- Card --
+.card-container {
+    padding: 0;
+
+    .card-item {
+        margin: 0.5em 1rem 0 0;
+        border: 1px solid $MED_GREY;
+        border-radius: $RECT_BORDER_RADIUS $RECT_BORDER_RADIUS 0 0;
+        background-color: white;
+        padding: 0;
+
+        .card-header {
+            border-radius: 8px 8px 0 0;
+            background-color: $BLUE_GREEN;
+            padding: 1rem;
+            color: white;
+
+        }
+
+        .card-body {
+            border-radius: $RECT_BORDER_RADIUS $RECT_BORDER_RADIUS 0 0;
+            padding: 0.8em;
+            max-height: 150px;
+            overflow: auto;
+            color: $DARK_GREY;
+        }
+    }
+
+    .card-item:hover {
+        opacity: 80%;
+        border: solid grey 1px;
+    }
+}
+
+// -- Tags --
+.tag {
+    display: inline-block;
+    border-radius: 15px;
+    background-color: $MED_GREY;
+    padding: 5px 10px;
+    max-width: 100px;
+    font-size: .8em;
+}
+
+.card-body {
+    .tag {
+        margin: 0.2em;
+    }
+}
+
+.tags-container {
+    margin: auto;
+    padding: 0;
+    max-width: 400px;
+    text-align: center;
+
+    .tag {
+        z-index: 100;
+        margin: 0.2em;
+    }
+}
+
+// -- Activity --
+.no-activities {
+    padding: 2em;
+    .fa {
+        color: $BLUE_GREEN;
+    }
+    .no-activities-body {
+        padding: 1em;
+    }
+}
+.activity-hours {
+    position: relative;
+    bottom: 0;
+    right: 0;
+    padding-bottom: 0.5em;
+    color: black;
+    font-weight: bold;
+}
+
+.date-row {
+    margin: auto;
+    max-width: 450px;
+}
+
+.activity-description {
+    padding: 1em 0;
+}
+
+// -- Session --
+.no-sessions {
+    margin: 1em 1em 2em 1em;
+}
+.session-body {
+    background-color: $LIGHT-GREY;
+}
