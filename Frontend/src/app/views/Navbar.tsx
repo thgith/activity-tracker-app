@@ -25,14 +25,14 @@ export const Navbar = () => {
                 <button
                     className="navbar-toggler"
                     type="button"
-                    data-toggle="collapse"
-                    data-target="#navbarTogglerDemo01"
-                    aria-controls="navbarTogglerDemo01"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#activity-tracker-navbar"
+                    aria-controls="activity-tracker-navbar"
                     aria-expanded="false"
                     aria-label="Toggle navigation">
                     <span className="navbar-toggler-icon"></span>
                 </button>
-                <div className="collapse navbar-collapse">
+                <div id="activity-tracker-navbar" className="collapse navbar-collapse">
                     <Link to="/" className="navbar-brand">
                         Activity Tracker App
                     </Link>
@@ -41,7 +41,8 @@ export const Navbar = () => {
                             <Link to="/" className="nav-link">
                                 <span className="fa fa-home"></span>
                                 <span>Home</span>
-                                <span className="sr-only">(current)</span></Link>
+                                <span className="sr-only">(current)</span>
+                            </Link>
                         </li>
                         {currUserId ? <li className="nav-item">
                             <Link to="/stats" className="nav-link">

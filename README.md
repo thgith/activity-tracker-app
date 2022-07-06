@@ -11,8 +11,11 @@ Used to track how much time is spent on activities.
 ## Frontend
 - React
 - Redux-Toolkit
+  - redux - global store
+  - immer - simplifies reducers logic
+  - redux-thunk - used for async; autogenerates actions (pending, fulfilled, rejected)
 - TypeScript
-- Bootstrap
+- Bootstrap 5
 - SASS
 
 ## Other
@@ -74,6 +77,7 @@ Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hove
 - Manually add/edit/delete a session
 - Add session with stopwatch
 - Color picker for activity
+- List page with total time spent on each activity
 - Activity filter on list page
 - Tagging on activities
 
