@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Loader } from '../../app/views/Loader';
 import { ISessionNew } from '../sessions/ISession';
@@ -7,6 +8,7 @@ import { incrementTimer, pauseTimer, resetTimer, startTimer } from './timerSlice
 
 export const Timer = (props: any) => {
     const dispatch = useDispatch()
+    const [loading, setLoading] = useState(false);
     const timerData = useSelector((state: any) => state.timer);
     let intervalHandle: any;
 
@@ -30,6 +32,7 @@ export const Timer = (props: any) => {
     const handleAddSessionFromTimer = () => {
         clearInterval(timerData.intervalId);
 
+        setLoading(true);
         dispatch(pauseTimer({}));
         var session: ISessionNew = {
             activityId: props.activityId,
@@ -43,9 +46,11 @@ export const Timer = (props: any) => {
             .then(() => {
                 console.log('session added', 'timer cleared');
                 dispatch(resetTimer({}));
+                setLoading(false);
             })
             .catch((e: any) => {
                 console.log(e);
+                setLoading(false);
             });
     };
 
@@ -100,8 +105,12 @@ export const Timer = (props: any) => {
                         className="btn btn-primary"
                         onClick={handleAddSessionFromTimer}
                     >
-                        <span className="fa fa-save"></span>
-                        <span>Save Session</span>
+                        {loading ?
+                            <span className="fa fa-spinner fa-pulse"></span> :
+                            <span>
+                                <span className="fa fa-save"></span>
+                                <span>Save Session</span>
+                            </span>}
                     </button>
                 </div>
             </div>

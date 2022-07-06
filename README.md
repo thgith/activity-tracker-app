@@ -50,19 +50,22 @@ dotnet ef database update
 ```
 
 ## 4. Start up backend API
-In `/Backend/ActivityTrackerApp`
+In `/Backend/ActivityTrackerApp`, run the following to start the API on port `7109`
 ```bash
-#Will start on port 7109
 dotnet run
 ```
 ## 5. Start up frontend
-In `/Frontend`
+In `/Frontend`, run the following to start the frontend on port `3000`
 ```bash
-# Will start on port 3000
 npm start 
 ```
 
 You can now go to `localhost:3000` and test the application out.
+You can also test out the API in Postman at `localhost:7109/api/v1`, but you will
+need to hit the `/api/v1/Auth/register` endpoint first to be authenticated for the other routes.
+
+# How to Run Tests
+Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hovering over the class/test methods. A couple of tests are broken due to some changes right now, but the layout will be basically the same.
 
 # Features
 - Login/registration with email and JWT token auth
@@ -75,4 +78,4 @@ You can now go to `localhost:3000` and test the application out.
 - Tagging on activities
 
 [Implementation Notes](/docs/ImplementationNotes.md)
-[To Dos](/docs/Todos.md)
+[To Dos](/docs/ToDos.md)

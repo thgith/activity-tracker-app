@@ -36,5 +36,5 @@ export const ForgotPassword = (props: any) => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};

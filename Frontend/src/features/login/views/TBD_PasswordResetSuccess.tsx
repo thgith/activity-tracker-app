@@ -12,5 +12,5 @@ export const PasswordReset = (props: any) => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};

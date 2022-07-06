@@ -134,8 +134,13 @@ export const ProfileEdit = (props: any) => {
                                             </button>
                                         </Link>
                                         <button type="submit" className="btn btn-primary">
-                                            <span className="fa fa-save fa-lg"></span>
-                                            <span>Save</span>
+                                            {loading ?
+                                                <span className="fa fa-spinner fa-pulse"></span> :
+                                                <span>
+                                                    <span className="fa fa-save fa-lg"></span>
+                                                    <span>Save</span>
+                                                </span>
+                                            }
                                         </button>
                                     </div>
                                 </div>

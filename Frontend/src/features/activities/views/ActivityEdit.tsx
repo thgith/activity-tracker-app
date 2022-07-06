@@ -159,9 +159,9 @@ export const ActivityEdit = (props: any) => {
     const createColor = (selectedColor: string, colorClass: string) => {
         const className = `btn color-circle ${colorClass} col-1 ${color === selectedColor ? 'selected' : ''}`
         return (
-        <button className={className} value={selectedColor} onClick={changeColor}>
-            {color === selectedColor ? <div className="fa fa-check text-center"></div> : null}
-        </button>);
+            <button className={className} value={selectedColor} onClick={changeColor}>
+                {color === selectedColor ? <div className="fa fa-check text-center"></div> : null}
+            </button>);
     };
 
     if (!activity) {
@@ -321,13 +321,19 @@ export const ActivityEdit = (props: any) => {
                                                 <button
                                                     className="btn btn-primary"
                                                     type="submit">
-                                                    <span className="save-activity-btn fa fa-save fa-lg"></span>
-                                                    <span>Save</span>
+                                                    {loading ? <span className="fa fa-spinner fa-pulse" /> :
+                                                        <span>
+                                                            <span className="save-activity-btn fa fa-save fa-lg"></span>
+                                                            <span>Save</span>
+                                                        </span>}
                                                 </button>
                                                 <button
                                                     className="btn btn-secondary">
-                                                    <span className="archive-activity-btn fa fa-archive fa-lg"></span>
-                                                    <span>Archive</span>
+                                                    {loading ? <span className="fa fa-spinner fa-pulse" /> :
+                                                        <span>
+                                                            <span className="archive-activity-btn fa fa-archive fa-lg"></span>
+                                                            <span>Archive</span>
+                                                        </span>}
                                                 </button>
                                                 <button
                                                     className="btn btn-dark"
@@ -337,8 +343,7 @@ export const ActivityEdit = (props: any) => {
                                                         <span>
                                                             <span className="delete-activity-btn fa fa-trash fa-lg"></span>
                                                             <span>Delete</span>
-                                                        </span>
-                                                    }
+                                                        </span>}
                                                 </button>
                                             </div>
                                         </div>

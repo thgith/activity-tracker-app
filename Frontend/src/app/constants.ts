@@ -3,7 +3,7 @@ export const API_URL_BASE = 'https://localhost:7109/api/v1/';
 // NOTE: This is a non http-only cookie that doesn't store any JWT info.
 //       It's just for logic after the user is already authenticated with
 //       with a JWT token stored elsewhere
-export const CURR_USER_ID_COOKIE_NAME = 'curr_user_id'
+export const CURR_USER_ID_COOKIE_NAME = 'curr_user_id';
 
 export const STANDARD_DATE_DISPLAY_FORMAT = 'MMMM DD, YYYY';
 export const LONG_DATE_FORMAT = 'dddd MM/DD/YYYY hh:mm A';

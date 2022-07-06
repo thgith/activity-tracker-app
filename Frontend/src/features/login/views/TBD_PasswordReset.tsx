@@ -40,5 +40,5 @@ export const PasswordReset = (props: any) => {
                 </div>
             </form>
         </div>
-    )
-}
+    );
+};

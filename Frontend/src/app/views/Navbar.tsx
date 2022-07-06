@@ -13,9 +13,7 @@ export const Navbar = () => {
             .unwrap()
             .then(() => {
                 console.log("succesffuly logged out");
-                window.setTimeout(function () {
-                    navigate('/');
-                }, 3000);
+                navigate('/login');
             })
             .catch(() => {
             });
@@ -57,9 +55,9 @@ export const Navbar = () => {
                                 <span>Profile</span>
                             </Link>
                         </li> : null}
-                        <li className="nav-item">
+                        {!currUserId ? <li className="nav-item">
                             <Link to="/register" className="nav-link">Register</Link>
-                        </li>
+                        </li> : null}
                         {currUserId ? (<li className="nav-item" onClick={handleLogout}>
                             <Link to="/login" className="nav-link">
                                 <span className="fa fa-sign-out"></span>
@@ -70,5 +68,5 @@ export const Navbar = () => {
                 </div>
             </div>
         </nav>
-    )
+    );
 };

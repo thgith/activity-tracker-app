@@ -7,10 +7,7 @@ export const listActivities = createAsyncThunk(
     'activity/list',
     async (userId: string, thunkAPI) => {
         try {
-            // Try to log in
             const response: any = await ActivityService.getAllActivitiesForUser(userId);
-
-            // Success
             return { activities: response.data };
         } catch (error: any) {
             const message =
@@ -78,10 +75,7 @@ export const deleteActivity = createAsyncThunk(
     'activity/delete',
     async (activityId: string, thunkAPI) => {
         try {
-            // Try to log in
             const data: any = await ActivityService.deleteActivity(activityId);
-
-            // Success
             return { activityId: activityId };
         } catch (error: any) {
             const message =
