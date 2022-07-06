@@ -33,6 +33,7 @@ public class ActivityServiceTests
     private static Mock<DbSet<Activity>> _activitiesDbSetMock;
     private static Mock<IDataContext> _dbContextMock;
     private static Mock<IUserService> _userServiceMock;
+    private static Mock<ISessionService> _sessionServiceMock;
     private static Mock<IMapper> _mapperMock;
 
     // Called before all tests
@@ -70,6 +71,7 @@ public class ActivityServiceTests
         _dbContextMock.Setup(x => x.Activities)
                 .Returns(_activitiesDbSetMock.Object);
         _userServiceMock = new Mock<IUserService>();
+        _sessionServiceMock = new Mock<ISessionService>();
         _mapperMock = new Mock<IMapper>();
         _mapperMock.Setup(x => x.Map<ActivityGetDto>(_gameDevAct))
                     .Returns(new ActivityGetDto
@@ -126,6 +128,7 @@ public class ActivityServiceTests
         var activityService = new ActivityService(
             _dbContextMock.Object,
             _userServiceMock.Object,
+            _sessionServiceMock.Object,
             _mapperMock.Object);
 
         // -- Act --
@@ -184,6 +187,7 @@ public class ActivityServiceTests
         var activityService = new ActivityService(
             _dbContextMock.Object,
             _userServiceMock.Object,
+            _sessionServiceMock.Object,
             _mapperMock.Object);
 
         // -- Act --
@@ -243,6 +247,7 @@ public class ActivityServiceTests
         var activityService = new ActivityService(
             _dbContextMock.Object,
             _userServiceMock.Object,
+            _sessionServiceMock.Object,
             _mapperMock.Object);
 
         // -- Act --
@@ -259,6 +264,7 @@ public class ActivityServiceTests
         var activityService = new ActivityService(
             _dbContextMock.Object,
             _userServiceMock.Object,
+            _sessionServiceMock.Object,
             _mapperMock.Object);
 
         // -- Act --
