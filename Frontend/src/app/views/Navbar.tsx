@@ -1,11 +1,10 @@
 import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { getUserIdCookie } from '../helpers/helpers';
 import { logOut } from '../../features/User/userSlice';
 
 export const Navbar = () => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
     const currUserId = getUserIdCookie();
 
     const handleLogout = () => {
@@ -13,7 +12,8 @@ export const Navbar = () => {
             .unwrap()
             .then(() => {
                 console.log("succesffuly logged out");
-                navigate('/login');
+                // Go ahead and refresh instead of navigate() to clear state
+                window.location.href = '/login';
             })
             .catch(() => {
             });
