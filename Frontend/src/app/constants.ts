@@ -25,3 +25,4 @@ export const PURPLE = '#9966ff';
 export const BLUE = '#3366ff';
 export const BLUE_GREEN = '#00cccc';
 export const GREEN = '#00cc66';
+export const DEFAULT_COLOR = BLUE_GREEN;

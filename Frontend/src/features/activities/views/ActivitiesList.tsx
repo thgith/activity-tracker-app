@@ -1,20 +1,11 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom'
-import { getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
+import { calculateActivityHours, calculateTotalActivityHours, displayTags, getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
 import { getUser } from '../../User/userSlice';
-import { ISession } from '../../sessions/ISession';
 import { IActivity } from '../IActivity';
 import { Loader } from '../../../app/views/Loader';
 import { listActivities } from '../activityMethods';
-
-const displayTags = (tags: string[]) => {
-    let tagItems: any = [];
-    tags.forEach(tag => {
-        tagItems.push(<span className="tag" key={tag}>{tag}</span>);
-    });
-    return tagItems;
-}
 
 export const ActivitiesList = () => {
     const dispatch = useDispatch();
@@ -50,34 +41,20 @@ export const ActivitiesList = () => {
         }
     });
 
-    const calculateActivityHours = (activityId: string) => {
-        let totalSeconds = 0;
-        let sessions = activityIdToSessions ? activityIdToSessions[activityId] : [];
-        sessions.map((x: ISession) => {
-            totalSeconds += x.durationSeconds
-        });
-
-        return Math.round(totalSeconds / 3600 * 10) / 10;
-    }
-
-    const getTotalHours = () => {
-        let totalSeconds = 0;
-        if (activityIdToSessions) {
-            Object.keys(activityIdToSessions).forEach((k: string) => {
-                let sessions = activityIdToSessions[k];
-                sessions.map((x: ISession) => {
-                    totalSeconds += x.durationSeconds
-                })
-            });
-        }
-        return Math.round(totalSeconds / 3600 * 10) / 10;
-    }
-
+    /**
+     * Updates the filter string in the store with the value
+     * the user typed in the filter input bar.
+     */
     const updateStringFilter = (e: any) => {
         console.log(e.target.value);
         setStringFilter(e.target.value.toLowerCase());
     }
 
+    /**
+     * Checks whether the tags includes the filter string.
+     * @param {string} tags - The tags associated with the activity.
+     * @param {string} filterStr - The string to find in the tags.
+     */
     const tagsContainFilter = (tags: string[] | null, filterStr: string) => {
         if (!tags) {
             return false;
@@ -85,15 +62,20 @@ export const ActivitiesList = () => {
 
         let tagsContainFilter = false;
         tags.forEach((tag) => {
-            let val = tag.toLowerCase().includes(filterStr);
+            tag.toLowerCase().includes(filterStr);
             if (tag.toLowerCase().includes(filterStr)) {
                 tagsContainFilter = true;
                 return;
-            }            
+            }
         })
         return tagsContainFilter;
     }
 
+    /**
+     * Checks whether activity's name, description, or tags
+     * includes the filter string obtained from the filter bar.
+     * @param {IActivity} activity - The activity to check.
+     */
     const isActivityIncludedInFilter = (activity: IActivity) => {
         return (activity.name?.toLowerCase().includes(stringFilter)) ||
             (activity.description?.toLowerCase().includes(stringFilter)) ||
@@ -113,25 +95,25 @@ export const ActivitiesList = () => {
 
     const renderedActivities = activities.map((activity: IActivity) => (
         isActivityIncludedInFilter(activity) ?
-        <div className="card-container activity-item col-md-4 col-sm-6 mt-2" key={activity.id}>
-            <div className="card-item">
-                <Link to={`/activities/${activity.id}`} style={{ textDecoration: 'none' }}>
-                    <div className="activity-header card-header" style={{ backgroundColor: activity.colorHex as string }}>
-                        <h3 className="text-center">{activity.name}</h3>
-                    </div>
-                    <div className="activity-body card-body">
-                        <div className="activity-hours">
-                            {calculateActivityHours(activity.id as string)} hours over {activityIdToSessions ? activityIdToSessions[activity.id as string].length : 0} sessions
+            <div className="card-container activity-item col-md-4 col-sm-6 mt-2" key={activity.id}>
+                <div className="card-item">
+                    <Link to={`/activities/${activity.id}`} style={{ textDecoration: 'none' }}>
+                        <div className="activity-header card-header" style={{ backgroundColor: activity.colorHex as string }}>
+                            <h3 className="text-center">{activity.name}</h3>
                         </div>
-                        <div className="tags">
-                            {displayTags(activity.tags as string[])}
+                        <div className="activity-body card-body">
+                            <div className="activity-hours">
+                                {calculateActivityHours(activityIdToSessions, activity.id as string)} hours over {activityIdToSessions ? activityIdToSessions[activity.id as string].length : 0} sessions
+                            </div>
+                            <div className="tags">
+                                {displayTags(activity.tags as string[])}
+                            </div>
+                            <div className="activity-description">{activity.description}</div>
                         </div>
-                        <div className="activity-description">{activity.description}</div>
-                    </div>
-                </Link>
+                    </Link>
+                </div>
             </div>
-        </div>
-    : null));
+            : null));
 
     return (
         <div className="activities-list container">
@@ -139,7 +121,7 @@ export const ActivitiesList = () => {
             <p className="text-center">
                 <b>
                     <span className="fa fa-clock-o"></span>
-                    <span>Total Time: {getTotalHours()} hours</span>
+                    <span>Total Time: {calculateTotalActivityHours(activityIdToSessions)} hours</span>
                 </b>
             </p>
             <div className="row">
@@ -158,7 +140,7 @@ export const ActivitiesList = () => {
                             aria-label="Search"
                             aria-describedby="search-addon"
                             onKeyUp={updateStringFilter}
-                            />
+                        />
                         <span className="input-group-text border-0" id="search-addon">
                             <span className="fa fa-search"></span>
                         </span>

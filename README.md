@@ -81,5 +81,6 @@ Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hove
 - Activity filter on list page
 - Tagging on activities
 
-[Implementation Notes](/docs/ImplementationNotes.md)
-[To Dos](/docs/ToDos.md)
+---
+- [Implementation Notes](/docs/ImplementationNotes.md)
+- [To Dos](/docs/ToDos.md)

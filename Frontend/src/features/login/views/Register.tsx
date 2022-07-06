@@ -7,7 +7,7 @@ import { REQUIRED_FIELD_MSG } from '../../../app/constants';
 import { clearMessage } from '../../message/messageSlice';
 import { register } from '../../User/userSlice';
 
-const Register = (props: any) => {
+const Register = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [successful, setSuccessful] = useState(false);

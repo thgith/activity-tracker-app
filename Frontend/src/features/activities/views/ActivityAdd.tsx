@@ -4,8 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import moment from 'moment';
 import * as Yup from 'yup';
-import { BLUE, BLUE_GREEN, CORAL, DARK_GREY, GREEN, ORANGE, PICKER_DATE_DISPLAY_FORMAT, PINK, PURPLE, REQUIRED_FIELD_MSG, YELLOW } from '../../../app/constants';
-import { getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
+import { BLUE, BLUE_GREEN, CORAL, DARK_GREY, DEFAULT_COLOR, GREEN, ORANGE, PICKER_DATE_DISPLAY_FORMAT, PINK, PURPLE, REQUIRED_FIELD_MSG, YELLOW } from '../../../app/constants';
+import { getUserIdCookie, onlyUnique, trimmedStrArray, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
 import { IActivity } from '../IActivity';
 import { getUser } from '../../User/userSlice';
 import { addActivity } from '../activityMethods';
@@ -15,7 +15,7 @@ export const ActivityAdd = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const { user: currentUser } = useSelector((state: any) => state.userData);
-    const [color, setColor] = useState(BLUE_GREEN);
+    const [selectedColor, setSelectedColor] = useState(DEFAULT_COLOR);
 
     useEffectSkipInitialRender(() => {
         const currUserId = getUserIdCookie();
@@ -47,17 +47,11 @@ export const ActivityAdd = () => {
             .required(REQUIRED_FIELD_MSG),
     });
 
-    const onlyUnique = (value: string, index: number, self: string[]) => {
-        return self.indexOf(value) === index
-    }
 
-    const trimmedStrArray = (array: string[]) => {
-        for (let i = 0; i < array.length; i++) {
-            array[i] = array[i].trim();
-        }
-        return array;
-    }
 
+    /**
+     * Add the activity.
+     */
     const handleAdd = (formValue: any) => {
         const { name, description, startDate, dueDate, tags } = formValue;
         var activity: IActivity = {
@@ -73,7 +67,7 @@ export const ActivityAdd = () => {
                 .split(',')
                 .filter((x: any) => x.length !== 0))
                 .filter(onlyUnique) : [],
-            colorHex: color
+            colorHex: selectedColor
         }
         setLoading(true);
         dispatch<any>(addActivity(activity))
@@ -88,13 +82,18 @@ export const ActivityAdd = () => {
 
     const changeColor = (e: any) => {
         e.preventDefault();
-        setColor(e.target.value)
+        setSelectedColor(e.target.value);
     };
 
-    const createColor = (selectedColor: string, colorClass: string) => {
-        const className = `btn color-circle ${colorClass} col-1 ${color === selectedColor ? 'selected' : ''}`
-        return <button className={className} value={selectedColor} onClick={changeColor}>
-            {color === selectedColor ? <div className="fa fa-check text-center"></div> : null}
+    /**
+     * Create the color div
+     * @param {string} divColor - The name of the color for this div circle.
+     * @param {string} colorClass - The class to apply to the color div.
+     */
+    const createColor = (divColor: string, colorClass: string) => {
+        const className = `btn color-circle ${colorClass} col-1 ${selectedColor === divColor ? 'selected' : ''}`
+        return <button className={className} value={divColor} onClick={changeColor}>
+            {selectedColor === divColor ? <div className="fa fa-check text-center"></div> : null}
         </button>
     };
 
@@ -111,7 +110,7 @@ export const ActivityAdd = () => {
                 </div>
                 <div className="col-12 col-md-8">
                     <div className="panel-container">
-                        <h2 className="text-center colored-header" style={{ backgroundColor: color }}>New Activity</h2>
+                        <h2 className="text-center colored-header" style={{ backgroundColor: selectedColor }}>New Activity</h2>
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
@@ -246,5 +245,5 @@ export const ActivityAdd = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};

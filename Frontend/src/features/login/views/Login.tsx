@@ -129,5 +129,5 @@ export const Login = (props: any) => {
                 )}
             </div>
         </div>
-    )
-}
+    );
+};

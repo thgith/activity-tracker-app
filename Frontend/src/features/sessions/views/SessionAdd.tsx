@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import moment from 'moment'
 import * as Yup from 'yup';
-import { BLUE_GREEN, PICKER_DATE_DISPLAY_FORMAT, REQUIRED_FIELD_MSG } from '../../../app/constants'
+import { BLUE_GREEN, DEFAULT_COLOR, PICKER_DATE_DISPLAY_FORMAT, REQUIRED_FIELD_MSG } from '../../../app/constants'
 import { getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers'
 import { ISessionNew } from '../ISession'
 import { getUser } from '../../User/userSlice'
@@ -128,7 +128,7 @@ export const SessionAdd = () => {
                 </div>
                 <div className="col-12 col-md-8">
                     <div className="panel-container">
-                        <h2 className="colored-header text-center" style={{ backgroundColor: activity?.colorHex ?? BLUE_GREEN }}>New Session</h2>
+                        <h2 className="colored-header text-center" style={{ backgroundColor: activity?.colorHex ?? DEFAULT_COLOR }}>New Session</h2>
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}

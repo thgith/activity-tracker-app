@@ -61,4 +61,4 @@ export const ActivityService = {
     createActivity,
     editActivity,
     deleteActivity,
-}
+};

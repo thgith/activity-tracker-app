@@ -12,5 +12,5 @@ export const SessionNotFound = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};

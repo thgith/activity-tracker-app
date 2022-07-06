@@ -4,8 +4,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import moment from 'moment';
 import * as Yup from 'yup';
-import { REQUIRED_FIELD_MSG, YELLOW, ORANGE, CORAL, PINK, PURPLE, BLUE, BLUE_GREEN, DARK_GREY, GREEN, PICKER_DATE_DISPLAY_FORMAT } from '../../../app/constants'
-import { getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers'
+import { REQUIRED_FIELD_MSG, YELLOW, ORANGE, CORAL, PINK, PURPLE, BLUE, BLUE_GREEN, DARK_GREY, GREEN, PICKER_DATE_DISPLAY_FORMAT, DEFAULT_COLOR } from '../../../app/constants'
+import { getUserIdCookie, onlyUnique, trimmedStrArray, useEffectSkipInitialRender } from '../../../app/helpers/helpers'
 import { IActivity, IActivityEdit } from '../IActivity'
 import { getUser } from '../../User/userSlice'
 import { getActivity, editActivity, deleteActivity } from '../activityMethods';
@@ -54,30 +54,32 @@ export const ActivityEdit = (props: any) => {
 
     activity = activityFromList ?? activityFromGet;
 
-    const [color, setColor] = useState(activity?.colorHex ?? BLUE_GREEN);
+    const [selectedColor, setSelectedColor] = useState(activity?.colorHex ?? DEFAULT_COLOR);
 
     const getInitialStartDate = () => {
         if (activity && activity.startDateUtc) {
             return formatDate(activity.startDateUtc.toString());
         }
         return null;
-    }
+    };
+
     const getInitialDueDate = () => {
         if (activity && activity.dueDateUtc) {
             return formatDate(activity.dueDateUtc.toString());
         }
         return null;
-    }
+    };
+
     const getInitialCompletedDate = () => {
         if (activity && activity.completedDateUtc) {
             return formatDate(activity.completedDateUtc.toString());
         }
         return null;
-    }
+    };
 
     const formatDate = (dateItem: string | undefined) => {
         return moment(dateItem).format(PICKER_DATE_DISPLAY_FORMAT);
-    }
+    };
 
     const initialValues = {
         name: activity ? activity.name : '',
@@ -93,17 +95,9 @@ export const ActivityEdit = (props: any) => {
             .required(REQUIRED_FIELD_MSG),
     });
 
-    const onlyUnique = (value: string, index: number, self: string[]) => {
-        return self.indexOf(value) === index
-    }
-
-    const trimmedStrArray = (array: string[]) => {
-        for (let i = 0; i < array.length; i++) {
-            array[i] = array[i].trim();
-        }
-        return array;
-    }
-
+    /**
+     * Add the activity.
+     */
     const handleEdit = (formValue: any) => {
         const { name, description, startDate, dueDate, completedDate, tags } = formValue;
 
@@ -115,7 +109,7 @@ export const ActivityEdit = (props: any) => {
             startDateUtc: startDate,
             dueDateUtc: dueDate,
             completedDateUtc: completedDate,
-            colorHex: color,
+            colorHex: selectedColor,
             isArchived: false,
             tags: tags !== '' ? trimmedStrArray(tags
                 .split(',')
@@ -133,10 +127,16 @@ export const ActivityEdit = (props: any) => {
             });
     }
 
+    /**
+     * Archive the activity.
+     */
     const onArchiveClicked = () => {
         console.log('TBD');
     }
 
+    /**
+     * Delete the activity.
+     */
     const onDeleteClicked = (e: any) => {
         e.preventDefault()
         setLoading(true);
@@ -153,14 +153,14 @@ export const ActivityEdit = (props: any) => {
 
     const changeColor = (e: any) => {
         e.preventDefault();
-        setColor(e.target.value)
+        setSelectedColor(e.target.value)
     };
 
-    const createColor = (selectedColor: string, colorClass: string) => {
-        const className = `btn color-circle ${colorClass} col-1 ${color === selectedColor ? 'selected' : ''}`
+    const createColor = (itemColor: string, colorClass: string) => {
+        const className = `btn color-circle ${colorClass} col-1 ${selectedColor === itemColor ? 'selected' : ''}`
         return (
-            <button className={className} value={selectedColor} onClick={changeColor}>
-                {color === selectedColor ? <div className="fa fa-check text-center"></div> : null}
+            <button className={className} value={itemColor} onClick={changeColor}>
+                {selectedColor === itemColor ? <div className="fa fa-check text-center"></div> : null}
             </button>);
     };
 
@@ -196,7 +196,7 @@ export const ActivityEdit = (props: any) => {
                 </div>
                 <div className="col-12 col-md-8">
                     <div className="panel-container">
-                        <h2 className="colored-header text-center" style={{ backgroundColor: color as string }}>Edit Activity</h2>
+                        <h2 className="colored-header text-center" style={{ backgroundColor: selectedColor as string }}>Edit Activity</h2>
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}

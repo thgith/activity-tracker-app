@@ -69,7 +69,7 @@ button .fa,
 .colored-header {
     color: white;
     border-radius: $RECT_BORDER_RADIUS $RECT_BORDER_RADIUS 0 0;
-    background-color: $BLUE_GREEN;
+    background-color: $DEFAULT_COLOR;
     padding: 0.5em;
 }
 
@@ -180,7 +180,7 @@ button .fa,
 
         .card-header {
             border-radius: 8px 8px 0 0;
-            background-color: $BLUE_GREEN;
+            background-color: $DEFAULT_COLOR;
             padding: 1rem;
             color: white;
 
@@ -233,7 +233,7 @@ button .fa,
 .no-activities {
     padding: 2em;
     .fa {
-        color: $BLUE_GREEN;
+        color: $DEFAULT_COLOR;
     }
     .no-activities-body {
         padding: 1em;

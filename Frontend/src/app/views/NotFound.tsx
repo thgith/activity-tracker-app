@@ -1,4 +1,4 @@
-export const NotFound = (props: any) => {
+export const NotFound = () => {
     return (
         <div className="container">
             <div className="panel-container text-center">

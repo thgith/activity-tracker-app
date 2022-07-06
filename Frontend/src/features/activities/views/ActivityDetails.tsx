@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate, useParams } from "react-router-dom"; // This is syntax that changed with v6
 import moment from 'moment';
 import { STANDARD_DATE_DISPLAY_FORMAT } from '../../../app/constants';
-import { getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
+import { displayTags, getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
 import { SessionsList } from '../../sessions/views/SessionsList';
 import { Timer } from '../../timer/Timer';
 import { getUser } from '../../User/userSlice';
@@ -57,13 +57,6 @@ export const ActivityDetails = () => {
 
     activity = activityFromList ?? activityFromGet;
 
-    const displayTags = (tags: string[]) => {
-        let tagItems: any = [];
-        tags.forEach(tag => {
-            tagItems.push(<span className='tag' key={tag}>{tag}</span>);
-        });
-        return tagItems;
-    }
     const getTotalActivityHours = () => {
         let totalSeconds = 0;
         let sessions: any = []
@@ -222,5 +215,5 @@ export const ActivityDetails = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};

@@ -11,7 +11,7 @@ const getUser = (userId: string) => {
         .then((response: any) => {
             return response.data;
         });
-}
+};
 
 const addUser = (
     firstName: string,
@@ -28,15 +28,7 @@ const addUser = (
         .then((response: any) => {
             return response.data;
         });
-}
-
-// const config = {
-//     headers: {
-//         'Referrer-Policy': 'origin',
-//         'Access-Control-Allow-Origin': '*',
-//         'Access-Control-Allow-Headers': 'Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control'
-//     }
-// }
+};
 
 const updateUser = (
     firstName: string,

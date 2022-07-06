@@ -263,5 +263,5 @@ export const SessionEdit = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};

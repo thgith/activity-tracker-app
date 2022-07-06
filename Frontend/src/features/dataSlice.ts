@@ -8,10 +8,10 @@ import { listSessionsForActivity, getSession, addSession, editSession, deleteSes
 export interface DataState {
     activities: IActivity[];
     stringFilter: string;
-    activityIdToSessions: Dictionary<ISession>;
+    activityIdToSessions: Dictionary<ISession[]>;
     gotFullListBefore: boolean;
     isLoading: boolean;
-}
+};
 
 const initialState: DataState = {
     activities: [],
@@ -47,9 +47,6 @@ const dataSlice = createSlice({
         },
         [(getActivity as any).fulfilled]: (state: any, action: any) => {
             console.log('get fulfilled');
-            // Only add to activities if we already made a call to make the list
-            // Othwerise we leave it empty so that the list we be grabbed when it goes back
-            // if (state.activities.length !== 0) {
             state.activities.push(action.payload.activity);
             // Add or replace it in our dictionary
             const updatedDictionary = produce(state.activityIdToSessions, (draft: any) => {
@@ -57,7 +54,6 @@ const dataSlice = createSlice({
             });
             // Set the state with the updated data (immer pattern)
             state.activityIdToSessions = updatedDictionary;
-            // }
         },
         [(getActivity as any).rejected]: (state: any, action: any) => {
             console.log('list rejected');
@@ -176,6 +172,6 @@ const dataSlice = createSlice({
             console.log('delete rejected');
         },
     }
-})
+});
 
 export default dataSlice.reducer;
