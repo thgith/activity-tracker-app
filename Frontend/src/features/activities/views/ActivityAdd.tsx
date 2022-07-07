@@ -208,7 +208,13 @@ export const ActivityAdd = () => {
                                             </div>
                                             <div className="row">
                                                 <div className="col-12">
-                                                    <label>Tags</label>
+                                                    <label htmlFor="tags">Tags</label>
+                                                    <span
+                                                        className="tooltip-bubble fa fa-info-circle"
+                                                        data-toggle="tooltip"
+                                                        data-placement="top"
+                                                        title="Separate tags with a comma. Beginning and ending whitespace is trimmed. Duplicates are removed.">
+                                                    </span>
                                                     <Field
                                                         className="form-control"
                                                         type="text"

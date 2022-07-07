@@ -65,6 +65,12 @@ hr {
     background-color: $LIGHT-GREY;
 }
 
+.tooltip-bubble {
+    margin: 0 .2em;
+    cursor: pointer;
+    color: $BLUE;
+}
+
 nav .fa,
 button .fa,
 .fa-clock-o {

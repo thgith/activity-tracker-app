@@ -309,10 +309,10 @@ export const ActivityEdit = (props: any) => {
                                         <div className="col-12">
                                             <label>Tags</label>
                                             <span
-                                                className="fa fa-info"
+                                                className="tooltip-bubble fa fa-info-circle"
                                                 data-toggle="tooltip"
                                                 data-placement="top"
-                                                title="Separate tags with a comma. Beginning and ending whitespace is trimmed. Duplicates are removed">
+                                                title="Separate tags with a comma. Beginning and ending whitespace is trimmed. Duplicates are removed.">
                                             </span>
                                             <Field
                                                 className="form-control"
