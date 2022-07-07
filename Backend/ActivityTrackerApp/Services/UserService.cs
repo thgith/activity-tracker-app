@@ -65,6 +65,7 @@ public class UserService : IUserService
         };
     }
 
+    /// <inheritdoc/>
     public async Task<bool> ChangePassword(Guid currUserId, string newPassword)
     {
         var user = await _getActiveUser(currUserId);
@@ -100,11 +101,7 @@ public class UserService : IUserService
         return users.Select(x => _mapper.Map<UserGetDto>(x));
     }
 
-    /// <summary>
-    /// Gets the active user with the given ID.
-    /// </summary>
-    /// <param name="userId">The ID of the user to get.</param>
-    /// <returns>The requested user.</returns>
+    /// <inheritdoc/>
     public async Task<UserGetDto> GetUserAsync(Guid currUserId, Guid userId)
     {
         // Check permissions
@@ -119,13 +116,7 @@ public class UserService : IUserService
         return _mapper.Map<UserGetDto>(user);
     }
 
-    /// <summary>
-    /// Updates the user.
-    /// </summary>
-    /// <param name="userId">The ID of the user to update.</param>
-    /// <param name="userPutDto">The user object.</param>
-    /// </summary>
-    /// <returns>The updated user.</returns>
+    /// <inheritdoc/>
     public async Task<UserGetDto> UpdateUserAsync(Guid currUserId, Guid userId, UserUpdateDto userPutDto)
     {
         if (userPutDto == null)
@@ -187,13 +178,7 @@ public class UserService : IUserService
         return _mapper.Map<UserGetDto>(user);
     }
 
-    /// <summary>
-    /// Soft deletes the user with the ID.
-    /// </summary>
-    /// <param name="userId">The ID of the user to delete.</param>
-    /// <returns>
-    /// <c>true</c> if the delete was successful, <c>false</c> otherwise.
-    /// </returns>
+    /// </inheritdoc>
     public async Task<bool> DeleteUserAsync(Guid currUserId, Guid userId)
     {
         // Check permissions
@@ -245,7 +230,6 @@ public class UserService : IUserService
                 x.Role == Roles.ADMIN);
     }
 
-    /// <remarks>This includes emails that are part of deactiviated users.</remarks>
     public async Task<bool> IsEmailTaken(string email)
     {
         return await _dbContext.Users.AnyAsync(x => x.Email == email);

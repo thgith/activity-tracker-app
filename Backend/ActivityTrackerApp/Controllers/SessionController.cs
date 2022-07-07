@@ -23,6 +23,7 @@ public class SessionController : ApiControllerBase<SessionController>
 
     /// <summary>
     /// Get all sessions associated with the user and activity
+    /// Users can get their own sessions, but only admins can get other users' sessions.
     /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -41,6 +42,11 @@ public class SessionController : ApiControllerBase<SessionController>
         return await checkAuthAndPerformAction(Request, GetAllSessionsForActivityPartialAsync);
     }
 
+    /// <summary>
+    /// Gets the session with the ID.
+    /// Users can get their own sessions, but only admins can get other users' sessions.
+    /// </summary>
+    /// <param name="sessionId">The ID of the session to get.</param>
     [HttpGet("{sessionId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -57,6 +63,11 @@ public class SessionController : ApiControllerBase<SessionController>
         return await checkAuthAndPerformAction(Request, GetSessionPartialAsync);
     }
 
+    /// <summary>
+    /// Creates a new session.
+    /// Users can create their own sessions, but only admins can create other users' sessions.
+    /// </summary>
+    /// <param name="sessionCreateDto">The session create object.</param>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,6 +85,12 @@ public class SessionController : ApiControllerBase<SessionController>
         return await checkAuthAndPerformAction(Request, CreateSessionPartialAsync);
     }
 
+    /// <summary>
+    /// Updates the session with the ID.
+    /// Users can update their own sessions, but only admins can update other users' sessions.
+    /// </summary>
+    /// <param name="sessionId">The ID of the session to update.</param>
+    /// <param name="sessionUpdateDto">The update object.</param>
     [HttpPut("{sessionId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -99,6 +116,11 @@ public class SessionController : ApiControllerBase<SessionController>
         return await checkAuthAndPerformAction(Request, UpdateSessionPartialAsync);
     }
 
+    /// <summary>
+    /// Deletes the session with the ID.
+    /// Users can delete their own sessions, but only admins can delete other users' sessions.
+    /// </summary>
+    /// <param name="sessionId">The ID of the session to delete.</param>
     [HttpDelete("{sessionId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

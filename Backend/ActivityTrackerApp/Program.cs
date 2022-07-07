@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using ActivityTrackerApp.Constants;
@@ -18,7 +19,7 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
     var services = builder.Services;
-    
+
     // Set up CORS configuration
     services.AddCors(options =>
     {
@@ -98,6 +99,14 @@ try
 
     services.AddControllers();
 
+    services.AddSwaggerGen(x =>
+    {
+        // Show XML docs in Swagger
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        x.IncludeXmlComments(xmlPath);
+    });
+
     var app = builder.Build();
 
     if (!app.Environment.IsDevelopment())
@@ -118,7 +127,11 @@ try
 
     app.UseEndpoints(endpoints => endpoints.MapControllers());
 
-    app.MapGet("/", () => "Hello World!");
+    app.UseSwagger();
+    // Swagger endpoint now available at /swagger
+    app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", "Activity Tracker API v1"));
+
+    app.MapGet("/", () => "Activity Tracker API ready for requests!");
 
     app.Run();
 

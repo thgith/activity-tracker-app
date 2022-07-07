@@ -26,9 +26,14 @@ public abstract class ApiControllerBase<T> : Controller
         this.jwtService = jwtService ?? throw new ArgumentNullException(nameof(jwtService));
         this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-
+    /// <summary>
+    /// Checks if the user is currently authenticated and then carry out
+    /// the <c>actionMethod</c> if they are. Else throw an err.
+    /// </summary>
+    /// <param name="request">The request object.</param>
+    /// <param name="actionMethod">The method to run if the user is authenticated.</param>
     protected async Task<IActionResult> checkAuthAndPerformAction(
-        HttpRequest request, 
+        HttpRequest request,
         Func<Guid, Task<IActionResult>> actionMethod)
     {
         try

@@ -23,6 +23,10 @@ public class AuthController : ApiControllerBase<AuthController>
         _helperService = helperService ?? throw new ArgumentNullException(nameof(helperService));
     }
 
+    /// <summary>
+    /// Registers a new user.
+    /// </summary>
+    /// <param name="userRegisterDto">The registration data.</param>
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -80,6 +84,9 @@ public class AuthController : ApiControllerBase<AuthController>
         }
     }
 
+    /// <summary>
+    /// Logs in the user by creating and setting auth cookies.
+    /// </summary>
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -143,6 +150,9 @@ public class AuthController : ApiControllerBase<AuthController>
         }
     }
 
+    /// <summary>
+    /// Logs out the user by clearing the auth cookies.
+    /// </summary>
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

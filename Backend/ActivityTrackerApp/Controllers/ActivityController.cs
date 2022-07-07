@@ -23,6 +23,7 @@ public class ActivityController : ApiControllerBase<ActivityController>
 
     /// <summary>
     /// Gets the activities associated with the user.
+    /// Users can get their activities, but only admins can get other users' activities.
     /// </summary>
     /// <param name="userId">The ID of the user to get.</param>
     /// <returns>List of activities.</returns>
@@ -43,6 +44,7 @@ public class ActivityController : ApiControllerBase<ActivityController>
 
     /// <summary>
     /// Gets the activity with the given ID.
+    /// Users can get their own activity, but only admins can get other users' activities.
     /// </summary>
     /// <param name="activityId">The ID of the activity to get.</param>
     /// <returns>The activity.</returns>
@@ -68,6 +70,7 @@ public class ActivityController : ApiControllerBase<ActivityController>
 
     /// <summary>
     /// Creates a new activity.
+    /// Users can create their own activity, but only admins can create activities for other users.
     /// </summary>
     /// <param name="newActivityDto">The activity model for the create.</param>
     /// <returns>The newly created activity.</returns>
@@ -94,6 +97,7 @@ public class ActivityController : ApiControllerBase<ActivityController>
 
     /// <summary>
     /// Updates the activity.
+    /// Users can update their own activity, but only admins can update other users' activities.
     /// </summary>
     /// <param name="activityUpdateDto">The activity model for the update.</param>
     /// <returns>The updated activity.</returns>
@@ -121,7 +125,8 @@ public class ActivityController : ApiControllerBase<ActivityController>
 
     /// <summary>
     /// Deletes the activity with the given ID.
-    /// <summary>
+    /// Users can delete their own activity, but only admins can delete other users' activities.
+    /// </summary>
     /// <param name="activityId">The ID of the activity to delete.</param>
     [HttpDelete("{activityId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]

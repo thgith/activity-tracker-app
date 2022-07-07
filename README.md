@@ -63,9 +63,10 @@ In `/Frontend`, run the following to start the frontend on port `3000`
 npm start 
 ```
 
-You can now go to `localhost:3000` and test the application out.
-You can also test out the API in Postman at `localhost:7109/api/v1`, but you will
+- You can now go to `localhost:3000` and test the application out.
+- You can also test out the API in Postman at `localhost:7109/api/v1`, but you will
 need to hit the `/api/v1/Auth/register` endpoint first to be authenticated for the other routes.
+- You can go to `localhost:7109/swagger` to view the available API endpoints
 
 # How to Run Tests
 Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hovering over the class/test methods. A couple of tests are broken due to some changes right now, but the layout will be basically the same.

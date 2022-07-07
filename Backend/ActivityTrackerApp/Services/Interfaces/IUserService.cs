@@ -18,16 +18,23 @@ namespace ActivityTrackerApp.Services
         /// Logs the user in.
         /// </summary>
         /// <param name="userLoginDto">The user credentials to log in.</param>
-        /// <returns>An object of the user info with a JWT token.</param>
+        /// <returns>An object of the user info with a JWT token.</returns>
         Task<EntityWithToken<UserGetDto>> AuthenticateUserAsync(UserLoginDto userLoginDto);
 
         /// <summary>
         /// Registers a new user.
         /// </summary>
         /// <param name="newUserDto">The new user object.</param>
-        /// <returns>An object of the new user with a JWT token.</param>
+        /// <returns>An object of the new user with a JWT token.</returns>
         Task<EntityWithToken<UserGetDto>> RegisterUserAsync(UserRegisterDto newUserDto);
 
+        // TODO: Allow admins to change other users' passwords
+        /// <summary>
+        /// Changes the password of the current user.
+        /// </summary>
+        /// <param name="currUserId">The ID of the current user.</param>
+        /// <param name="newPassword">The new password.</param>
+        /// <returns>Whether changing the password was successful</returns>
         Task<bool> ChangePassword(Guid currUserId, string newPassword);
 
         /// <summary>
@@ -58,7 +65,7 @@ namespace ActivityTrackerApp.Services
             UserUpdateDto updatedUserDto);
 
         /// <summary>
-        /// Deletes the user with the ID.
+        /// Soft deletes the user with the ID.
         /// </summary>
         /// <param name="currUserId">The ID of the current user.</param>
         /// <param name="userId">The ID of the user to delete.</param>
@@ -68,6 +75,7 @@ namespace ActivityTrackerApp.Services
         /// <summary>
         /// Checks whether the email is already taken by another user.
         /// </summary>
+        /// <remarks>This includes emails that are part of deactiviated users.</remarks>
         /// <param name="email">The email to check.</param>
         /// <returns>Whether the email is taken.</returns>
         Task<bool> IsEmailTaken(string email);

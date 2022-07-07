@@ -39,8 +39,8 @@ public class SessionService : ISessionService
 
         // Else there is an associated activity to filter by
         // Check if the activity exists first
-        var activity = await _dbContext.Activities.FirstOrDefaultAsync(x => 
-                            x.Id == activityId && 
+        var activity = await _dbContext.Activities.FirstOrDefaultAsync(x =>
+                            x.Id == activityId &&
                             x.DeletedDateUtc == null);
 
         // Activity doesn't exist, so return
@@ -59,7 +59,7 @@ public class SessionService : ISessionService
         // Get all active sessions
         var sessionsQuery = _dbContext.Sessions
             .Where(x => x.DeletedDateUtc == null);
-        
+
         // Add filter on activity if exists
         if (activityId != null)
         {
@@ -129,7 +129,7 @@ public class SessionService : ISessionService
         }
 
         // Convert DTO to entity
-        var session =  _mapper.Map<Session>(newSessionDto);
+        var session = _mapper.Map<Session>(newSessionDto);
 
         // Add session
         await _dbContext.Sessions.AddAsync(session);
@@ -148,7 +148,7 @@ public class SessionService : ISessionService
     {
         // Get active session with ID
         var session = await _getActiveSession(sessionId);
-        
+
         // Return if activity doesn't exist (or the user was soft deleted)
         if (session == null)
         {
@@ -173,7 +173,7 @@ public class SessionService : ISessionService
         }
         if (updateSessionDto.DurationSeconds != null)
         {
-            session.DurationSeconds = (uint) updateSessionDto.DurationSeconds;
+            session.DurationSeconds = (uint)updateSessionDto.DurationSeconds;
         }
 
         // Save to DB
@@ -217,7 +217,7 @@ public class SessionService : ISessionService
         // Save to DB
         // SaveChangesAsync returns the number of entries written to the DB
         await _dbContext.SaveChangesAsync();
-        return true;        
+        return true;
     }
 
     private async Task<Session> _getActiveSession(Guid sessionId)
