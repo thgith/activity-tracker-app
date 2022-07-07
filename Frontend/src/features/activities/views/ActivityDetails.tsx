@@ -131,19 +131,19 @@ export const ActivityDetails = () => {
                                     </div>
                                     <div className="date-row row text-center">
                                         <div className="col-4">
-                                            <label><b>Start Date</b></label>
+                                            <label>Start Date</label>
                                             <p className="activity-start-date">
                                                 {moment(activity.startDateUtc).format(STANDARD_DATE_DISPLAY_FORMAT)}
                                             </p>
                                         </div>
                                         <div className="col-4">
-                                            <label><b>Due Date</b></label>
+                                            <label>Due Date</label>
                                             <p className="activity-due-date">
                                                 {activity.dueDateUtc ? moment(activity.dueDateUtc).format(STANDARD_DATE_DISPLAY_FORMAT) : 'N/A'}
                                             </p>
                                         </div>
                                         <div className="col-4">
-                                            <label><b>Completed Date</b></label>
+                                            <label>Completed Date</label>
                                             <p className="activity-completed-date">
                                                 {activity.completedDateUtc ? moment(activity.completedDateUtc).format(STANDARD_DATE_DISPLAY_FORMAT) : 'N/A'}
                                             </p>

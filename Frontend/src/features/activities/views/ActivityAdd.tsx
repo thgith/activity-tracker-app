@@ -52,11 +52,11 @@ export const ActivityAdd = () => {
     const validationSchema = Yup.object().shape({
         name: Yup.string()
             .required(REQUIRED_FIELD_MSG),
-        startDate: Yup.string()
+        startDate: Yup.date()
             .required(REQUIRED_FIELD_MSG),
+        dueDate: Yup.date().min(Yup.ref('startDate'), 'Must be greater than Start Date').nullable(),
+        completedDate: Yup.date().min(Yup.ref('startDate'), 'Must be greater than Start Date').nullable()
     });
-
-
 
     /**
      * Add the activity.
@@ -159,7 +159,7 @@ export const ActivityAdd = () => {
                                             <div className="row">
                                                 <div className="col-12">
                                                     <div className="form-group">
-                                                        <label htmlFor="startDate">Start Date</label>
+                                                        <label htmlFor="startDate">Start Date<span className="mandatory-field">*</span></label>
                                                         <Field
                                                             className="form-control"
                                                             type="date"
@@ -179,6 +179,12 @@ export const ActivityAdd = () => {
                                                 <div className="col-12">
                                                     <div className="form-group">
                                                         <label htmlFor="dueDate">Due Date</label>
+                                                        <span
+                                                            className="tooltip-bubble fa fa-info-circle"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title="Must occur after Start Date.">
+                                                        </span>
                                                         <Field
                                                             className="form-control"
                                                             type="date"

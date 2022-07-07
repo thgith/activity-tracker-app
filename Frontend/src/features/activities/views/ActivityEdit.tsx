@@ -367,13 +367,14 @@ export const ActivityEdit = (props: any) => {
                                                                 <span>Save</span>
                                                             </span>
                                                         </button>
-                                                        <button
+                                                        {/* TODO set up archiving */}
+                                                        {/* <button
                                                             className="btn btn-secondary">
                                                             <span>
                                                                 <span className="archive-activity-btn fa fa-archive fa-lg"></span>
                                                                 <span>Archive</span>
                                                             </span>
-                                                        </button>
+                                                        </button> */}
                                                         <button
                                                             className="btn btn-dark"
                                                             type="button"

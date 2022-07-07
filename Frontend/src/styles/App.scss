@@ -180,14 +180,17 @@ button .fa,
     border-radius: $RECT_BORDER_RADIUS;
     background-color: $LIGHT-GREY;
     padding: 1em;
-    max-width:400px;
+    max-width: 400px;
 }
 
 // -- Card --
 .card-container {
-    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 0.5em;
 
     .card-item {
+        flex: 0 0 100%;
         margin: 0.5em 1rem 0 0;
         border: 1px solid $MED_GREY;
         border-radius: $RECT_BORDER_RADIUS $RECT_BORDER_RADIUS 0 0;
@@ -199,7 +202,6 @@ button .fa,
             background-color: $DEFAULT_COLOR;
             padding: 1rem;
             color: white;
-
         }
 
         .card-body {
@@ -248,13 +250,16 @@ button .fa,
 // -- Activity --
 .no-activities {
     padding: 2em;
+
     .fa {
         color: $DEFAULT_COLOR;
     }
+
     .no-activities-body {
         padding: 1em;
     }
 }
+
 .activity-hours {
     position: relative;
     bottom: 0;
@@ -277,6 +282,7 @@ button .fa,
 .no-sessions {
     margin: 1em 1em 2em 1em;
 }
+
 .session-body {
     background-color: $LIGHT-GREY;
 }
