@@ -192,6 +192,11 @@ export const ActivityAdd = () => {
                                                             name="dueDate"
                                                             placeholder="Due Date"
                                                         />
+                                                        <ErrorMessage
+                                                            name="dueDate"
+                                                            component="div"
+                                                            className="alert alert-danger"
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
