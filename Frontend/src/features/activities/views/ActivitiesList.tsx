@@ -104,7 +104,7 @@ export const ActivitiesList = () => {
 
     const renderedActivities = activities.map((activity: IActivity) => (
         isActivityIncludedInFilter(activity) ?
-            <div className="card-container activity-item col-md-4 col-sm-6 mt-2" key={activity.id}>
+            <div className="card-container activity-item-container col-md-4 col-sm-6 mt-2" key={activity.id}>
                 <div className="card-item">
                     <Link to={`/activities/${activity.id}`} style={{ textDecoration: 'none' }}>
                         <div className="activity-header card-header" style={{ backgroundColor: activity.colorHex as string }}>

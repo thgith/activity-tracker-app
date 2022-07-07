@@ -17,8 +17,8 @@ export const Session = (props: any) => {
     const colorHexNoHash: string = props.colorHex.substring(1);
     
     return (
-        <div className="card-container session-item col-md-4 col-sm-6 mt-2">
-            <div className="card-item">
+        <div className="card-container session-item-container col-md-4 col-sm-6 mt-2">
+            <div className="card-item session-item">
                 <Link to={`/sessions/${session.id}?activityId=${activityId}&colorHex=${colorHexNoHash}`} style={{ textDecoration: 'none' }}>
                     <div className="session-header card-header" style={{ backgroundColor: props.colorHex }}>
                         <h5>{moment(session.startDateUtc.toString()).format(LONG_DATE_FORMAT)}</h5>
