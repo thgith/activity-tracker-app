@@ -42,10 +42,15 @@ export const onlyUnique = (value: string, index: number, self: string[]) => {
 }
 
 export const trimmedStrArray = (array: string[]) => {
+    let newArr = [];
     for (let i = 0; i < array.length; i++) {
-        array[i] = array[i].trim();
+        let trimmedVal = array[i].trim();
+        // trim() just replaces side white space so double check empty
+        if (trimmedVal !== '') {
+            newArr.push(trimmedVal);
+        }
     }
-    return array;
+    return newArr;
 }
 
 /**
