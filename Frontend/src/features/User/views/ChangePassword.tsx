@@ -94,7 +94,10 @@ export const ChangePassword = (props: any) => {
             .then(() => {
                 console.log('Success changed password!');
                 setSuccessful(true);
-                navigate(`/profile/${currentUser.id}`);
+                window.setTimeout(function(){
+                    navigate(`/profile/${currentUser.id}`);
+                }, 3000);
+                
             })
             .catch((e: any) => {
                 console.log(e);
@@ -179,7 +182,7 @@ export const ChangePassword = (props: any) => {
                                 <div className="col-12">
                                     <div className="action-button-group">
                                         <Link to={`/profile/${currentUser.id}`}>
-                                            <button type="submit" className="btn btn-secondary">
+                                            <button type="button" className="btn btn-secondary">
                                                 <span className="fa fa-times fa-lg"></span>
                                                 <span>Cancel</span>
                                             </button>

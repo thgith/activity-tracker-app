@@ -31,16 +31,15 @@ const addUser = (
 };
 
 const updateUser = (
+    userId: string,
     firstName: string,
     lastName: string,
-    email: string,
-    password: string) => {
+    email: string) => {
     return axios
-        .put(`${USER_API_URL}`, {
+        .put(`${USER_API_URL}${userId}`, {
             'FirstName': firstName,
             'LastName': lastName,
             'Email': email,
-            'Password': password
         })
         .then((response: any) => {
             return response.data;

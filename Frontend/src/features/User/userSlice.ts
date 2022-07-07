@@ -9,7 +9,7 @@ export const register = createAsyncThunk(
     async ({ firstName, lastName, email, password }: IRegister, thunkAPI) => {
         try {
             const data: any = await AuthService.register(firstName, lastName, email, password);
-            thunkAPI.dispatch(setMessage("Successfully registered user. Redirecting to home page..."));
+            thunkAPI.dispatch(setMessage("Successfully registered user! Redirecting to home page..."));
             return { user: data.entity }
         } catch (error: any) {
             const message =
@@ -50,6 +50,7 @@ export const changePassword = createAsyncThunk(
     async ({ userId, email, oldPassword, newPassword }: { userId: string, email: string, oldPassword: string, newPassword: string }, thunkAPI) => {
         try {
             const data = await UserService.changePassword(userId, email, oldPassword, newPassword);
+            thunkAPI.dispatch(setMessage("Successfully changed password! Redirecting to user page..."));
             return data;
         } catch (error: any) {
             const message =
@@ -80,10 +81,10 @@ export const getUser = createAsyncThunk(
 
 export const updateUser = createAsyncThunk(
     'user/update',
-    async ({ firstName, lastName, email, password }: any, thunkAPI) => {
+    async ({ id, firstName, lastName, email }: any, thunkAPI) => {
         try {
-            const data = await UserService.updateUser(firstName, lastName, email, password);
-            return { user: { ...data.entity } };
+            const data = await UserService.updateUser(id, firstName, lastName, email);
+            return { user: data.entity };
         } catch (error: any) {
             const message =
                 (error.response && error.response.data && error.response.data.detail) ||

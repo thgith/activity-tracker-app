@@ -7,6 +7,7 @@ Used to track how much time is spent on activities.
 - Entity Framework (code-first)
 - Postgres
 - MSTest / Moq
+- Swagger
 
 ## Frontend
 - React

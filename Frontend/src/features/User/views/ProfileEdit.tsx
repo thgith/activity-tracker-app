@@ -49,7 +49,6 @@ export const ProfileEdit = (props: any) => {
         firstName: currentUser.firstName,
         lastName: currentUser.lastName,
         email: currentUser.email,
-        password: currentUser.password
     };
 
     const validationSchema = Yup.object().shape({
@@ -63,7 +62,7 @@ export const ProfileEdit = (props: any) => {
 
     const handleEdit = (formValue: any) => {
         console.log('handling edit');
-        const { firstName, lastName, email, password } = formValue;
+        const { firstName, lastName, email } = formValue;
         var editedUser: IUserUpdate = {
             id: currentUser.id,
             firstName: firstName,
@@ -104,8 +103,7 @@ export const ProfileEdit = (props: any) => {
                                             className="form-control"
                                             id="firstName"
                                             name="firstName"
-                                            placeholder="First Name"
-                                            value={currentUser.firstName}></Field>
+                                            placeholder="First Name"></Field>
                                     </div>
                                 </div>
                                 <div className="col-6">
@@ -115,8 +113,7 @@ export const ProfileEdit = (props: any) => {
                                             className="form-control"
                                             id="lastName"
                                             name="lastName"
-                                            placeholder="Last Name"
-                                            value={currentUser.lastName}></Field>
+                                            placeholder="Last Name"></Field>
                                     </div>
                                 </div>
                             </div>
@@ -128,8 +125,7 @@ export const ProfileEdit = (props: any) => {
                                             className="form-control"
                                             id="email"
                                             name="email"
-                                            placeholder="Email"
-                                            value={currentUser.email}></Field>
+                                            placeholder="Email"></Field>
                                     </div>
                                 </div>
                             </div>
@@ -137,7 +133,7 @@ export const ProfileEdit = (props: any) => {
                                 <div className="col-12">
                                     <div className="action-button-group">
                                         <Link to={`/profile/${currentUser.id}`}>
-                                            <button type="submit" className="btn btn-secondary">
+                                            <button type="button" className="btn btn-secondary">
                                                 <span className="fa fa-times fa-lg"></span>
                                                 <span>Cancel</span>
                                             </button>

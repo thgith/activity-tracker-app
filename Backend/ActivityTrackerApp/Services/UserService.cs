@@ -153,7 +153,7 @@ public class UserService : IUserService
             hasChange = true;
         }
 
-        if (userPutDto.Email != null)
+        if (userPutDto.Email != null && userPutDto.Email != user.Email)
         {
             if (await IsEmailTaken(userPutDto.Email))
             {
