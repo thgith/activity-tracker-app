@@ -134,13 +134,13 @@ export const ActivitiesList = () => {
                 </b>
             </p>
             <div className="row">
-                <div className="col-1">
+                {/* <div className="col-1">
                     <button className="btn btn-secondary">
                         <span className="fa fa-list"></span>
                         <span className="d-none d-md-inline-block">List</span>
                     </button>
-                </div>
-                <div className="col-9">
+                </div> */}
+                <div className="col-12 col-sm-9 col-xl-10">
                     <div className="input-group rounded">
                         <input
                             type="search"
@@ -155,11 +155,13 @@ export const ActivitiesList = () => {
                         </span>
                     </div>
                 </div>
-                <div className="col-2">
+                <div className="col-12 col-sm-3 col-xl-2 text-center">
                     <Link to="/activities/new">
-                        <button className="save-activity-btn btn btn-primary">
+                        <button className="add-activity-btn btn btn-primary">
                             <span className="fa fa-plus"></span>
-                            <span>Add New Activity</span>
+                            <span className="d-xs-inline d-sm-none d-lg-inline">Add New Activity</span>
+                            <span className="d-none d-md-inline d-lg-none">Add Activity</span>
+                            <span className="d-none d-sm-inline d-md-none">Add</span>
                         </button>
                     </Link>
                 </div>
