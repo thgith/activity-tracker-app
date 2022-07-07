@@ -221,7 +221,7 @@ public class ActivityService : IActivityService
         // Technically, this should be auto set at creation, but just in case set if null
         var startDateUtc = updatedActivityDto.StartDateUtc ?? activity.StartDateUtc ?? DateTime.UtcNow;
         var shortenedStartDateUtc = new DateTime(startDateUtc.Year, startDateUtc.Month, startDateUtc.Day, startDateUtc.Hour, startDateUtc.Minute, startDateUtc.Second, DateTimeKind.Utc);
-        activity.startDateUtc = shortenedStartDateUtc;
+        activity.StartDateUtc = shortenedStartDateUtc;
 
         // This might still be null if never set
         var dueDateUtc = updatedActivityDto.DueDateUtc ?? activity.DueDateUtc;
