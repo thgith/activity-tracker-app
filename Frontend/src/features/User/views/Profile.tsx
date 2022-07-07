@@ -1,6 +1,8 @@
+import moment from 'moment';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import { STANDARD_DATE_DISPLAY_FORMAT } from '../../../app/constants';
 import { getUserIdCookie } from '../../../app/helpers/helpers';
 import { Loader } from '../../../app/views/Loader';
 import { clearMessage } from '../../message/messageSlice';
@@ -30,7 +32,7 @@ export const Profile = (props: any) => {
             // Try to get user if not gotten yet
             dispatch<any>(getUser(currUserId))
                 .unwrap()
-                .then(() => { 
+                .then(() => {
                 })
                 .catch(() => {
                 });
@@ -66,7 +68,11 @@ export const Profile = (props: any) => {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col-12">
+                        <div className="col-6">
+                            <label htmlFor="role">Date Joined</label>
+                            <h5>{moment(currentUser.joinDateUtc).format(STANDARD_DATE_DISPLAY_FORMAT)}</h5>
+                        </div>
+                        <div className="col-6">
                             <label htmlFor="role">Role</label>
                             <h5>{currentUser.role}</h5>
                         </div>

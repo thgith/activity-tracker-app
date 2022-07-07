@@ -102,6 +102,9 @@ export const ActivityEdit = (props: any) => {
     const validationSchema = Yup.object().shape({
         name: Yup.string()
             .required(REQUIRED_FIELD_MSG),
+        startDate: Yup.date().required(REQUIRED_FIELD_MSG),
+        dueDate: Yup.date().min(Yup.ref('startDate'), 'Must be greater than Start Date').nullable(),
+        completedDate: Yup.date().min(Yup.ref('startDate'), 'Must be greater than Start Date').nullable()
     });
 
     /**
@@ -249,13 +252,18 @@ export const ActivityEdit = (props: any) => {
                                     <div className="row">
                                         <div className="col-12">
                                             <div className="form-group">
-                                                <label htmlFor="startDate">Start Date</label>
+                                                <label htmlFor="startDate">Start Date<span className="mandatory-field">*</span></label>
                                                 <Field
                                                     className="form-control"
                                                     type="date"
                                                     id="startDate"
                                                     name="startDate"
                                                     placeholder="Start Date"
+                                                />
+                                                <ErrorMessage
+                                                    name="startDate"
+                                                    component="div"
+                                                    className="alert alert-danger"
                                                 />
                                             </div>
                                         </div>
@@ -264,12 +272,23 @@ export const ActivityEdit = (props: any) => {
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label htmlFor="dueDate">Due Date</label>
+                                                <span
+                                                    className="tooltip-bubble fa fa-info-circle"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Must occur after Start Date.">
+                                                </span>
                                                 <Field
                                                     className="form-control"
                                                     type="date"
                                                     id="dueDate"
                                                     name="dueDate"
                                                     placeholder="Due Date"
+                                                />
+                                                <ErrorMessage
+                                                    name="dueDate"
+                                                    component="div"
+                                                    className="alert alert-danger"
                                                 />
                                             </div>
                                         </div>
@@ -278,12 +297,23 @@ export const ActivityEdit = (props: any) => {
                                         <div className="col-12">
                                             <div className="form-group">
                                                 <label htmlFor="completedDate">Completed Date</label>
+                                                <span
+                                                    className="tooltip-bubble fa fa-info-circle"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Must occur after Start Date.">
+                                                </span>
                                                 <Field
                                                     className="form-control"
                                                     type="date"
                                                     id="completedDate"
                                                     name="completedDate"
                                                     placeholder="Completed Date"
+                                                />
+                                                <ErrorMessage
+                                                    name="completedDate"
+                                                    component="div"
+                                                    className="alert alert-danger"
                                                 />
                                             </div>
                                         </div>
