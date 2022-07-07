@@ -102,7 +102,16 @@ export const ActivityEdit = (props: any) => {
     const validationSchema = Yup.object().shape({
         name: Yup.string()
             .required(REQUIRED_FIELD_MSG),
-        startDate: Yup.date().required(REQUIRED_FIELD_MSG),
+        startDate: Yup.date()
+            .required(REQUIRED_FIELD_MSG)
+            .when('dueDate', {
+                is: (dueDate: any) => dueDate && dueDate !== '',
+                then: Yup.date().max(Yup.ref('dueDate'), 'Must be earlier than Due Date'),
+            })
+            .when('completedDate', {
+                is: (completedDate: any) => completedDate && completedDate !== '',
+                then: Yup.date().max(Yup.ref('completedDate'), 'Must be earlier than Completed Date'),
+            }),
         dueDate: Yup.date().min(Yup.ref('startDate'), 'Must be greater than Start Date').nullable(),
         completedDate: Yup.date().min(Yup.ref('startDate'), 'Must be greater than Start Date').nullable()
     });
@@ -273,7 +282,7 @@ export const ActivityEdit = (props: any) => {
                                             <div className="form-group">
                                                 <label htmlFor="dueDate">Due Date</label>
                                                 <span
-                                                    className="tooltip-bubble fa fa-info-circle"
+                                                    className="info-tooltip tooltip-bubble fa fa-info-circle"
                                                     data-toggle="tooltip"
                                                     data-placement="top"
                                                     title="Must occur after Start Date.">
@@ -298,7 +307,7 @@ export const ActivityEdit = (props: any) => {
                                             <div className="form-group">
                                                 <label htmlFor="completedDate">Completed Date</label>
                                                 <span
-                                                    className="tooltip-bubble fa fa-info-circle"
+                                                    className="info-tooltip tooltip-bubble fa fa-info-circle"
                                                     data-toggle="tooltip"
                                                     data-placement="top"
                                                     title="Must occur after Start Date.">
@@ -339,7 +348,7 @@ export const ActivityEdit = (props: any) => {
                                         <div className="col-12">
                                             <label>Tags</label>
                                             <span
-                                                className="tooltip-bubble fa fa-info-circle"
+                                                className="info-tooltip tooltip-bubble fa fa-info-circle"
                                                 data-toggle="tooltip"
                                                 data-placement="top"
                                                 title="Separate tags with a comma. Beginning and ending whitespace is trimmed. Duplicates are removed.">

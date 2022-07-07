@@ -70,10 +70,20 @@ label {
 }
 
 .tooltip-bubble {
-    margin: 0 .2em;
+    margin: 0 0.2em;
     cursor: pointer;
-    color: $BLUE;
+
+    &.info-tooltip {
+        color: $BLUE;
+    }
+
+    &.alert-tooltip {
+        color: $CORAL
+    }
 }
+
+
+
 
 nav .fa,
 button .fa,
