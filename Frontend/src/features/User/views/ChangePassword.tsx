@@ -94,10 +94,10 @@ export const ChangePassword = (props: any) => {
             .then(() => {
                 console.log('Success changed password!');
                 setSuccessful(true);
-                window.setTimeout(function(){
+                window.setTimeout(function () {
                     navigate(`/profile/${currentUser.id}`);
                 }, 3000);
-                
+
             })
             .catch((e: any) => {
                 console.log(e);
@@ -120,7 +120,7 @@ export const ChangePassword = (props: any) => {
                     onSubmit={handleChangePassword}
                 >
                     <Form>
-                    {!successful && (<div className="panel-body-container">
+                        {!successful && (<div className="panel-body-container">
                             <div className="row text-center">
                                 <span className="fa fa-user-circle fa-5x"></span>
                             </div>
@@ -181,35 +181,34 @@ export const ChangePassword = (props: any) => {
                             <div className="row text-center">
                                 <div className="col-12">
                                     <div className="action-button-group">
-                                        <Link to={`/profile/${currentUser.id}`}>
-                                            <button type="button" className="btn btn-secondary">
-                                                <span className="fa fa-times fa-lg"></span>
-                                                <span>Cancel</span>
-                                            </button>
-                                        </Link>
-                                        <button type="submit" className="btn btn-primary">
-                                            {loading ?
-                                                <span className="fa fa-spinner fa-pulse"></span> :
-                                                <span>
+                                        {loading ? <span className="fa fa-spinner fa-pulse fa-2x" /> :
+                                            <div>
+                                                <Link to={`/profile/${currentUser.id}`}>
+                                                    <button type="button" className="btn btn-secondary">
+                                                        <span className="fa fa-times fa-lg"></span>
+                                                        <span>Cancel</span>
+                                                    </button>
+                                                </Link>
+                                                <button type="submit" className="btn btn-primary">
                                                     <span className="fa fa-save fa-lg"></span>
                                                     <span>Change Password</span>
-                                                </span>
-                                            }
-                                        </button>
+                                                </button>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
                         </div>)}
                         {message && (
-                        <div className="form-group text-center form-message">
-                            <div
-                                className={successful ? "alert alert-success" : "alert alert-danger"}
-                                role="alert"
-                            >
-                                {message}
+                            <div className="form-group text-center form-message">
+                                <div
+                                    className={successful ? "alert alert-success" : "alert alert-danger"}
+                                    role="alert"
+                                >
+                                    {message}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
                     </Form>
                 </Formik>
             </div>

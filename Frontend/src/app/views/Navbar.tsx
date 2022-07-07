@@ -51,7 +51,7 @@ export const Navbar = () => {
                             </Link>
                         </li> : null}
                         {currentUser ? <li className="nav-item">
-                            <Link to={`/profile/${currentUser}`} className="nav-link">
+                            <Link to={`/profile/${currentUser.id}`} className="nav-link">
                                 <span className="fa fa-user-circle"></span>
                                 <span>Profile</span>
                             </Link>

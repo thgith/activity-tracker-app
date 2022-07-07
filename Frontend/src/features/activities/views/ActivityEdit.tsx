@@ -327,33 +327,34 @@ export const ActivityEdit = (props: any) => {
                                     <div className="row text-center">
                                         <div className="col-12">
                                             <div className="action-button-group">
-                                                <button
-                                                    className="btn btn-primary"
-                                                    type="submit">
-                                                    {loading ? <span className="fa fa-spinner fa-pulse" /> :
-                                                        <span>
-                                                            <span className="save-activity-btn fa fa-save fa-lg"></span>
-                                                            <span>Save</span>
-                                                        </span>}
-                                                </button>
-                                                <button
-                                                    className="btn btn-secondary">
-                                                    {loading ? <span className="fa fa-spinner fa-pulse" /> :
-                                                        <span>
-                                                            <span className="archive-activity-btn fa fa-archive fa-lg"></span>
-                                                            <span>Archive</span>
-                                                        </span>}
-                                                </button>
-                                                <button
-                                                    className="btn btn-dark"
-                                                    type="button"
-                                                    onClick={onDeleteClicked}>
-                                                    {loading ? <span className="fa fa-spinner fa-pulse" /> :
-                                                        <span>
-                                                            <span className="delete-activity-btn fa fa-trash fa-lg"></span>
-                                                            <span>Delete</span>
-                                                        </span>}
-                                                </button>
+                                                {loading ? <span className="fa fa-spinner fa-pulse fa-2x" /> :
+                                                    <div>
+                                                        <button
+                                                            className="btn btn-primary"
+                                                            type="submit">
+                                                            <span>
+                                                                <span className="save-activity-btn fa fa-save fa-lg"></span>
+                                                                <span>Save</span>
+                                                            </span>
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-secondary">
+                                                            <span>
+                                                                <span className="archive-activity-btn fa fa-archive fa-lg"></span>
+                                                                <span>Archive</span>
+                                                            </span>
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-dark"
+                                                            type="button"
+                                                            onClick={onDeleteClicked}>
+                                                            <span>
+                                                                <span className="delete-activity-btn fa fa-trash fa-lg"></span>
+                                                                <span>Delete</span>
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
                                     </div>

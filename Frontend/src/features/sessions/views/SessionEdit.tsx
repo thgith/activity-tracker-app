@@ -237,31 +237,32 @@ export const SessionEdit = () => {
                                     <div className="row text-center">
                                         <div className="col-12">
                                             <div className="action-button-group">
-                                                <button className="cancel-btn btn btn-secondary d-inline-block d-md-none">
-                                                    {loading ? <span className="fa fa-spinner fa-pulse" /> :
-                                                        <span>
-                                                            <span className="fa fa-times fa-lg"></span>
-                                                            <span>Cancel</span>
-                                                        </span>}
-                                                </button>
-                                                <button
-                                                    className="save-session-btn btn btn-primary"
-                                                    type="submit">
-                                                    {loading ? <span className="fa fa-spinner fa-pulse" /> :
-                                                        <span>
-                                                            <span className="fa fa-save fa-lg"></span>
-                                                            <span>Save</span>
-                                                        </span>}
-                                                </button>
-                                                <button
-                                                    className="delete-session-btn btn btn-dark"
-                                                    onClick={onDeleteClicked}>
-                                                    {loading ? <span className="fa fa-spinner fa-pulse" /> :
-                                                        <span>
-                                                            <span className="fa fa-trash fa-lg"></span>
-                                                            <span>Delete</span>
-                                                        </span>}
-                                                </button>
+                                                {loading ? <span className="fa fa-spinner fa-pulse fa-2x" /> :
+                                                    <div>
+                                                        <button className="cancel-btn btn btn-secondary d-inline-block d-md-none">
+                                                            <span>
+                                                                <span className="fa fa-times fa-lg"></span>
+                                                                <span>Cancel</span>
+                                                            </span>
+                                                        </button>
+                                                        <button
+                                                            className="save-session-btn btn btn-primary"
+                                                            type="submit">
+                                                            <span>
+                                                                <span className="fa fa-save fa-lg"></span>
+                                                                <span>Save</span>
+                                                            </span>
+                                                        </button>
+                                                        <button
+                                                            className="delete-session-btn btn btn-dark"
+                                                            onClick={onDeleteClicked}>
+                                                            <span>
+                                                                <span className="fa fa-trash fa-lg"></span>
+                                                                <span>Delete</span>
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
                                     </div>

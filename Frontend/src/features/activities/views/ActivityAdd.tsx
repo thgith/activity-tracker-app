@@ -230,20 +230,22 @@ export const ActivityAdd = () => {
                                     <div className="row text-center">
                                         <div className="col-12">
                                             <div className="action-button-group">
-                                                <button className="cancel-btn btn btn-secondary d-inline-block d-md-none">
-                                                    <span className="fa fa-times fa-lg"></span>
-                                                    <span>Cancel</span>
-                                                </button>
-                                                <button
-                                                    className="btn btn-primary"
-                                                    type="submit">
-                                                    {loading ? <span className="fa fa-spinner fa-pulse" /> :
-                                                        <span>
-                                                            <span className="save-activity-btn fa fa-save"></span>
-                                                            <span>Save</span>
-                                                        </span>
-                                                    }
-                                                </button>
+                                                {loading ? <span className="fa fa-spinner fa-pulse fa-2x" /> :
+                                                    <div>
+                                                        <button className="cancel-btn btn btn-secondary d-inline-block d-md-none">
+                                                            <span className="fa fa-times fa-lg"></span>
+                                                            <span>Cancel</span>
+                                                        </button>
+                                                        <button
+                                                            className="btn btn-primary"
+                                                            type="submit">
+                                                            <span>
+                                                                <span className="save-activity-btn fa fa-save"></span>
+                                                                <span>Save</span>
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
                                     </div>
