@@ -88,7 +88,6 @@ export const SessionEdit = () => {
 
     const onDeleteClicked = (e: any) => {
         e.preventDefault()
-        console.log('delete clicked')
         setLoading(true);
         dispatch<any>(deleteSession({ activityId, sessionId } as any))
             .unwrap()
@@ -121,7 +120,6 @@ export const SessionEdit = () => {
     };
 
     const handleEdit = (formValue: any) => {
-        console.log('handling edit');
         const { startDateOnly, startTimeOnly, durationHours, durationMin, notes } = formValue;
         var session: ISessionEdit = {
             id: sessionId as string,

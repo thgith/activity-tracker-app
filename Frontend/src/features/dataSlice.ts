@@ -27,7 +27,6 @@ const dataSlice = createSlice({
     reducers: {},
     extraReducers: {
         [(listActivities as any).fulfilled]: (state: any, action: any) => {
-            console.log('list fulfilled');
             // The sessions on these activities objects don't matter,
             // since we will use the dictionary below when we need session data
             state.activities = action.payload.activities;
@@ -42,11 +41,9 @@ const dataSlice = createSlice({
             state.activityIdToSessions = updatedDictionary;
         },
         [(listActivities as any).rejected]: (state: any, action: any) => {
-            console.log('list rejected');
             state.activities = [];
         },
         [(getActivity as any).fulfilled]: (state: any, action: any) => {
-            console.log('get fulfilled');
             state.activities.push(action.payload.activity);
             // Add or replace it in our dictionary
             const updatedDictionary = produce(state.activityIdToSessions, (draft: any) => {
@@ -59,7 +56,6 @@ const dataSlice = createSlice({
             console.log('list rejected');
         },
         [(addActivity as any).fulfilled]: (state: any, action: any) => {
-            console.log('add fulfilled');
             state.activities.push(action.payload.activity);
 
             // Add it in our dictionary
@@ -73,7 +69,6 @@ const dataSlice = createSlice({
             console.log('add rejected');
         },
         [(editActivity as any).fulfilled]: (state: any, action: any) => {
-            console.log('edit fulfilled');
             const filteredState = state.activities
                 .filter((x: IActivity) => x.id !== action.payload.activity.id);
             state.activities = filteredState;
@@ -84,7 +79,6 @@ const dataSlice = createSlice({
         },
         [(deleteActivity as any).fulfilled]: (state: any, action: any) => {
             if (state.activities.length !== 0) {
-                console.log('delete fulfilled');
                 const updatedActivities = state.activities
                     .filter((x: IActivity) => x.id !== action.payload.activityId);
                 state.activities = updatedActivities;
@@ -101,8 +95,6 @@ const dataSlice = createSlice({
             console.log('delete rejected');
         },
         [(listSessionsForActivity as any).fulfilled]: (state: any, action: any) => {
-            console.log('list SESH fulfilled');
-
             // Update sessions for the activity in the dictionary
             const updatedDictionary = produce(state.activityIdToSessions, (draft: any) => {
                 draft[action.payload.activityId] = action.payload.sessions;
@@ -113,7 +105,6 @@ const dataSlice = createSlice({
             console.log('list rejected');
         },
         [(getSession as any).fulfilled]: (state: any, action: any) => {
-            console.log('get fulfilled');
             // Add or replace it in our dictionary
             const updatedDictionary = produce(state.activityIdToSessions, (draft: any) => {
                 // If we have it in the dictionary, remove and add it
@@ -128,7 +119,7 @@ const dataSlice = createSlice({
             state.activityIdToSessions = updatedDictionary;
         },
         [(getSession as any).rejected]: (state: any, action: any) => {
-            console.log('get SESH rejected');
+            console.log('get sesh rejected');
         },
         [(addSession as any).fulfilled]: (state: any, action: any) => {
             // Add it in our dictionary
@@ -156,7 +147,6 @@ const dataSlice = createSlice({
         },
         [(deleteSession as any).fulfilled]: (state: any, action: any) => {
             if (state.activities.length !== 0) {
-                console.log('delete SESH fulfilled');
                 if (state.activityIdToSessions[action.payload.activityId]) {
                     // Delete session from list in corresonding activity in dictionary. Must set to const to mutate the state after.
                     const updatedDictionary = produce(state.activityIdToSessions, (draft: any) => {

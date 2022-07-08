@@ -44,7 +44,6 @@ export const Timer = (props: any) => {
         dispatch<any>(addSession(session))
             .unwrap()
             .then(() => {
-                console.log('session added', 'timer cleared');
                 dispatch(resetTimer({}));
                 setLoading(false);
             })

@@ -61,7 +61,6 @@ export const ProfileEdit = (props: any) => {
     });
 
     const handleEdit = (formValue: any) => {
-        console.log('handling edit');
         const { firstName, lastName, email } = formValue;
         var editedUser: IUserUpdate = {
             id: currentUser.id,

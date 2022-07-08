@@ -55,7 +55,6 @@ export const ActivitiesList = () => {
      * the user typed in the filter input bar.
      */
     const updateStringFilter = (e: any) => {
-        console.log(e.target.value);
         setStringFilter(e.target.value.toLowerCase());
     }
 

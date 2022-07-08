@@ -92,7 +92,6 @@ export const ChangePassword = (props: any) => {
             }))
             .unwrap()
             .then(() => {
-                console.log('Success changed password!');
                 setSuccessful(true);
                 window.setTimeout(function () {
                     navigate(`/profile/${currentUser.id}`);

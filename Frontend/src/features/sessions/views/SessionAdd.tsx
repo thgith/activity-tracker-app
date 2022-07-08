@@ -94,7 +94,6 @@ export const SessionAdd = () => {
     };
 
     const handleAdd = (formValue: any) => {
-        console.log('handling add');
         const { startDateOnly, startTimeOnly, durationHours, durationMin, notes } = formValue;
         var session: ISessionNew = {
             activityId: activityId,
