@@ -38,8 +38,8 @@ You can find this in `/Backend/ActivityTrackerApp` Replace the values in `{{}}` 
 },
 "JwtConfig": {
     "Secret": "{{YOUR_RANDOM_SECRET_STRING}}",
-    "Issuer": "",
-    "Audience": ""
+    "Issuer": "activity-tracker",
+    "Audience": "activity-tracker"
 }
 ```
 ## 2. Set up migrations
@@ -52,7 +52,6 @@ dotnet ef migrations add "NAME_OF_MIGRATION"
 ```
 dotnet ef database update
 ```
-
 ## 4. Start up backend API
 In `/Backend/ActivityTrackerApp`, run the following to start the API on port `7109`
 ```bash

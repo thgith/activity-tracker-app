@@ -43,7 +43,7 @@ public class UserService : IUserService
     public async Task<EntityWithToken<UserGetDto>> AuthenticateUserAsync(UserLoginDto userLoginDto)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => 
-            x.Email == userLoginDto.Email &&
+            x.Email.ToLower() == userLoginDto.Email.ToLower() &&
             x.DeletedDateUtc == null);
 
         // User with email doesn't exist
@@ -153,13 +153,13 @@ public class UserService : IUserService
             hasChange = true;
         }
 
-        if (userPutDto.Email != null && userPutDto.Email != user.Email)
+        if (userPutDto.Email != null && userPutDto.Email.ToLower() != user.Email.ToLower())
         {
             if (await IsEmailTaken(userPutDto.Email))
             {
                 throw new InvalidDataException("This email is already in use");
             }
-            user.Email = userPutDto.Email;
+            user.Email = userPutDto.Email.ToLower();
             hasChange = true;
         }
 
@@ -232,7 +232,7 @@ public class UserService : IUserService
 
     public async Task<bool> IsEmailTaken(string email)
     {
-        return await _dbContext.Users.AnyAsync(x => x.Email == email);
+        return await _dbContext.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower());
     }
 
     private async Task<User> _createUserAsync(UserRegisterDto userRegisterDto)
@@ -245,6 +245,9 @@ public class UserService : IUserService
         // Convert DTO to entity
         var user =  _mapper.Map<User>(userRegisterDto);
 
+        // Always store email in lowercase
+        user.Email = user.Email.ToLower();
+        
         // Auto set join date. Recreate to get rid of ms
         var utcNow = DateTime.UtcNow;
         user.JoinDateUtc = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day, utcNow.Hour, utcNow.Minute, utcNow.Second, DateTimeKind.Utc);
