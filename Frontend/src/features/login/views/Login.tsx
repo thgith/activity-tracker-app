@@ -106,7 +106,10 @@ export const Login = (props: any) => {
                             <div className="row text-center">
                                 <div className="col-12">
                                     <div className="action-button-group">
-                                        <button type="submit" className="btn btn-primary">Log In</button>
+                                        {loading ? <span className="fa fa-spinner fa-pulse fa-2x" /> :
+
+                                            <button type="submit" className="btn btn-primary">Log In</button>
+                                        }
                                     </div>
                                 </div>
                             </div>
