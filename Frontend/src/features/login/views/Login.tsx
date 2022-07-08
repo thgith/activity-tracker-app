@@ -113,7 +113,7 @@ export const Login = (props: any) => {
                             <hr></hr>
                             <div className="row text-center">
                                 <div className="col-12">
-                                    <Link to="/resetPassword">Forgot password?</Link><br></br>
+                                    {/* <Link to="/resetPassword">Forgot password?</Link><br></br> */}
                                     <span>New? </span><Link to="/register">Register here</Link>
                                 </div>
                             </div>

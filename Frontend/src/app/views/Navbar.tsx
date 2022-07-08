@@ -44,12 +44,12 @@ export const Navbar = () => {
                                 <span className="sr-only">(current)</span>
                             </Link>
                         </li>
-                        {currentUser ? <li className="nav-item">
+                        {/* {currentUser ? <li className="nav-item">
                             <Link to="/stats" className="nav-link">
                                 <span className="fa fa-bar-chart"></span>
                                 <span>Stats</span>
                             </Link>
-                        </li> : null}
+                        </li> : null} */}
                         {currentUser ? <li className="nav-item">
                             <Link to={`/profile/${currentUser.id}`} className="nav-link">
                                 <span className="fa fa-user-circle"></span>

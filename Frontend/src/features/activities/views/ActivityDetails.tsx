@@ -74,7 +74,7 @@ export const ActivityDetails = () => {
         return !activity.completedDateUtc &&
             activity.dueDateUtc !== null &&
             activity.dueDateUtc &&
-            activity.dueDateUtc > new Date();
+            new Date(activity.dueDateUtc) < new Date();
     }
 
     if (!activity && !gotActivity) {
@@ -145,13 +145,13 @@ export const ActivityDetails = () => {
                                         </div>
                                         <div className="col-4">
                                             <label>Due Date
-                                                {isActivityOverdue() ?? 
+                                                {isActivityOverdue() ?
                                                     <span
                                                         className="alert-tooltip tooltip-bubble fa fa-exclamation-circle"
                                                         data-toggle="tooltip"
                                                         data-placement="top"
                                                         title="This activity is overdue">
-                                                    </span>}
+                                                    </span> : null}
                                             </label>
                                             <p className="activity-due-date">
                                                 {activity.dueDateUtc ? moment(activity.dueDateUtc).format(STANDARD_DATE_DISPLAY_FORMAT) : 'N/A'}
