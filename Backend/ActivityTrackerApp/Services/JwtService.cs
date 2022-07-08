@@ -54,7 +54,7 @@ namespace ActivityTrackerApp.Services
         {
             // Get key in config
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config[GlobalConstants.JWT_SECRET_KEY_NAME]));
-            
+
             // Create credentials with key and selected signing algorithm
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -71,7 +71,7 @@ namespace ActivityTrackerApp.Services
                 claims,
                 expires: DateTime.UtcNow.AddMinutes(expirationMinutes),
                 signingCredentials: credentials);
-            
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
@@ -83,11 +83,13 @@ namespace ActivityTrackerApp.Services
             {
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuerSigningKey = true,
-                ValidateIssuer = false,
-                ValidateAudience = false
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = _config[GlobalConstants.JWT_ISSUER_KEY_NAME],
+                ValidAudience = _config[GlobalConstants.JWT_AUDIENCE_KEY_NAME]
             }, out SecurityToken validatedToken);
 
-            return (JwtSecurityToken) validatedToken;
+            return (JwtSecurityToken)validatedToken;
         }
     }
 }

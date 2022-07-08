@@ -74,12 +74,12 @@ try
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(key),
-            // Enable this later. Then set in appsettings.json
-            ValidateIssuer = false,
-            ValidateAudience = false,
+            ValidateIssuer = true,
+            ValidateAudience = true,
             ValidateLifetime = true,
-            // Change this to true when not testing
-            RequireExpirationTime = false
+            ValidIssuer = builder.Configuration[GlobalConstants.JWT_ISSUER_KEY_NAME],
+            ValidAudience = builder.Configuration[GlobalConstants.JWT_AUDIENCE_KEY_NAME],
+            RequireExpirationTime = true
         };
     });
 
