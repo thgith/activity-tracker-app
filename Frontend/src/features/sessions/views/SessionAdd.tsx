@@ -32,7 +32,7 @@ export const SessionAdd = () => {
         clearInterval(timerData.intervalId);
         dispatch(resetTimer({}));
     }, [dispatch]);
-    
+
     const activityFromList: IActivity = useSelector((state: any) =>
         state.activitiesData ? state.activitiesData.activities.find((activity: any) => activity.id === activityId) : null
     );
@@ -77,7 +77,9 @@ export const SessionAdd = () => {
 
     const validationSchema = Yup.object().shape({
         startDateOnly: Yup.string()
-            .required(REQUIRED_FIELD_MSG)
+            .required(REQUIRED_FIELD_MSG),
+        notes: Yup.string()
+            .max(1000)
     });
 
     const combineDateAndTime = (dateVal: string, timeVal: string) => {
@@ -213,6 +215,11 @@ export const SessionAdd = () => {
                                                     id="notes"
                                                     name="notes"
                                                     placeholder="Notes"
+                                                />
+                                                <ErrorMessage
+                                                    name="notes"
+                                                    component="div"
+                                                    className="alert alert-danger"
                                                 />
                                             </div>
                                         </div>

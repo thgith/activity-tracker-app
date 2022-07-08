@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'; // This is syntax that changed with v6
-import { Field, Form, Formik } from 'formik';
+import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import moment from 'moment';
 import { PICKER_DATE_DISPLAY_FORMAT, REQUIRED_FIELD_MSG } from '../../../app/constants';
@@ -153,6 +153,8 @@ export const SessionEdit = () => {
     const validationSchema = Yup.object().shape({
         startDateOnly: Yup.string()
             .required(REQUIRED_FIELD_MSG),
+        notes: Yup.string()
+            .max(1000)
     });
 
     return (
@@ -185,6 +187,11 @@ export const SessionEdit = () => {
                                                 type="date"
                                                 id="startDateOnly"
                                                 name="startDateOnly"
+                                            />
+                                            <ErrorMessage
+                                                name="startDateOnly"
+                                                component="div"
+                                                className="alert alert-danger"
                                             />
                                         </div>
                                         <div className="col-6">
@@ -230,6 +237,11 @@ export const SessionEdit = () => {
                                                     id="notes"
                                                     name="notes"
                                                     placeholder="Notes..."
+                                                />
+                                                <ErrorMessage
+                                                    name="notes"
+                                                    component="div"
+                                                    className="alert alert-danger"
                                                 />
                                             </div>
                                         </div>

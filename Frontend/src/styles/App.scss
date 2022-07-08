@@ -206,6 +206,10 @@ button .fa,
         border-radius: $RECT_BORDER_RADIUS $RECT_BORDER_RADIUS 0 0;
         background-color: white;
         padding: 0;
+        // Might not need this. I put it here to help fix the text going over
+        // for gibberish nonbreaking words, but that should be rare
+        // in any useful situation
+        max-width: 24em;
 
         .card-header {
             border-radius: 8px 8px 0 0;
@@ -285,6 +289,7 @@ button .fa,
 }
 
 .activity-description {
+    word-wrap: break-word;
     padding: 1em 0;
 }
 
