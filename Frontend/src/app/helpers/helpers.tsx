@@ -1,7 +1,8 @@
 import { Dictionary } from '@reduxjs/toolkit';
+import moment from 'moment';
 import { useEffect, useRef, useState } from 'react';
 import { ISession } from '../../features/sessions/ISession';
-import { CURR_USER_ID_COOKIE_NAME } from '../constants';
+import { CURR_USER_ID_COOKIE_NAME, MIN_DATE } from '../constants';
 
 const getCookie = (cname: string) => {
     let name = cname + "=";
@@ -96,4 +97,22 @@ export const displayTags = (tags: string[]) => {
         tagItems.push(<span className='tag' key={tag}>{tag}</span>);
     });
     return tagItems;
+}
+
+/**
+ * Takes the local date value and converts it
+ * to what the API expects. 
+ * Frontend display values are local. API values are in UTC.
+ * @param {string | Date | null} dateLocal - The local date to convert.
+ */
+export const convertDateForApi = (dateLocal: string | Date | null) => {
+    if (!dateLocal) {
+        return null;
+    }
+
+    if (dateLocal === '') {
+        return MIN_DATE;
+    }
+
+    return moment(dateLocal).utc().format();
 }

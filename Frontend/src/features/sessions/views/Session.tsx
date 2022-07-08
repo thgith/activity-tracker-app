@@ -21,7 +21,7 @@ export const Session = (props: any) => {
             <div className="card-item session-item">
                 <Link to={`/sessions/${session.id}?activityId=${activityId}&colorHex=${colorHexNoHash}`} style={{ textDecoration: 'none' }}>
                     <div className="session-header card-header" style={{ backgroundColor: props.colorHex }}>
-                        <h5>{moment(session.startDateUtc.toString()).format(LONG_DATE_FORMAT)}</h5>
+                        <h5>{moment(session.startDateUtc.toString()).local().format(LONG_DATE_FORMAT)}</h5>
                     </div>
                     <div className="session-body card-body">
                         <p className="session-duration">{sessionDurationDisplay(session.durationSeconds)}</p>

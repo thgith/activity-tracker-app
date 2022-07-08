@@ -8,7 +8,15 @@ export interface ISession {
 
 export interface ISessionNew {
     activityId: any,
-    startDateUtc: Date,
+    startDate: Date,
+    durationSeconds: number,
+    notes: string
+}
+
+export interface ISessionEdit {
+    id: string
+    activityId: any,
+    startDate: Date,
     durationSeconds: number,
     notes: string
 }

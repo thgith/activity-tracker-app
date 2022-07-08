@@ -93,7 +93,7 @@ export const SessionDetails = () => {
                 <div className="col-12 col-md-8">
                     <div className="panel-container">
                         <h2 className="session-start-date colored-header text-center" style={{ backgroundColor: colorHex }}>
-                            {moment(session.startDateUtc.toString()).format(LONG_DATE_FORMAT)}
+                            {moment(session.startDateUtc.toString()).local().format(LONG_DATE_FORMAT)}
                         </h2>
                         <div className="panel-body-container">
                             <div className="row">

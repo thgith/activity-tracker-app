@@ -140,7 +140,7 @@ export const ActivityDetails = () => {
                                         <div className="col-4">
                                             <label>Start Date</label>
                                             <p className="activity-start-date">
-                                                {moment(activity.startDateUtc).format(STANDARD_DATE_DISPLAY_FORMAT)}
+                                                {moment(activity.startDateUtc).local().format(STANDARD_DATE_DISPLAY_FORMAT)}
                                             </p>
                                         </div>
                                         <div className="col-4">

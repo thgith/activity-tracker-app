@@ -96,7 +96,7 @@ export const SessionAdd = () => {
         const { startDateOnly, startTimeOnly, durationHours, durationMin, notes } = formValue;
         var session: ISessionNew = {
             activityId: activityId,
-            startDateUtc: combineDateAndTime(startDateOnly, startTimeOnly),
+            startDate: combineDateAndTime(startDateOnly, startTimeOnly),
             durationSeconds: convertToDurationSeconds(durationHours, durationMin),
             notes: notes
         }

@@ -86,8 +86,8 @@ export const ActivityEdit = (props: any) => {
         return null;
     };
 
-    const formatDate = (dateItem: string | undefined) => {
-        return moment(dateItem).format(PICKER_DATE_DISPLAY_FORMAT);
+    const formatDate = (dateItemUtc: string | undefined) => {
+        return moment(dateItemUtc).local().format(PICKER_DATE_DISPLAY_FORMAT);
     };
 
     const initialValues = {
@@ -127,9 +127,9 @@ export const ActivityEdit = (props: any) => {
         var editedActivity: IActivityEdit = {
             name: name,
             description: description,
-            startDateUtc: startDate,
-            dueDateUtc: dueDate,
-            completedDateUtc: completedDate,
+            startDate: startDate,
+            dueDate: dueDate,
+            completedDate: completedDate,
             colorHex: selectedColor,
             isArchived: false,
             tags: tags !== '' ? trimmedStrArray(tags

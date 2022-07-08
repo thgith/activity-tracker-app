@@ -1,14 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 export interface TimerState {
-    startDateUtc: string | null,
+    startDate: string | null,
     isRunning: boolean;
     secondsElapsed: number;
     intervalId: number | null;
 };
 
 const initialState: TimerState = {
-    startDateUtc: null,
+    startDate: null,
     isRunning: false,
     secondsElapsed: 0,
     intervalId: null
@@ -27,7 +27,7 @@ const timerSlice = createSlice({
         startTimer(state: TimerState, action) {
             console.log('timer started from slice');
             state.isRunning = true;
-            state.startDateUtc = action.payload.startDateUtc;
+            state.startDate = action.payload.startDate;
             state.intervalId = action.payload.intervalId;
         },
         incrementTimer(state, action) {
@@ -37,7 +37,7 @@ const timerSlice = createSlice({
         resetTimer(state, action) {
             console.log('timer restarted from slice');
             state.isRunning = false;
-            state.startDateUtc = null;
+            state.startDate = null;
             state.intervalId = null;
             state.secondsElapsed = 0;
 

@@ -17,7 +17,7 @@ export const Timer = (props: any) => {
         intervalHandle = setInterval(() => {
             dispatch(incrementTimer({}));
         }, 1000);
-        dispatch(startTimer({ startDateUtc: startDateStr, intervalId: intervalHandle }));
+        dispatch(startTimer({ startDate: startDateStr, intervalId: intervalHandle }));
     };
 
     const handlePauseTimer = () => {
@@ -36,7 +36,7 @@ export const Timer = (props: any) => {
         dispatch(pauseTimer({}));
         var session: ISessionNew = {
             activityId: props.activityId,
-            startDateUtc: new Date(timerData.startDateUtc),
+            startDate: new Date(timerData.startDate),
             durationSeconds: timerData.secondsElapsed,
             notes: ''
         };

@@ -8,7 +8,7 @@ import { PICKER_DATE_DISPLAY_FORMAT, REQUIRED_FIELD_MSG } from '../../../app/con
 import { getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
 import { Loader } from '../../../app/views/Loader';
 import { SessionNotFound } from './SessionNotFound';
-import { ISession } from '../ISession';
+import { ISession, ISessionEdit } from '../ISession';
 import { getUser } from '../../User/userSlice';
 import { listSessionsForActivity, deleteSession, addSession, editSession } from '../sessionMethods';
 import { clearMessage } from '../../message/messageSlice';
@@ -123,10 +123,10 @@ export const SessionEdit = () => {
     const handleEdit = (formValue: any) => {
         console.log('handling edit');
         const { startDateOnly, startTimeOnly, durationHours, durationMin, notes } = formValue;
-        var session: ISession = {
-            id: sessionId,
+        var session: ISessionEdit = {
+            id: sessionId as string,
             activityId: activityId,
-            startDateUtc: combineDateAndTime(startDateOnly, startTimeOnly),
+            startDate: combineDateAndTime(startDateOnly, startTimeOnly),
             durationSeconds: convertToDurationSeconds(durationHours, durationMin),
             notes: notes
         }
@@ -144,8 +144,8 @@ export const SessionEdit = () => {
 
     const initialValues = {
         notes: session.notes ?? '',
-        startDateOnly: moment(session.startDateUtc).format(PICKER_DATE_DISPLAY_FORMAT),
-        startTimeOnly: moment(session.startDateUtc).format('hh:mm'),
+        startDateOnly: moment(session.startDateUtc).local().format(PICKER_DATE_DISPLAY_FORMAT),
+        startTimeOnly: moment(session.startDateUtc).local().format('HH:mm'),
         durationHours: Math.floor(session.durationSeconds / 3600),
         durationMin: calculateRemainingMinutes(session.durationSeconds)
     };
