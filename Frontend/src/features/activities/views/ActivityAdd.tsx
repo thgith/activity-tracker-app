@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import moment from 'moment';
 import * as Yup from 'yup';
-import { BLUE, BLUE_GREEN, CORAL, DARK_GREY, DEFAULT_COLOR, GREEN, ORANGE, PICKER_DATE_DISPLAY_FORMAT, PINK, PURPLE, REQUIRED_FIELD_MSG, YELLOW } from '../../../app/constants';
+import { BLUE, BLUE_GREEN, CORAL, DARK_GREY, DEFAULT_COLOR, GREEN, LONG_TEXT_MAX_CHAR, ORANGE, PICKER_DATE_DISPLAY_FORMAT, PINK, PURPLE, REQUIRED_FIELD_MSG, SHORT_TEXT_MAX_CHAR, YELLOW } from '../../../app/constants';
 import { getUserIdCookie, onlyUnique, trimmedStrArray, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
 import { IActivity } from '../IActivity';
 import { getUser } from '../../User/userSlice';
@@ -51,7 +51,10 @@ export const ActivityAdd = () => {
 
     const validationSchema = Yup.object().shape({
         name: Yup.string()
-            .required(REQUIRED_FIELD_MSG),
+            .required(REQUIRED_FIELD_MSG)
+            .max(SHORT_TEXT_MAX_CHAR),
+        description: Yup.string()
+            .max(LONG_TEXT_MAX_CHAR),
         startDate: Yup.date()
             .required(REQUIRED_FIELD_MSG)
             .when('dueDate', {
@@ -157,6 +160,11 @@ export const ActivityAdd = () => {
                                                     id="description"
                                                     name="description"
                                                     placeholder="Description"
+                                                />
+                                                <ErrorMessage
+                                                    name="description"
+                                                    component="div"
+                                                    className="alert alert-danger"
                                                 />
                                             </div>
                                             <div className="row">

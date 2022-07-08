@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import moment from 'moment'
 import * as Yup from 'yup';
-import { DEFAULT_COLOR, PICKER_DATE_DISPLAY_FORMAT, REQUIRED_FIELD_MSG } from '../../../app/constants'
+import { DEFAULT_COLOR, LONG_TEXT_MAX_CHAR, PICKER_DATE_DISPLAY_FORMAT, REQUIRED_FIELD_MSG } from '../../../app/constants'
 import { getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers'
 import { ISessionNew } from '../ISession'
 import { getUser } from '../../User/userSlice'
@@ -79,7 +79,7 @@ export const SessionAdd = () => {
         startDateOnly: Yup.string()
             .required(REQUIRED_FIELD_MSG),
         notes: Yup.string()
-            .max(1000)
+            .max(LONG_TEXT_MAX_CHAR)
     });
 
     const combineDateAndTime = (dateVal: string, timeVal: string) => {

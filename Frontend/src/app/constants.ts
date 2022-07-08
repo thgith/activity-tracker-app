@@ -1,4 +1,6 @@
 export const REQUIRED_FIELD_MSG = 'This field is required.';
+export const SHORT_TEXT_MAX_CHAR = 50;
+export const LONG_TEXT_MAX_CHAR = 1000;
 export const API_URL_BASE = 'https://localhost:7109/api/v1/';
 // NOTE: This is a non http-only cookie that doesn't store any JWT info.
 //       It's just for logic after the user is already authenticated with

@@ -54,27 +54,27 @@ export const Profile = (props: any) => {
                     <div className="row">
                         <div className="col-6">
                             <label htmlFor="firstName">First Name</label>
-                            <h5>{currentUser.firstName}</h5>
+                            <div>{currentUser.firstName}</div>
                         </div>
                         <div className="col-6">
                             <label htmlFor="lastName">Last Name</label>
-                            <h5>{currentUser.lastName}</h5>
+                            <div>{currentUser.lastName}</div>
                         </div>
                     </div>
                     <div className="row">
                         <div className="col-12">
                             <label htmlFor="email">Email</label>
-                            <h5>{currentUser.email}</h5>
+                            <div>{currentUser.email}</div>
                         </div>
                     </div>
                     <div className="row">
                         <div className="col-6">
                             <label htmlFor="role">Date Joined</label>
-                            <h5>{moment(currentUser.joinDateUtc).format(STANDARD_DATE_DISPLAY_FORMAT)}</h5>
+                            <div>{moment(currentUser.joinDateUtc).format(STANDARD_DATE_DISPLAY_FORMAT)}</div>
                         </div>
                         <div className="col-6">
                             <label htmlFor="role">Role</label>
-                            <h5>{currentUser.role}</h5>
+                            <div>{currentUser.role}</div>
                         </div>
                     </div>
                     <div className="row text-center">

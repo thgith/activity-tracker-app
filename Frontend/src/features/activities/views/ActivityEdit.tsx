@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Form, Formik, Field, ErrorMessage } from 'formik';
 import moment from 'moment';
 import * as Yup from 'yup';
-import { REQUIRED_FIELD_MSG, YELLOW, ORANGE, CORAL, PINK, PURPLE, BLUE, BLUE_GREEN, DARK_GREY, GREEN, PICKER_DATE_DISPLAY_FORMAT, DEFAULT_COLOR } from '../../../app/constants'
+import { REQUIRED_FIELD_MSG, YELLOW, ORANGE, CORAL, PINK, PURPLE, BLUE, BLUE_GREEN, DARK_GREY, GREEN, PICKER_DATE_DISPLAY_FORMAT, DEFAULT_COLOR, SHORT_TEXT_MAX_CHAR, LONG_TEXT_MAX_CHAR } from '../../../app/constants'
 import { getUserIdCookie, onlyUnique, trimmedStrArray, useEffectSkipInitialRender } from '../../../app/helpers/helpers'
 import { IActivity, IActivityEdit } from '../IActivity'
 import { getUser } from '../../User/userSlice'
@@ -101,7 +101,10 @@ export const ActivityEdit = (props: any) => {
 
     const validationSchema = Yup.object().shape({
         name: Yup.string()
-            .required(REQUIRED_FIELD_MSG),
+            .required(REQUIRED_FIELD_MSG)
+            .max(SHORT_TEXT_MAX_CHAR),
+        description: Yup.string()
+            .max(LONG_TEXT_MAX_CHAR),
         startDate: Yup.date()
             .required(REQUIRED_FIELD_MSG)
             .when('dueDate', {
@@ -254,6 +257,11 @@ export const ActivityEdit = (props: any) => {
                                                     id="description"
                                                     name="description"
                                                     placeholder="Description"
+                                                />
+                                                <ErrorMessage
+                                                    name="description"
+                                                    component="div"
+                                                    className="alert alert-danger"
                                                 />
                                             </div>
                                         </div>
