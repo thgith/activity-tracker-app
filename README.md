@@ -154,6 +154,7 @@ need to hit the `/api/v1/Auth/register` endpoint first to be authenticated for t
 ## How to Run Tests
 - Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hovering over the class/test methods. A couple of tests are broken due to some changes right now, but the layout will be basically the same.
 
+---
 ## To Dos
 ### Soon
 - Archive an activity
@@ -163,7 +164,7 @@ need to hit the `/api/v1/Auth/register` endpoint first to be authenticated for t
 - Make tags pop up as pills when adding/editing them
 - Fix tests after changes
 - Add tests for other services
----
+
 ### Authentication
 - Stronger password requirements
 - Confirm registration email
