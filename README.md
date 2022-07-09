@@ -26,6 +26,7 @@ Used to track how much time is spent on activities.
     - [4. Start up backend API](#4-start-up-backend-api)
     - [5. Start up frontend](#5-start-up-frontend)
   - [How to Run Tests](#how-to-run-tests)
+  - [To Dos](#to-dos)
 
 ## Features
 - Login/registration with email and JWT token auth
@@ -152,3 +153,38 @@ need to hit the `/api/v1/Auth/register` endpoint first to be authenticated for t
 
 ## How to Run Tests
 - Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hovering over the class/test methods. A couple of tests are broken due to some changes right now, but the layout will be basically the same.
+
+## To Dos
+### Soon
+- Archive an activity
+
+### Clean up
+- Combine common details and edit views
+- Make tags pop up as pills when adding/editing them
+- Fix tests after changes
+- Add tests for other services
+---
+### Authentication
+- Stronger password requirements
+- Confirm registration email
+- Password reset
+- 2-factor auth
+- Token refresh
+
+### User
+- Admin view
+- Default profile pictures
+- Upload profile picture
+
+### Activities / Sessions
+- Order activities
+- Only get first 10 sessions with load more button(?)
+- Side bar of most recent sessions
+- Make clicking on a tag go to the list page with activities filtered by the string
+
+### Other Features
+- Stats
+- Export data
+- Import data
+- Dark mode
+- Pomodoro
