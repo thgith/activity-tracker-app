@@ -1,4 +1,4 @@
-# Activity Tracker
+# Activity Time Tracker
 Used to track how much time is spent on activities.
 
 ![Activity List](/docs/images/activities_list.png)
@@ -10,14 +10,14 @@ Used to track how much time is spent on activities.
 ## Table of Contents
   - [Features](#features)
   - [Demos](#demos)
-    - [Activity List](#activity-list--filtering)
+    - [Activity List / Filtering](#activity-list--filtering)
     - [Register](#register)
     - [Add Activity](#add-activity)
     - [Edit Activity](#edit-activity)
     - [Add Session From Timer / Activity Details](#add-session-from-timer--activity-details)
-    - [Manually Add Session / Session Details / Edit Session](#manually-add-session--session-details--edit-session)
+    - [Manually Add Session / Session Details / Edit Session / Delete Session](#manually-add-session--session-details--edit-session)
     - [Edit User / Change Password](#edit-user--change-password)
-    - [Responsive](#responsive)
+    - [Responsiveness](#responsive)
   - [Tech Stack](#tech-stack)
   - [API Endpoints](#api-endpoints)
   - [How to Set Up](#how-to-set-up)
