@@ -11,7 +11,7 @@ Used to track how much time is spent on activities.
   - [Features](#features)
   - [Demos](#demos)
     - [Activity List / Filtering](#activity-list--filtering)
-    - [Register](#register)
+    - [Register User](#register)
     - [Add Activity](#add-activity)
     - [Edit Activity](#edit-activity)
     - [Add Session From Timer / Activity Details](#add-session-from-timer--activity-details)
