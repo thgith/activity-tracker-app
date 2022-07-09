@@ -1,15 +1,96 @@
 # Activity Tracker
 Used to track how much time is spent on activities.
+![Activity List](/docs/images/activities_list.png)
 
-# Tech Stack
-## Backend
+![Activity Details](/docs/images/activity_details.png)
+
+## Table of Contents
+  - [Features](#features)
+  - [Demos](#demos)
+    - [Activity List](#activity-list)
+    - [Register](#register)
+    - [Add Activity](#add-activity)
+    - [Edit Activity](#edit-activity)
+    - [Add Session From Timer / Activity Details](#add-session-from-timer--activity-details)
+    - [Manually Add Session / Session Details / Edit Session](#manually-add-session--session-details--edit-session)
+    - [Edit User / Change Password](#edit-user--change-password)
+    - [Responsive](#responsive)
+  - [Tech Stack](#tech-stack)
+    - [Backend](#backend)
+    - [Frontend](#frontend)
+    - [Other](#other)
+  - [API Endpoints](#api-endpoints)
+    - [Authentication](#authentication)
+    - [Activity](#activity)
+    - [Session](#session)
+    - [User](#user)
+  - [How to Set Up](#how-to-set-up)
+    - [1. Set up appsettings.json](#1-set-up-appsettingsjson)
+    - [2. Set up migrations](#2-set-up-migrations)
+    - [3. Apply the migrations to your database](#3-apply-the-migrations-to-your-database)
+    - [4. Start up backend API](#4-start-up-backend-api)
+    - [5. Start up frontend](#5-start-up-frontend)
+  - [How to Run Tests](#how-to-run-tests)
+
+<a name="features"></a>
+## Features
+- Login/registration with email and JWT token auth
+- Add/edit a user
+- Change user password when logged in
+- Add/edit/delete an activity
+- Manually add/edit/delete a session
+- Add session with stopwatch
+- Color picker for activity
+- List page with total time spent on each activity
+- Activity filter on list page
+- Tagging on activities
+
+---
+<a name="demo"></a>
+## Demos
+<a name="activity-list-demo"></a>
+### Activity List
+![Activity List Demo](/docs/videos/activity_list_demo.gif)
+
+<a name="register-demo"></a>
+### Register
+![Register Demo](/docs/videos/register_demo.gif)
+
+<a name="add-activity-demo"></a>
+### Add Activity
+![Add Activity Demo](/docs/videos/new_activity_demo.gif)
+
+<a name="edit-activity-demo"></a>
+### Edit Activity
+![Edit Activity Demo](/docs/videos/edit_activity_demo.gif)
+
+<a name="timer-demo"></a>
+### Add Session From Timer / Activity Details
+![Timer Demo](/docs/videos/timer_demo.gif)
+
+<a name="session-demo"></a>
+### Manually Add Session / Session Details / Edit Session
+![Session Demo](/docs/videos/session_demo.gif)
+
+<a name="edit-user-demo"></a>
+### Edit User / Change Password
+![User Demo](/docs/videos/user_demo.gif)
+
+<a name="responsive-demo"></a>
+### Responsive
+![Responsive Demo](/docs/videos/responsive_demo.gif)
+
+---
+<a name="tech-stack"></a>
+## Tech Stack
+### Backend
 - .NET Core 4
 - Entity Framework (code-first)
 - Postgres
 - MSTest / Moq
 - Swagger
 
-## Frontend
+### Frontend
 - React
 - Redux-Toolkit
   - redux - global store
@@ -19,29 +100,34 @@ Used to track how much time is spent on activities.
 - Bootstrap 5
 - SASS
 
-## Other
+### Other
 - VS Code
 - PGAdmin
 - Postman
 - Redux DevTools
 - FireFox / Chrome / Edge
 
-# API Endpoints
-Here are the available API endpoints. Go to the Swagger endpoint `/swagger` (See `How to Set Up` below for more details) and expand the tabs to see more info (type of data to post, etc.) NOTE: You will need to hit the `login` or `register` endpoints first before hitting the other endpoints to be authenticated.
-## Authentication
+---
+<a name="api-endpoints"></a>
+## API Endpoints
+Go to the Swagger endpoint `/swagger` (See `How to Set Up` below for more details) and expand the tabs to see more info (type of data to post, etc.) NOTE: You will need to hit the `login` or `register` endpoints first before hitting the other endpoints to be authenticated.
+
+### Authentication
 ![Authentication Endpoints](/docs/images/api_auth_endpoints.png)
 
-## Activity
+### Activity
 ![Activity Endpoints](/docs/images/api_activity_endpoints.png)
 
-## Session
+### Session
 ![Session Endpoints](/docs/images/api_session_endpoints.png)
 
-## User
+### User
 ![User Endpoints](/docs/images/api_user_endpoints.png)
 
-# How to Set Up
-## 1. Set up appsettings.json
+---
+<a name="setup"></a>
+## How to Set Up
+### 1. Set up appsettings.json
 You can find this in `/Backend/ActivityTrackerApp` Replace the values in `{{}}` with your values. These values will probably be moved to environment variables later.
 - `YOUR_POSTGRES_USER`
 - `YOUR_POSTGRES_PASSWORD`
@@ -56,22 +142,22 @@ You can find this in `/Backend/ActivityTrackerApp` Replace the values in `{{}}` 
     "Audience": "activity-tracker"
 }
 ```
-## 2. Set up migrations
+### 2. Set up migrations
 Create migrations. I don't store the migrations right now since this doesn't have a stable release yet.
 In `/Backend/ActivityTrackerApp`, run:
 ```bash
 dotnet ef migrations add "NAME_OF_MIGRATION"
 ```
-## 3. Apply the migrations to your database
+### 3. Apply the migrations to your database
 ```
 dotnet ef database update
 ```
-## 4. Start up backend API
+### 4. Start up backend API
 In `/Backend/ActivityTrackerApp`, run the following to start the API on port `7109`
 ```bash
 dotnet run
 ```
-## 5. Start up frontend
+### 5. Start up frontend
 In `/Frontend`, run the following to start the frontend on port `3000`
 ```bash
 npm start 
@@ -82,21 +168,6 @@ npm start
 need to hit the `/api/v1/Auth/register` endpoint first to be authenticated for the other routes.
 - You can go to `https://localhost:7109/swagger` to view the available API endpoints
 
-# How to Run Tests
-Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hovering over the class/test methods. A couple of tests are broken due to some changes right now, but the layout will be basically the same.
-
-# Features
-- Login/registration with email and JWT token auth
-- Add/edit a user
-- Change user password when logged in
-- Add/edit/delete an activity
-- Manually add/edit/delete a session
-- Add session with stopwatch
-- Color picker for activity
-- List page with total time spent on each activity
-- Activity filter on list page
-- Tagging on activities
-
----
-- [Implementation Notes](/docs/ImplementationNotes.md)
-- [To Dos](/docs/ToDos.md)
+<a name="setup-tests"></a>
+## How to Run Tests
+- Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hovering over the class/test methods. A couple of tests are broken due to some changes right now, but the layout will be basically the same.
