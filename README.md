@@ -1,5 +1,6 @@
 # Activity Tracker
 Used to track how much time is spent on activities.
+
 ![Activity List](/docs/images/activities_list.png)
 ![Activity Details](/docs/images/activity_details.png)
 ![Activity Edit](/docs/images/edit_activity.png)
@@ -8,7 +9,7 @@ Used to track how much time is spent on activities.
 ## Table of Contents
   - [Features](#features)
   - [Demos](#demos)
-    - [Activity List](#activity-list)
+    - [Activity List](#activity-list--filtering)
     - [Register](#register)
     - [Add Activity](#add-activity)
     - [Edit Activity](#edit-activity)
@@ -26,7 +27,6 @@ Used to track how much time is spent on activities.
     - [5. Start up frontend](#5-start-up-frontend)
   - [How to Run Tests](#how-to-run-tests)
 
-<a name="features"></a>
 ## Features
 - Login/registration with email and JWT token auth
 - Add/edit a user
@@ -40,42 +40,32 @@ Used to track how much time is spent on activities.
 - Tagging on activities
 
 ---
-<a name="demo"></a>
 ## Demos
-<a name="activity-list-demo"></a>
-### Activity List
+### Activity List / Filtering
 ![Activity List Demo](/docs/videos/activity_list_demo.gif)
 
-<a name="register-demo"></a>
 ### Register
 ![Register Demo](/docs/videos/register_demo.gif)
 
-<a name="add-activity-demo"></a>
 ### Add Activity
 ![Add Activity Demo](/docs/videos/new_activity_demo.gif)
 
-<a name="edit-activity-demo"></a>
 ### Edit Activity
 ![Edit Activity Demo](/docs/videos/edit_activity_demo.gif)
 
-<a name="timer-demo"></a>
 ### Add Session From Timer / Activity Details
 ![Timer Demo](/docs/videos/timer_demo.gif)
 
-<a name="session-demo"></a>
 ### Manually Add Session / Session Details / Edit Session
 ![Session Demo](/docs/videos/session_demo.gif)
 
-<a name="edit-user-demo"></a>
 ### Edit User / Change Password
 ![User Demo](/docs/videos/user_demo.gif)
 
-<a name="responsive-demo"></a>
 ### Responsive
 ![Responsive Demo](/docs/videos/responsive_demo.gif)
 
 ---
-<a name="tech-stack"></a>
 ## Tech Stack
 ### Backend
 - .NET Core 4
@@ -102,7 +92,6 @@ Used to track how much time is spent on activities.
 - FireFox / Chrome / Edge
 
 ---
-<a name="api-endpoints"></a>
 ## API Endpoints
 Go to the Swagger endpoint `/swagger` (See `How to Set Up` below for more details) and expand the tabs to see more info (type of data to post, etc.) NOTE: You will need to hit the `login` or `register` endpoints first before hitting the other endpoints to be authenticated.
 
@@ -119,7 +108,6 @@ Go to the Swagger endpoint `/swagger` (See `How to Set Up` below for more detail
 ![User Endpoints](/docs/images/api_user_endpoints.png)
 
 ---
-<a name="setup"></a>
 ## How to Set Up
 ### 1. Set up appsettings.json
 You can find this in `/Backend/ActivityTrackerApp` Replace the values in `{{}}` with your values. These values will probably be moved to environment variables later.
@@ -162,6 +150,5 @@ npm start
 need to hit the `/api/v1/Auth/register` endpoint first to be authenticated for the other routes.
 - You can go to `https://localhost:7109/swagger` to view the available API endpoints
 
-<a name="setup-tests"></a>
 ## How to Run Tests
 - Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hovering over the class/test methods. A couple of tests are broken due to some changes right now, but the layout will be basically the same.
