@@ -167,6 +167,12 @@ public class SessionService : ISessionService
         }
 
         // NOTE: You can't change the activity ID associated with a session once it's created
+        if (updateSessionDto.StartDateUtc != null && updateSessionDto.StartDateUtc != DateTime.MinValue)
+        {
+            var startDateUtc = (DateTime)updateSessionDto.StartDateUtc;
+            var shortenedStartDateUtc = new DateTime(startDateUtc.Year, startDateUtc.Month, startDateUtc.Day, startDateUtc.Hour, startDateUtc.Minute, startDateUtc.Second, DateTimeKind.Utc);
+            session.StartDateUtc = shortenedStartDateUtc;
+        }
         if (updateSessionDto.Notes != null)
         {
             session.Notes = updateSessionDto.Notes;

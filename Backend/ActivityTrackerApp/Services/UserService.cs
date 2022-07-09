@@ -178,7 +178,7 @@ public class UserService : IUserService
         return _mapper.Map<UserGetDto>(user);
     }
 
-    /// </inheritdoc>
+    /// <inheritdoc/>
     public async Task<bool> DeleteUserAsync(Guid currUserId, Guid userId)
     {
         // Check permissions
