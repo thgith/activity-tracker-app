@@ -6,6 +6,7 @@ Used to track how much time is spent on activities.
 ![Activity Edit](/docs/images/edit_activity.png)
 ![Activity Mobile](/docs/images/activity_mobile.png)
 
+---
 ## Table of Contents
   - [Features](#features)
   - [Demos](#demos)
@@ -28,6 +29,7 @@ Used to track how much time is spent on activities.
   - [How to Run Tests](#how-to-run-tests)
   - [To Dos](#to-dos)
 
+---
 ## Features
 - Login/registration with email and JWT token auth
 - Add/edit a user
