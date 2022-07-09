@@ -260,7 +260,9 @@ export const ActivityAdd = () => {
                                             <div className="action-button-group">
                                                 {loading ? <span className="fa fa-spinner fa-pulse fa-2x" /> :
                                                     <div>
-                                                        <button className="cancel-btn btn btn-secondary d-inline-block d-md-none">
+                                                        <button 
+                                                            className="cancel-btn btn btn-secondary d-inline-block d-md-none"
+                                                            type="button">
                                                             <span className="fa fa-times fa-lg"></span>
                                                             <span>Cancel</span>
                                                         </button>
