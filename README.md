@@ -1,8 +1,9 @@
 # Activity Tracker
 Used to track how much time is spent on activities.
 ![Activity List](/docs/images/activities_list.png)
-
 ![Activity Details](/docs/images/activity_details.png)
+![Activity Edit](/docs/images/edit_activity.png)
+![Activity Mobile](/docs/images/activity_mobile.png)
 
 ## Table of Contents
   - [Features](#features)
@@ -16,14 +17,7 @@ Used to track how much time is spent on activities.
     - [Edit User / Change Password](#edit-user--change-password)
     - [Responsive](#responsive)
   - [Tech Stack](#tech-stack)
-    - [Backend](#backend)
-    - [Frontend](#frontend)
-    - [Other](#other)
   - [API Endpoints](#api-endpoints)
-    - [Authentication](#authentication)
-    - [Activity](#activity)
-    - [Session](#session)
-    - [User](#user)
   - [How to Set Up](#how-to-set-up)
     - [1. Set up appsettings.json](#1-set-up-appsettingsjson)
     - [2. Set up migrations](#2-set-up-migrations)
