@@ -7,7 +7,7 @@ const sessionDurationDisplay = (seconds: number) => {
     const momentTime = moment.utc(seconds * 1000);
     return (
     <span>
-        {momentTime.format('H')} hours {momentTime.format('m')} minutes {momentTime.format('s')} seconds
+        {Math.floor(seconds / 3600)} hours {momentTime.format('m')} minutes {momentTime.format('s')} seconds
     </span>);
 };
 
