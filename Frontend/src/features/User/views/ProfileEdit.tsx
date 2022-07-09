@@ -131,21 +131,23 @@ export const ProfileEdit = (props: any) => {
                             <div className="row text-center">
                                 <div className="col-12">
                                     <div className="action-button-group">
-                                        <Link to={`/profile/${currentUser.id}`}>
-                                            <button type="button" className="btn btn-secondary">
-                                                <span className="fa fa-times fa-lg"></span>
-                                                <span>Cancel</span>
-                                            </button>
-                                        </Link>
-                                        <button type="submit" className="btn btn-primary">
-                                            {loading ?
-                                                <span className="fa fa-spinner fa-pulse"></span> :
-                                                <span>
-                                                    <span className="fa fa-save fa-lg"></span>
-                                                    <span>Save</span>
-                                                </span>
-                                            }
-                                        </button>
+                                        {loading ?
+                                            <span className="fa fa-spinner fa-pulse fa-2x"></span> :
+                                            <div>
+                                                <Link to={`/profile/${currentUser.id}`}>
+                                                    <button type="button" className="btn btn-secondary">
+                                                        <span className="fa fa-times fa-lg"></span>
+                                                        <span>Cancel</span>
+                                                    </button>
+                                                </Link>
+                                                <button type="submit" className="btn btn-primary">
+                                                    <span>
+                                                        <span className="fa fa-save fa-lg"></span>
+                                                        <span>Save</span>
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
