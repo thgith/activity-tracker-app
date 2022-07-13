@@ -1,6 +1,5 @@
 import axios from 'axios';
-import moment from 'moment';
-import { API_URL_BASE, MIN_DATE } from '../app/constants';
+import { API_URL_BASE } from '../app/constants';
 import { convertDateForApi } from '../app/helpers/helpers';
 import { IActivity, IActivityEdit } from '../features/activities/IActivity';
 const ACTIVITY_API_URL = `${API_URL_BASE}Activity/`;

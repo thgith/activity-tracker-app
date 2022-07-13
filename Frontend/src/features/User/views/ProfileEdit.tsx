@@ -60,6 +60,10 @@ export const ProfileEdit = (props: any) => {
             .required(REQUIRED_FIELD_MSG),
     });
 
+    /**
+     * Edit the user.
+     * @param formValue - The values from the form.
+     */
     const handleEdit = (formValue: any) => {
         const { firstName, lastName, email } = formValue;
         var editedUser: IUserUpdate = {

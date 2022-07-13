@@ -7,7 +7,11 @@ namespace ActivityTrackerApp.Dtos;
 /// </summary>
 public class ActivityGetDto : BaseEntity
 {
+    /// <summary>
+    /// The ID of the user who owns the activity.
+    /// </summary>
     public Guid OwnerId { get; set; }
+
     /// <summary>
     /// Name of the activity.
     /// </summary>

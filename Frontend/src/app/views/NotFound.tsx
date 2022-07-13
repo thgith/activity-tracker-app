@@ -8,5 +8,5 @@ export const NotFound = () => {
                 <h5 className="panel-body-container">We're sorry. We couldn't find the page you requested.</h5>
             </div>
         </div>
-    )
+    );
 };

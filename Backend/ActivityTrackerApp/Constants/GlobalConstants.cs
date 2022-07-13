@@ -1,4 +1,8 @@
 namespace ActivityTrackerApp.Constants;
+
+/// <summary>
+/// Constants.
+/// </summary>
 public static class GlobalConstants
 {
     public const string APP_NAME = "Activity Tracker";

@@ -21,15 +21,27 @@ public class Session : BaseEntity
     [ForeignKey("ActivityId")]
     public virtual Activity Activity { get; set; }
 
+    /// <summary>
+    /// The date the session was started.
+    /// </summary>
     [Required]
     public DateTime? StartDateUtc { get; set; }
 
+    /// <summary>
+    /// How long the session is in seconds.
+    /// </summary>
     [Required]
     [Column(TypeName="int")]
     public uint DurationSeconds { get; set; }
 
+    /// <summary>
+    /// Optional additional notes.
+    /// </summary>
     [MaxLength(1024)]
     public string Notes { get; set; }
 
+    /// <summary>
+    /// The date the session was soft-deleted.
+    /// </summary>
     public DateTime? DeletedDateUtc { get; set; }
 }

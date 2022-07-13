@@ -19,7 +19,6 @@ export const SessionDetails = () => {
     const activityId = searchParams.get('activityId');
     const colorHexNoHash = searchParams.get('colorHex');
     const colorHex = `#${colorHexNoHash}`;
-    const [loading, setLoading] = useState(false);
     const { user: currentUser } = useSelector((state: any) => state.userData);
     const [gotSessions, setGotSessions] = useState(false);
     var activityIdToSessions = useSelector((state: any) => state.activitiesData.activityIdToSessions)
@@ -121,7 +120,6 @@ export const SessionDetails = () => {
 const getHourFromDurationSec = (durationSeconds: number) => {
     return Math.floor(durationSeconds / 3600);
 }
-
 
 const getRemainingMinFromDurationSec = (durationSeconds: number) => {
     return Math.round(durationSeconds % 3600 / 60)

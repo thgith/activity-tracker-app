@@ -86,20 +86,6 @@ export const SessionEdit = () => {
         return Math.round(durationSeconds % 3600 / 60)
     }
 
-    const onDeleteClicked = (e: any) => {
-        e.preventDefault()
-        setLoading(true);
-        dispatch<any>(deleteSession({ activityId, sessionId } as any))
-            .unwrap()
-            .then(() => {
-                navigate(`/activities/${activityId}`);
-            })
-            .catch((e: any) => {
-                console.log(e)
-                setLoading(false);
-            });
-    };
-
     const insertSelectOptions = () => {
         const selects = [];
         for (let i = 0; i < 60; i++)
@@ -119,6 +105,10 @@ export const SessionEdit = () => {
         return hours * 3600 + minutes * 60;
     };
 
+    /**
+     * Edit the session.
+     * @param formValue - The values from the form.
+     */
     const handleEdit = (formValue: any) => {
         const { startDateOnly, startTimeOnly, durationHours, durationMin, notes } = formValue;
         var session: ISessionEdit = {
@@ -136,6 +126,24 @@ export const SessionEdit = () => {
             })
             .catch((e: any) => {
                 console.log(e);
+                setLoading(false);
+            });
+    };
+
+    /**
+     * Delete the session.
+     * @param e - The click event.
+     */
+    const handleDelete = (e: any) => {
+        e.preventDefault()
+        setLoading(true);
+        dispatch<any>(deleteSession({ activityId, sessionId } as any))
+            .unwrap()
+            .then(() => {
+                navigate(`/activities/${activityId}`);
+            })
+            .catch((e: any) => {
+                console.log(e)
                 setLoading(false);
             });
     };
@@ -265,7 +273,7 @@ export const SessionEdit = () => {
                                                         </button>
                                                         <button
                                                             className="delete-session-btn btn btn-dark"
-                                                            onClick={onDeleteClicked}>
+                                                            onClick={handleDelete}>
                                                             <span>
                                                                 <span className="fa fa-trash fa-lg"></span>
                                                                 <span>Delete</span>

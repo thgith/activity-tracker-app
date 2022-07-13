@@ -4,6 +4,9 @@ using AutoMapper;
 
 namespace ActivityTrackerApp.Mappings;
 
+/// <summary>
+/// Mappings for from entities to DTOs and vice versa.
+/// </summary>
 public class AutomapperProfile : Profile
 {
     public AutomapperProfile()

@@ -82,17 +82,31 @@ export const SessionAdd = () => {
             .max(LONG_TEXT_MAX_CHAR)
     });
 
-    const combineDateAndTime = (dateVal: string, timeVal: string) => {
-        var dateDt = moment(dateVal).format(PICKER_DATE_DISPLAY_FORMAT);
-        var timeDt = moment(timeVal, ["h:mm A"]).format("HH:mm");
+    /**
+     * Combines the date only and time only values to a date.
+     * @param {number} dateOnlyVal - The date only portion.
+     * @param {number} timeOnlyVal - The time only portion.
+     */
+    const combineDateAndTime = (dateOnlyVal: string, timeOnlyVal: string) => {
+        var dateDt = moment(dateOnlyVal).format(PICKER_DATE_DISPLAY_FORMAT);
+        var timeDt = moment(timeOnlyVal, ['h:mm A']).format('HH:mm');
         let date = new Date(dateDt + ' ' + timeDt);
         return date;
     };
 
+    /**
+     * Converts the display hours and minutes to seconds.
+     * @param {number} hours - The hours to convert.
+     * @param {number} minutes - The minutes to convert.
+     */
     const convertToDurationSeconds = (hours: number, minutes: number) => {
         return hours * 3600 + minutes * 60;
     };
 
+    /**
+     * Try to add the session.
+     * @param formValue - The values from the form.
+     */
     const handleAdd = (formValue: any) => {
         const { startDateOnly, startTimeOnly, durationHours, durationMin, notes } = formValue;
         var session: ISessionNew = {
@@ -226,19 +240,23 @@ export const SessionAdd = () => {
                                     <div className="row text-center">
                                         <div className="col-12">
                                             <div className="action-button-group">
-                                                <Link to={`/activities/${activityId}`}>
-                                                    <button
-                                                        className="cancel-btn btn btn-secondary d-inline-block d-md-none">
-                                                        <span className="fa fa-times fa-lg"></span>
-                                                        <span>Cancel</span>
-                                                    </button>
-                                                </Link>
-                                                <button
-                                                    className="save-session-btn btn btn-primary"
-                                                    type="submit">
-                                                    <span className="fa fa-save fa-lg"></span>
-                                                    <span>Save</span>
-                                                </button>
+                                                {loading ? <span className="fa fa-spinner fa-pulse fa-2x" /> :
+                                                    <div>
+                                                        <Link to={`/activities/${activityId}`}>
+                                                            <button
+                                                                className="cancel-btn btn btn-secondary d-inline-block d-md-none">
+                                                                <span className="fa fa-times fa-lg"></span>
+                                                                <span>Cancel</span>
+                                                            </button>
+                                                        </Link>
+                                                        <button
+                                                            className="save-session-btn btn btn-primary"
+                                                            type="submit">
+                                                            <span className="fa fa-save fa-lg"></span>
+                                                            <span>Save</span>
+                                                        </button>
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
                                     </div>

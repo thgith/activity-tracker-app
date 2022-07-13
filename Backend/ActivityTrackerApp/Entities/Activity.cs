@@ -63,6 +63,9 @@ public class Activity : BaseEntity
     // [MaxLength(10)]
     public IList<string>? Tags { get; set; }
 
+    /// <summary>
+    /// The ID of the user who owns the activity.
+    /// </summary>
     [Required]
     public Guid OwnerId { get; set; }
 
