@@ -5,7 +5,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import moment from 'moment';
 import * as Yup from 'yup';
 import { REQUIRED_FIELD_MSG, YELLOW, ORANGE, CORAL, PINK, PURPLE, BLUE, BLUE_GREEN, DARK_GREY, GREEN, PICKER_DATE_DISPLAY_FORMAT, DEFAULT_COLOR, SHORT_TEXT_MAX_CHAR, LONG_TEXT_MAX_CHAR } from '../../../app/constants'
-import { getUserIdCookie, onlyUnique, trimmedStrArray, useEffectSkipInitialRender } from '../../../app/helpers/helpers'
+import { createTagsArray, getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers'
 import { IActivity, IActivityEdit } from '../IActivity'
 import { getUser } from '../../User/userSlice'
 import { getActivity, editActivity, deleteActivity } from '../activityMethods';
@@ -135,10 +135,7 @@ export const ActivityEdit = (props: any) => {
             completedDate: completedDate,
             colorHex: selectedColor,
             isArchived: false,
-            tags: tags !== '' ? trimmedStrArray(tags
-                .split(',')
-                .filter((x: any) => x.length !== 0))
-                .filter(onlyUnique) : [],
+            tags: tags !== '' ? createTagsArray(tags) : [],
         }
         dispatch<any>(editActivity({ activityId: activityId, updatedActivity: editedActivity }))
             .unwrap()

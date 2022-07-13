@@ -5,7 +5,7 @@ import { Form, Formik, Field, ErrorMessage } from 'formik';
 import moment from 'moment';
 import * as Yup from 'yup';
 import { BLUE, BLUE_GREEN, CORAL, DARK_GREY, DEFAULT_COLOR, GREEN, LONG_TEXT_MAX_CHAR, ORANGE, PICKER_DATE_DISPLAY_FORMAT, PINK, PURPLE, REQUIRED_FIELD_MSG, SHORT_TEXT_MAX_CHAR, YELLOW } from '../../../app/constants';
-import { getUserIdCookie, onlyUnique, trimmedStrArray, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
+import { createTagsArray, getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
 import { IActivity } from '../IActivity';
 import { getUser } from '../../User/userSlice';
 import { addActivity } from '../activityMethods';
@@ -78,10 +78,7 @@ export const ActivityAdd = () => {
             completedDateUtc: null,
             isArchived: false,
             sessions: [],
-            tags: tags !== '' ? trimmedStrArray(tags
-                .split(',')
-                .filter((x: any) => x.length !== 0))
-                .filter(onlyUnique) : [],
+            tags: tags !== '' ? createTagsArray(tags) : [],
             colorHex: selectedColor
         }
         setLoading(true);

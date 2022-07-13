@@ -38,11 +38,26 @@ export const useEffectSkipInitialRender = (callback: any) => {
 
 };
 
-export const onlyUnique = (value: string, index: number, self: string[]) => {
+const onlyUnique = (value: string, index: number, self: string[]) => {
     return self.indexOf(value) === index
-}
+};
 
-export const trimmedStrArray = (array: string[]) => {
+/**
+ * Creates the tags array from the tag string.
+ * @param {string} tags - The string of comma-separated tags.
+ */
+export const createTagsArray = (tags: string) => {
+    return trimStrArray(tags
+        .split(',')
+        .filter((x: any) => x.length !== 0))
+        .filter(onlyUnique);
+};
+
+/**
+ * Trims the white space in the string array.
+ * @param {string[]} array - The array to trim.
+ */
+export const trimStrArray = (array: string[]) => {
     let newArr = [];
     for (let i = 0; i < array.length; i++) {
         let trimmedVal = array[i].trim();
@@ -52,7 +67,7 @@ export const trimmedStrArray = (array: string[]) => {
         }
     }
     return newArr;
-}
+};
 
 /**
  * Calculates the total hours spent on the activity.
@@ -69,7 +84,7 @@ export const calculateActivityHours = (activityIdToSessions: Dictionary<ISession
     });
 
     return Math.round(totalSeconds / 3600 * 10) / 10;
-}
+};
 
 /**
  * Calculates the total hours spent on activities.
@@ -85,7 +100,7 @@ export const calculateTotalActivityHours = (activityIdToSessions: Dictionary<ISe
         });
     }
     return Math.round(totalSeconds / 3600 * 10) / 10;
-}
+};
 
 /**
  * Creates the tags view.
@@ -97,7 +112,7 @@ export const displayTags = (tags: string[]) => {
         tagItems.push(<span className='tag' key={tag}>{tag}</span>);
     });
     return tagItems;
-}
+};
 
 /**
  * Takes the local date value and converts it
@@ -115,4 +130,4 @@ export const convertDateForApi = (dateLocal: string | Date | null) => {
     }
 
     return moment(dateLocal).utc().format();
-}
+};
