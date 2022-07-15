@@ -1,5 +1,8 @@
 namespace ActivityTrackerApp.Exceptions;
 
+/// <summary>
+/// Exception that indicates a resource was forbidden.
+/// </summary>
 [Serializable]
 public class ForbiddenException : Exception
 {

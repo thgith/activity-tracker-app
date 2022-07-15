@@ -68,6 +68,9 @@ public class Activity : BaseEntity
     [Required]
     public Guid OwnerId { get; set; }
 
+    /// <summary>
+    /// User of the activity. Placed here as virtual for EF to create a FK.
+    /// </summary>
     [ForeignKey("UserId")]
     public virtual User User { get; set; }
 

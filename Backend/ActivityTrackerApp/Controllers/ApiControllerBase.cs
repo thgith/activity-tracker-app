@@ -13,8 +13,19 @@ namespace ActivityTrackerApp.Controllers;
 [ApiController]
 public abstract class ApiControllerBase<T> : Controller
 {
+    /// <summary>
+    /// Service for working with user data.
+    /// </summary>
     protected readonly IUserService userService;
+
+    /// <summary>
+    /// Service for working with JWT data.
+    /// </summary>
     protected readonly IJwtService jwtService;
+
+    /// <summary>
+    /// Logger.
+    /// </summary>
     protected readonly ILogger<T> logger;
 
     /// <summary>

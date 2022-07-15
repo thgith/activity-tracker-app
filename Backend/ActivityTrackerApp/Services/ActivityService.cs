@@ -32,7 +32,7 @@ public class ActivityService : IActivityService
         _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
     }
 
-    // <inheritdoc/>
+    /// <inheritdoc/>
     public async Task<IEnumerable<ActivityGetDto>> GetAllActivitiesForUserAsync(
         Guid currUserId,
         Guid? ownerId = null,
@@ -81,7 +81,7 @@ public class ActivityService : IActivityService
         return activitiesGetDtos;
     }
 
-    // <inheritdoc/>
+    /// <inheritdoc/>
     public async Task<ActivityGetDto> GetActivityAsync(
         Guid currUserId,
         Guid activityId,
@@ -108,7 +108,7 @@ public class ActivityService : IActivityService
         return activityGetDto;
     }
 
-    // <inheritdoc/>
+    /// <inheritdoc/>
     public async Task<ActivityGetDto> CreateActivityAsync(
         Guid currUserId,
         Guid ownerId,
@@ -188,7 +188,7 @@ public class ActivityService : IActivityService
         return _mapper.Map<ActivityGetDto>(activity);
     }
 
-    // <inheritdoc/>
+    /// <inheritdoc/>
     public async Task<ActivityGetDto> UpdateActivityAsync(
         Guid currUserId,
         Guid activityId,
@@ -304,7 +304,7 @@ public class ActivityService : IActivityService
         return _mapper.Map<ActivityGetDto>(activity);
     }
 
-    // <inheritdoc/>
+    /// <inheritdoc/>
     public async Task<bool> DeleteActivityAsync(
         Guid currUserId,
         Guid activityId)

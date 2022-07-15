@@ -75,6 +75,7 @@ public class ActivityController : ApiControllerBase<ActivityController>
     /// Creates a new activity.
     /// Users can create their own activity, but only admins can create activities for other users.
     /// </summary>
+    /// <param name="userId">The ID of the user to create the activity for.</param>
     /// <param name="newActivityDto">The activity model for the create.</param>
     /// <returns>The newly created activity.</returns>
     [HttpPost]
@@ -102,6 +103,7 @@ public class ActivityController : ApiControllerBase<ActivityController>
     /// Updates the activity.
     /// Users can update their own activity, but only admins can update other users' activities.
     /// </summary>
+    /// <param name="activityId">The ID of the activity to update.</param>
     /// <param name="activityUpdateDto">The activity model for the update.</param>
     /// <returns>The updated activity.</returns>
     [HttpPut("{activityId}")]

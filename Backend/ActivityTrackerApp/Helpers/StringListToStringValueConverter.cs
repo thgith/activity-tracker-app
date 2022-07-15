@@ -1,3 +1,4 @@
+using ActivityTrackerApp.Entities;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ActivityTrackerApp.Helpers;
@@ -9,11 +10,18 @@ namespace ActivityTrackerApp.Helpers;
 /// </summary>
 public class StringListToStringValueConverter : ValueConverter<IList<string>, string>
 {
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public StringListToStringValueConverter() : base(le => ListToString(le), (s => StringToList(s)))
     {
 
     }
 
+    /// <summary>
+    /// Converts the list of strings to a comma separated string.
+    /// </summary>
+    /// <param name="value">The list to convert.</param>
     public static string ListToString(IList<string> value)
     {
         if (value == null || value.Count() == 0)
@@ -24,6 +32,10 @@ public class StringListToStringValueConverter : ValueConverter<IList<string>, st
         return string.Join(",", value);
     }
 
+    /// <summary>
+    /// Converts the comma-separated string to a list of strings.
+    /// </summary>
+    /// <param name="value">The string to convert.</param>
     public static IList<string> StringToList(string value)
     {
         if (value == null || value == string.Empty)

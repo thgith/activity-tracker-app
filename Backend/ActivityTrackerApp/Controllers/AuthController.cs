@@ -4,7 +4,6 @@ using ActivityTrackerApp.Services;
 using Microsoft.AspNetCore.Mvc;
 namespace ActivityTrackerApp.Controllers;
 
-
 /// <summary>
 /// Auth endpoints. 
 /// Endpoint will be: api/v1/Auth

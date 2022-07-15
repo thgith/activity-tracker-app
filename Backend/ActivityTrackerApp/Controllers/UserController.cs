@@ -73,6 +73,7 @@ public class UserController : ApiControllerBase<UserController>
     /// Users can update themselves, but only admins can update other users.
     /// </summary>
     /// <param name="userId">The ID of the user to update.</param>
+    /// <param name="userPutDto">The user update object.</param>
     [HttpPut("{userId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -136,6 +137,7 @@ public class UserController : ApiControllerBase<UserController>
     /// Doesn't actually matter right now though since currently, it only changes
     /// the password of the current user.
     /// </param>
+    /// <param name="userDto">The password change object.</param>
     [HttpPut("{userId}/changePassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

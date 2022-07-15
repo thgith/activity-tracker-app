@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace ActivityTrackerApp.Dtos;
 
 /// <summary>
-/// An activity.
+/// An activity. Format from a POST request.
 /// </summary>
 public class ActivityCreateDto
 {

@@ -54,5 +54,8 @@ public class ActivityGetDto : BaseEntity
     /// </summary>
     public IList<string>? Tags { get; set; }
 
+    /// <summary>
+    /// Sessions.
+    /// </summary>
     public virtual IList<SessionGetDto> Sessions { get; set; }
 }

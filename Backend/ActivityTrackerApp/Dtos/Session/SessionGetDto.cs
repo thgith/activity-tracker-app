@@ -5,6 +5,9 @@ namespace ActivityTrackerApp.Dtos;
 /// </summary>
 public class SessionGetDto
 {
+    /// <summary>
+    /// ID of the session.
+    /// </summary>
     public Guid Id { get; set; }
     
     /// <summary>

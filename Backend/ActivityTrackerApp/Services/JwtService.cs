@@ -44,7 +44,7 @@ namespace ActivityTrackerApp.Services
             {
                 token = _verify(jwtCookie);
             }
-            catch (Exception e)
+            catch (Exception _e)
             {
                 throw new UnauthenticatedException("You are not properly authenticated");
             }
