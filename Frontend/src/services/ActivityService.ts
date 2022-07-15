@@ -22,7 +22,8 @@ const createActivity = (newActivity: IActivity) => {
         {
             'Name': newActivity.name,
             'Description': newActivity.description,
-            // NOTE: We check empty string in case the user manually clears the date field (while null means they didn't fill it in).
+            // NOTE: We check empty string in case the user manually clears
+            //       the date field (while null means they didn't fill it in).
             'StartDateUtc': convertDateForApi(newActivity.startDateUtc),
             'DueDateUtc': convertDateForApi(newActivity.dueDateUtc),
             'CompletedDateUtc': convertDateForApi(newActivity.completedDateUtc),
@@ -37,7 +38,8 @@ const editActivity = (activityId: string, updatedActivity: IActivityEdit) => {
         {
             'Name': updatedActivity.name,
             'Description': updatedActivity.description,
-            // NOTE: We check empty string in case the user manually clears the date field (while null means they didn't fill it in).
+            // NOTE: We check empty string in case the user manually clears
+            //       the date field (while null means they didn't fill it in).
             'StartDateUtc': convertDateForApi(updatedActivity.startDate),
             'DueDateUtc': convertDateForApi(updatedActivity.dueDate),
             'CompletedDateUtc': convertDateForApi(updatedActivity.completedDate),

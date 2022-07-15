@@ -13,7 +13,7 @@ import { clearMessage } from '../../message/messageSlice';
 import { resetTimer } from '../../timer/timerSlice';
 
 export const SessionDetails = () => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const activityId = searchParams.get('activityId');
@@ -21,7 +21,7 @@ export const SessionDetails = () => {
     const colorHex = `#${colorHexNoHash}`;
     const { user: currentUser } = useSelector((state: any) => state.userData);
     const [gotSessions, setGotSessions] = useState(false);
-    var activityIdToSessions = useSelector((state: any) => state.activitiesData.activityIdToSessions)
+    var activityIdToSessions = useSelector((state: any) => state.activitiesData.activityIdToSessions);
     const timerData = useSelector((state: any) => state.timer);
 
     useEffect(() => {
@@ -114,17 +114,17 @@ export const SessionDetails = () => {
 
 
         </div>
-    )
-}
+    );
+};
 
 const getHourFromDurationSec = (durationSeconds: number) => {
     return Math.floor(durationSeconds / 3600);
-}
+};
 
 const getRemainingMinFromDurationSec = (durationSeconds: number) => {
     return Math.round(durationSeconds % 3600 / 60)
-}
+};
 
 const getRemainingSecFromDurationSec = (durationSeconds: number) => {
     return durationSeconds % 3600 % 60
-}
+};

@@ -12,6 +12,7 @@ import { getActivity, editActivity, deleteActivity } from '../activityMethods';
 import { Loader } from '../../../app/views/Loader';
 import { clearMessage } from '../../message/messageSlice';
 import { resetTimer } from '../../timer/timerSlice';
+import { ActivityNotFound } from './ActivityNotFound';
 
 export const ActivityEdit = (props: any) => {
     // const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -190,18 +191,7 @@ export const ActivityEdit = (props: any) => {
             return <Loader />
         }
 
-        return (
-            <div className="container">
-                <div className="panel-container text-center">
-                    <h2 className="colored-header">Activity Not Found</h2>
-                    <div className="panel-body-container">
-                        <h5>
-                            Return to <Link to="/">activities list</Link>
-                        </h5>
-                    </div>
-                </div>
-            </div>
-        );
+        return <ActivityNotFound />;
     }
 
     return (

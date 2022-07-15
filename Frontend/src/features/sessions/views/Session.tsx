@@ -3,7 +3,7 @@ import moment from 'moment';
 import { LONG_DATE_FORMAT } from '../../../app/constants';
 import { ISession } from '../ISession';
 
-const sessionDurationDisplay = (seconds: number) => {
+const createSessionDurationDisplay = (seconds: number) => {
     const momentTime = moment.utc(seconds * 1000);
     return (
     <span>
@@ -24,7 +24,7 @@ export const Session = (props: any) => {
                         <h5>{moment(session.startDateUtc.toString()).local().format(LONG_DATE_FORMAT)}</h5>
                     </div>
                     <div className="session-body card-body">
-                        <p className="session-duration">{sessionDurationDisplay(session.durationSeconds)}</p>
+                        <p className="session-duration">{createSessionDurationDisplay(session.durationSeconds)}</p>
                         <p className="session-notes">{session.notes}</p>
                     </div>
                 </Link>

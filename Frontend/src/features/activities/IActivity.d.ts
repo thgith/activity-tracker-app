@@ -10,7 +10,7 @@ export interface IActivity {
     colorHex: string?,
     tags: string[] | null,
     sessions: ISession[]
-}
+};
 
 export interface IActivityEdit {
     name: string?,
@@ -22,4 +22,4 @@ export interface IActivityEdit {
     isArchived: boolean?,
     colorHex: string?,
     tags: string[] | null
-}
+};

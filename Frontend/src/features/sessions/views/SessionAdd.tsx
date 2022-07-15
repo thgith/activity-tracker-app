@@ -15,9 +15,8 @@ import { Loader } from '../../../app/views/Loader';
 import { clearMessage } from '../../message/messageSlice';
 import { resetTimer } from '../../timer/timerSlice';
 
-
 export const SessionAdd = () => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const activityId = searchParams.get('activityId');
@@ -127,7 +126,10 @@ export const SessionAdd = () => {
             });
     };
 
-    const insertSelectOptions = () => {
+    /**
+     * Create the selects for time fields. 0-60.
+     */
+    const insertTimeSelectOptions = () => {
         const selects = [];
         for (let i = 0; i < 60; i++)
             selects.push(<option value={i} key={i}>{i}</option>)
@@ -199,7 +201,7 @@ export const SessionAdd = () => {
                                                 id="durationHours"
                                                 name="durationHours"
                                             >
-                                                {insertSelectOptions()}
+                                                {insertTimeSelectOptions()}
                                             </Field>
                                         </div>
                                         <div className="col-3">hours</div>
@@ -211,7 +213,7 @@ export const SessionAdd = () => {
                                                 name="durationMin"
                                                 placeholder="Duration Minutes"
                                             >
-                                                {insertSelectOptions()}
+                                                {insertTimeSelectOptions()}
                                             </Field>
                                         </div>
                                         <div className="col-3">minutes</div>

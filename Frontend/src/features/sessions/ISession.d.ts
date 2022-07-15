@@ -4,14 +4,14 @@ export interface ISession {
     startDateUtc: Date,
     durationSeconds: number,
     notes: string
-}
+};
 
 export interface ISessionNew {
     activityId: any,
     startDate: Date,
     durationSeconds: number,
     notes: string
-}
+};
 
 export interface ISessionEdit {
     id: string
@@ -19,4 +19,4 @@ export interface ISessionEdit {
     startDate: Date,
     durationSeconds: number,
     notes: string
-}
+};

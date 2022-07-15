@@ -6,7 +6,11 @@ import { ISessionNew } from '../sessions/ISession';
 import { addSession } from '../sessions/sessionMethods';
 import { incrementTimer, pauseTimer, resetTimer, startTimer } from './timerSlice';
 
-export const Timer = (props: any) => {
+interface TimerProps {
+    activityId: string
+}
+
+export const Timer = (props: TimerProps) => {
     const dispatch = useDispatch()
     const [loading, setLoading] = useState(false);
     const timerData = useSelector((state: any) => state.timer);

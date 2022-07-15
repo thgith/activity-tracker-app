@@ -10,6 +10,7 @@ import { getUser } from '../../User/userSlice';
 import { ISession } from '../../sessions/ISession';
 import { getActivity } from '../activityMethods';
 import { Loader } from '../../../app/views/Loader';
+import { ActivityNotFound } from './ActivityNotFound';
 
 export const ActivityDetails = () => {
     const navigate = useNavigate();
@@ -82,18 +83,7 @@ export const ActivityDetails = () => {
             return <Loader />
         }
 
-        return (
-            <div className="container">
-                <div className="panel-container text-center">
-                    <h2 className="colored-header">Activity Not Found</h2>
-                    <div className="panel-body-container">
-                        <h5>
-                            Return to <Link to="/">activities list</Link>
-                        </h5>
-                    </div>
-                </div>
-            </div>
-        )
+        return <ActivityNotFound />;
     }
 
     return (
@@ -169,7 +159,7 @@ export const ActivityDetails = () => {
                                         </div>
                                         <div className="col-8">
                                             <div id="timer" className="collapse show">
-                                                <Timer activityId={activityId}></Timer>
+                                                <Timer activityId={activityId as string}></Timer>
                                             </div>
                                         </div>
                                     </div>

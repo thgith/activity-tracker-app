@@ -173,5 +173,5 @@ export const ActivitiesList = () => {
                 }
             </div>
         </div>
-    )
-}
+    );
+};

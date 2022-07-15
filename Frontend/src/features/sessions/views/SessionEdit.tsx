@@ -15,7 +15,7 @@ import { clearMessage } from '../../message/messageSlice';
 import { resetTimer } from '../../timer/timerSlice';
 
 export const SessionEdit = () => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const activityId = searchParams.get('activityId');
@@ -24,7 +24,7 @@ export const SessionEdit = () => {
     const [loading, setLoading] = useState(false);
     const { user: currentUser } = useSelector((state: any) => state.userData);
     const [gotSessions, setGotSessions] = useState(false);
-    var activityIdToSessions = useSelector((state: any) => state.activitiesData.activityIdToSessions)
+    var activityIdToSessions = useSelector((state: any) => state.activitiesData.activityIdToSessions);
     const timerData = useSelector((state: any) => state.timer);
 
     useEffect(() => {
@@ -86,7 +86,10 @@ export const SessionEdit = () => {
         return Math.round(durationSeconds % 3600 / 60)
     }
 
-    const insertSelectOptions = () => {
+    /**
+     * Create the selects for time fields. 0-60.
+     */
+    const insertTimeSelectOptions = () => {
         const selects = [];
         for (let i = 0; i < 60; i++)
             selects.push(<option value={i} key={i}>{i}</option>)
@@ -94,13 +97,23 @@ export const SessionEdit = () => {
         return selects;
     }
 
+    /**
+     * Combines the date only and time only values to a date.
+     * @param {number} dateOnlyVal - The date only portion.
+     * @param {number} timeOnlyVal - The time only portion.
+     */
     const combineDateAndTime = (dateVal: string, timeVal: string) => {
         var dateDt = moment(dateVal).format(PICKER_DATE_DISPLAY_FORMAT);
         var timeDt = moment(timeVal, ["h:mm A"]).format("HH:mm");
         let date = new Date(dateDt + ' ' + timeDt);
         return date;
     };
-
+    
+    /**
+     * Converts the display hours and minutes to seconds.
+     * @param {number} hours - The hours to convert.
+     * @param {number} minutes - The minutes to convert.
+     */
     const convertToDurationSeconds = (hours: number, minutes: number) => {
         return hours * 3600 + minutes * 60;
     };
@@ -218,7 +231,7 @@ export const SessionEdit = () => {
                                                 className="form-control"
                                                 id="durationHours"
                                                 name="durationHours">
-                                                {insertSelectOptions()}
+                                                {insertTimeSelectOptions()}
                                             </Field>
                                         </div>
                                         <div className="col-3">hours</div>
@@ -228,7 +241,7 @@ export const SessionEdit = () => {
                                                 className="form-control"
                                                 id="durationMin"
                                                 name="durationMin">
-                                                {insertSelectOptions()}
+                                                {insertTimeSelectOptions()}
                                             </Field>
                                         </div>
                                         <div className="col-3">minutes</div>
