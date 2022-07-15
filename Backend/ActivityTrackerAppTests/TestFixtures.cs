@@ -204,6 +204,7 @@ public static class TestFixtures
             ActivityId = PANIC_ACT_GUID,
             Notes = "",
             StartDateUtc = DateTime.UtcNow,
+            DurationSeconds = 2000,
             DeletedDateUtc = null
         };
     }
@@ -216,6 +217,7 @@ public static class TestFixtures
             ActivityId = GAME_DEV_ACT_GUID,
             Notes = GAME_DEV_SESH1_NOTES,
             StartDateUtc = DateTime.UtcNow,
+            DurationSeconds = 3600,
             DeletedDateUtc = null
         };
     }
@@ -228,6 +230,7 @@ public static class TestFixtures
             ActivityId = GAME_DEV_ACT_GUID,
             Notes = GAME_DEV_SESH2_NOTES,
             StartDateUtc = DateTime.UtcNow,
+            DurationSeconds = 4600,
             DeletedDateUtc = null
         };
     }
@@ -240,6 +243,7 @@ public static class TestFixtures
             ActivityId = PIANO_ACT_GUID,
             Notes = PIANO_SESH1_NOTES,
             StartDateUtc = DateTime.UtcNow,
+            DurationSeconds = 6600,
             DeletedDateUtc = null
         };
     }
@@ -252,6 +256,7 @@ public static class TestFixtures
             ActivityId = PIANO_ACT_GUID,
             Notes = PIANO_SESH2_NOTES,
             StartDateUtc = DateTime.UtcNow,
+            DurationSeconds = 2000,
             DeletedDateUtc = null
         };
     }

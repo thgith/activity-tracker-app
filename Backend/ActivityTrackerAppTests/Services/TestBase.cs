@@ -68,30 +68,30 @@ public abstract class TestBase
         // Jane's acts
         panicAct = GeneratePanicActivity();
         panicSesh = GeneratePanicSession();
-        panicAct.Sessions = new List<Session>{ panicSesh };
+        panicAct.Sessions = new List<Session> { panicSesh };
         janesActs = new List<Activity> { panicAct };
 
         // John's acts
         gameDevSesh1 = GenerateGameDevSession1();
         gameDevSesh2 = GenerateGameDevSession2();
         gameDevAct = GenerateGameDevActivity();
-        gameDevAct.Sessions = new List<Session>{ gameDevSesh1, gameDevSesh2 };
+        gameDevAct.Sessions = new List<Session> { gameDevSesh1, gameDevSesh2 };
 
         pianoSesh1 = GeneratePianoSession1();
         pianoSesh2 = GeneratePianoSession2();
         pianoAct = GeneratePianoActivity();
-        pianoAct.Sessions = new List<Session>{ pianoSesh1, pianoSesh2 };
+        pianoAct.Sessions = new List<Session> { pianoSesh1, pianoSesh2 };
 
         mcatAct = GenerateMcatActivity();
         sleepingAct = GenerateSleepingActivity();
-        johnsActs = new List<Activity>{ gameDevAct, pianoAct, mcatAct, sleepingAct };
+        johnsActs = new List<Activity> { gameDevAct, pianoAct, mcatAct, sleepingAct };
 
         // Judy's acts
         baseballAct = GenerateBaseballActivity();
-        judysActs = new List<Activity>{ baseballAct };
+        judysActs = new List<Activity> { baseballAct };
 
-        allSessions = new List<Session>{ panicSesh, gameDevSesh1, gameDevSesh2, pianoSesh1, pianoSesh2 };
-        allActs = new List<Activity>{ panicAct, gameDevAct, pianoAct, mcatAct, sleepingAct, baseballAct };
+        allSessions = new List<Session> { panicSesh, gameDevSesh1, gameDevSesh2, pianoSesh1, pianoSesh2 };
+        allActs = new List<Activity> { panicAct, gameDevAct, pianoAct, mcatAct, sleepingAct, baseballAct };
     }
 
     private void _setUpDbMocks()
@@ -106,9 +106,8 @@ public abstract class TestBase
             usersDbSetMock = usersData.AsQueryable().BuildMockDbSet();
             dbContextMock.Setup(x => x.Users)
                     .Returns(usersDbSetMock.Object);
-
-
         }
+
         void _setUpActivitiesDbMocks()
         {
             activitiesDbSetMock = allActs.AsQueryable().BuildMockDbSet();
@@ -116,6 +115,7 @@ public abstract class TestBase
                     .Returns(activitiesDbSetMock.Object);
 
         }
+
         void _setUpSessionsDbMocks()
         {
             sessionsDbSetMock = allSessions.AsQueryable().BuildMockDbSet();
@@ -174,6 +174,13 @@ public abstract class TestBase
     private void _setUpServiceMocks()
     {
         userServiceMock = new Mock<IUserService>();
+        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
+                    .Returns(Task.FromResult(true));
+        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
+                            .Returns(Task.FromResult(false));
+        userServiceMock.Setup(m => m.IsAdmin(JUDY_USER_GUID))
+                            .Returns(Task.FromResult(false));
+
         sessionServiceMock = new Mock<ISessionService>();
     }
 }

@@ -11,7 +11,7 @@ using ActivityTrackerApp.Exceptions;
 
 namespace ActivityTrackerAppTests;
 
-// TODO: Add sessions and test
+// TODO: Need to test diff data edge cases
 // TODO test 
 //  startDateUtc null
 //  startDateUtc > dueDateUtc
@@ -38,9 +38,6 @@ public class ActivityServiceTests : TestBase
     public async Task GetAllActivitiesAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
-                            .Returns(Task.FromResult(true));
-
         var activityService = new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -98,9 +95,6 @@ public class ActivityServiceTests : TestBase
     public async Task GetAllActivitiesAsync_NonAdmin_OwnActivities_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         var activityService = new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -159,9 +153,6 @@ public class ActivityServiceTests : TestBase
     public async Task GetAllActivitiesAsync_NonAdmin_AnothersActivities_ThrowForbidden()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         var activityService = new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -176,9 +167,6 @@ public class ActivityServiceTests : TestBase
     public async Task GetAllActivitiesAsync_Admin_AnothersActivity_DeletedActivity_ReturnEmpty()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
-                            .Returns(Task.FromResult(true));
-
         var activityService = new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -199,9 +187,6 @@ public class ActivityServiceTests : TestBase
     public async Task GetActivityAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
-                            .Returns(Task.FromResult(true));
-
         var activityService = new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -231,9 +216,6 @@ public class ActivityServiceTests : TestBase
     public async Task GetActivityAsync_NonAdmin_OwnActivity_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         var activityService = new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -264,9 +246,6 @@ public class ActivityServiceTests : TestBase
     public async Task GetActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         var activityService = new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -281,9 +260,6 @@ public class ActivityServiceTests : TestBase
     public async Task GetActivityAsync_Admin_AnothersActivity_DeletedActivity_ReturnEmpty()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         var activityService = new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -305,9 +281,6 @@ public class ActivityServiceTests : TestBase
     public async Task CreateActivityAsync_Admin_AnothersActivity_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
-                            .Returns(Task.FromResult(true));
-
         var actCreateDto = new ActivityCreateDto
         {
             Name = "NEW ACT",
@@ -386,9 +359,6 @@ public class ActivityServiceTests : TestBase
     public async Task DeleteActivityAsync_Admin_AnothersActivity_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
-                            .Returns(Task.FromResult(true));
-
         var activityService = new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -420,9 +390,6 @@ public class ActivityServiceTests : TestBase
     public async Task DeleteActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         var activityService = new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -438,9 +405,6 @@ public class ActivityServiceTests : TestBase
     public async Task DeleteActivityAsync_NonAdmin_OwnActivity_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         var activityService = new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,

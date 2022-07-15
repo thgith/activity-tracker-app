@@ -12,6 +12,7 @@ using ActivityTrackerApp.Exceptions;
 namespace ActivityTrackerAppTests;
 
 // TODO: Need to finish these tests
+// TODO: Need to test diff data edge cases
 [TestClass]
 public class SessionServiceTests : TestBase
 {
@@ -39,9 +40,6 @@ public class SessionServiceTests : TestBase
     public async Task GetAllSessionsByActivityIdAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
-                            .Returns(Task.FromResult(true));
-
         mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh1))
                     .Returns(new SessionGetDto
                     {
@@ -82,9 +80,6 @@ public class SessionServiceTests : TestBase
     public async Task GetAllSessionsByActivityIdAsync_NonAdmin_OwnSession_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh1))
                     .Returns(new SessionGetDto
                     {
@@ -127,9 +122,6 @@ public class SessionServiceTests : TestBase
     public async Task GetSessionAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
-                            .Returns(Task.FromResult(true));
-
         mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh1))
                     .Returns(new SessionGetDto
                     {
@@ -158,9 +150,6 @@ public class SessionServiceTests : TestBase
     public async Task GetSessionAsync_NonAdmin_OwnSession_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh1))
                     .Returns(new SessionGetDto
                     {
@@ -190,9 +179,6 @@ public class SessionServiceTests : TestBase
     public async Task GetSessionAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         var sessionService = new SessionService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -209,9 +195,6 @@ public class SessionServiceTests : TestBase
     public async Task CreateSessionAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         var newSessionDto = new SessionCreateDto
         {
             ActivityId = GAME_DEV_ACT_GUID,
@@ -283,9 +266,6 @@ public class SessionServiceTests : TestBase
     public async Task CreateSessionAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         var newSessionDto = new SessionCreateDto
         {
             ActivityId = PANIC_ACT_GUID,
@@ -302,14 +282,14 @@ public class SessionServiceTests : TestBase
         // -- Act --
         var session = await sessionService.CreateSessionAsync(JOHN_USER_GUID, newSessionDto);
     }
+    // TODO add more tests
+    #endregion CreateSessionAsync
 
+    #region UpdateSessionAsync
     [TestMethod]
-    public async Task CreateSessionAsync_NonAdmin_OwnSession()
+    public async Task UpdateSessionAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         // Replicate the add adding to the DB collection
         sessionsDbSetMock.Setup(m => m.AddAsync(It.IsAny<Session>(), It.IsAny<CancellationToken>()))
                         .Callback((Session session, CancellationToken _) => { allSessions.Add(session); });
@@ -352,7 +332,7 @@ public class SessionServiceTests : TestBase
             mapperMock.Object);
 
         // -- Act --
-        var session = await sessionService.CreateSessionAsync(JOHN_USER_GUID, newSessionDto);
+        var session = await sessionService.CreateSessionAsync(JANE_USER_GUID, newSessionDto);
 
         // -- Assert --
         // Check return object
@@ -376,10 +356,92 @@ public class SessionServiceTests : TestBase
         Assert.AreEqual(newSessionDto.Notes, savedSesh.Notes);
     }
 
-    // TODO add more tests
-    #endregion CreateSessionAsync
+    [TestMethod]
+    [ExpectedException(typeof(ForbiddenException))]
+    public async Task UpdateSessionAsync_NonAdmin_AnothersSession_ThrowForbidden()
+    {
+        // -- Arrange --
+        var updateSessionDto = new SessionUpdateDto
+        {
+            StartDateUtc = DateTime.UtcNow,
+            DurationSeconds = 200,
+            Notes = "notes"
+        };
 
-    #region UpdateSessionAsync
+        var sessionService = new SessionService(
+            dbContextMock.Object,
+            userServiceMock.Object,
+            mapperMock.Object);
+
+        // -- Act --
+        var session = await sessionService.UpdateSessionAsync(JOHN_USER_GUID, PANIC_SESH_GUID, updateSessionDto);
+    }
+
+    [TestMethod]
+    public async Task UpdateSessionAsync_NonAdmin_OwnSession_Ok()
+    {
+        // -- Arrange --
+        // Replicate the add adding to the DB collection
+        sessionsDbSetMock.Setup(m => m.AddAsync(It.IsAny<Session>(), It.IsAny<CancellationToken>()))
+                        .Callback((Session session, CancellationToken _) => { allSessions.Add(session); });
+
+        // Replicate the save setting a new GUID for the new session
+        dbContextMock.Setup(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()))
+                        .Callback((CancellationToken _) => { allSessions.Last().Id = Guid.NewGuid(); });
+
+        var updateSessionDto = new SessionUpdateDto
+        {
+            StartDateUtc = DateTime.UtcNow,
+            DurationSeconds = 200,
+            Notes = "notes"
+        };
+
+        mapperMock.Setup(x => x.Map<Session>(updateSessionDto))
+                    .Returns(new Session
+                    {
+                        StartDateUtc = (DateTime)updateSessionDto.StartDateUtc,
+                        DurationSeconds = (uint)updateSessionDto.DurationSeconds,
+                        Notes = updateSessionDto.Notes
+                    });
+
+        mapperMock.Setup(x => x.Map<SessionGetDto>(It.IsAny<Session>()))
+                    .Returns((Session session) =>
+                        new SessionGetDto
+                        {
+                            Id = session.Id,
+                            ActivityId = session.ActivityId,
+                            StartDateUtc = (DateTime)session.StartDateUtc,
+                            DurationSeconds = session.DurationSeconds,
+                            Notes = session.Notes
+                        });
+
+        var sessionService = new SessionService(
+            dbContextMock.Object,
+            userServiceMock.Object,
+            mapperMock.Object);
+
+        // -- Act --
+        var session = await sessionService.UpdateSessionAsync(JOHN_USER_GUID, GAME_DEV_SESH1_GUID, updateSessionDto);
+
+        // -- Assert --
+        // Check return object
+        Assert.IsNotNull(session);
+        Assert.AreEqual(GAME_DEV_ACT_GUID, session.ActivityId);
+        DatesEqualWithinSeconds((DateTime)updateSessionDto.StartDateUtc, session.StartDateUtc);
+        Assert.AreEqual(updateSessionDto.DurationSeconds, session.DurationSeconds);
+        Assert.AreEqual(updateSessionDto.Notes, session.Notes);
+
+        // Check the fake DB
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        Assert.AreEqual(5, allSessions.Count());
+        var savedGameDevSesh = allSessions[1];
+        Assert.AreEqual(GAME_DEV_ACT_GUID, savedGameDevSesh.ActivityId);
+        DatesEqualWithinSeconds((DateTime)updateSessionDto.StartDateUtc, (DateTime)savedGameDevSesh.StartDateUtc);
+        Assert.AreEqual(updateSessionDto.DurationSeconds, savedGameDevSesh.DurationSeconds);
+        Assert.AreEqual(updateSessionDto.Notes, savedGameDevSesh.Notes);
+    }
+
+    // TODO add more tests
     #endregion UpdateSessionAsync
 
     #region DeleteSessionAsync
@@ -388,9 +450,6 @@ public class SessionServiceTests : TestBase
     public async Task DeleteActivityAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
-                            .Returns(Task.FromResult(true));
-
         var sessionService = new SessionService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -413,13 +472,9 @@ public class SessionServiceTests : TestBase
 
     [TestMethod]
     [ExpectedException(typeof(ForbiddenException))]
-
     public async Task DeleteActivityAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         var sessionService = new SessionService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -434,9 +489,6 @@ public class SessionServiceTests : TestBase
     public async Task DeleteActivityAsync_NonAdmin_OwnActivity_Ok()
     {
         // -- Arrange --
-        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
-                            .Returns(Task.FromResult(false));
-
         var sessionService = new SessionService(
             dbContextMock.Object,
             userServiceMock.Object,
