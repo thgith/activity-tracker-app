@@ -15,13 +15,23 @@ namespace ActivityTrackerAppTests;
 [TestClass]
 public class SessionServiceTests : TestBase
 {
+    private void _assertSessionsEqual(Session expectedSession, SessionGetDto actualSession)
+    {
+        Assert.IsNotNull(actualSession);
+        Assert.AreEqual(expectedSession.Id, actualSession.Id);
+        Assert.AreEqual(expectedSession.ActivityId, actualSession.ActivityId);
+        DatesEqualWithinSeconds((DateTime)expectedSession.StartDateUtc, actualSession.StartDateUtc);
+        Assert.AreEqual(expectedSession.DurationSeconds, actualSession.DurationSeconds);
+        Assert.AreEqual(expectedSession.Notes, actualSession.Notes);
+    }
+
     // Called before all tests
     // TODO figure out why it didn't like being in the base class
     [ClassInitialize()]
     public static void InitializeClass(TestContext context)
     {
         // Init users here since they won't change through each activity test
-        _usersData = new List<User> { GenerateJaneUser(), GenerateJohnUser(), GenerateJudyUser() };
+        usersData = new List<User> { GenerateJaneUser(), GenerateJohnUser(), GenerateJudyUser() };
     }
 
     #region GetAllSessionsAsync
@@ -29,50 +39,169 @@ public class SessionServiceTests : TestBase
     public async Task GetAllSessionsByActivityIdAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
-        _userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
+        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
                             .Returns(Task.FromResult(true));
 
+        mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh1))
+                    .Returns(new SessionGetDto
+                    {
+                        Id = gameDevSesh1.Id,
+                        ActivityId = gameDevSesh1.ActivityId,
+                        StartDateUtc = (DateTime)gameDevSesh1.StartDateUtc,
+                        DurationSeconds = gameDevSesh1.DurationSeconds,
+                        Notes = gameDevSesh1.Notes
+                    });
+
+        mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh2))
+                    .Returns(new SessionGetDto
+                    {
+                        Id = gameDevSesh2.Id,
+                        ActivityId = gameDevSesh2.ActivityId,
+                        StartDateUtc = (DateTime)gameDevSesh2.StartDateUtc,
+                        DurationSeconds = gameDevSesh2.DurationSeconds,
+                        Notes = gameDevSesh2.Notes
+                    });
+
         var sessionService = new SessionService(
-            _dbContextMock.Object,
-            _userServiceMock.Object,
-            _mapperMock.Object);
+            dbContextMock.Object,
+            userServiceMock.Object,
+            mapperMock.Object);
 
         // -- Act --
-        var sessions = await sessionService.GetAllSessionsByActivityIdAsync(JANE_USER_GUID);
+        var sessions = await sessionService.GetAllSessionsByActivityIdAsync(JANE_USER_GUID, GAME_DEV_ACT_GUID);
 
         // -- Assert --
         Assert.IsNotNull(sessions);
-        Assert.AreEqual(sessions.Count(), 3);
+        Assert.AreEqual(2, sessions.Count());
         var sessionsList = sessions.ToList();
-
-        throw new NotImplementedException();
+        _assertSessionsEqual(gameDevSesh1, sessionsList[0]);
+        _assertSessionsEqual(gameDevSesh2, sessionsList[1]);
     }
 
     [TestMethod]
     public async Task GetAllSessionsByActivityIdAsync_NonAdmin_OwnSession_Ok()
     {
         // -- Arrange --
-        _userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
-                            .Returns(Task.FromResult(true));
+        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
+                            .Returns(Task.FromResult(false));
+
+        mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh1))
+                    .Returns(new SessionGetDto
+                    {
+                        Id = gameDevSesh1.Id,
+                        ActivityId = gameDevSesh1.ActivityId,
+                        StartDateUtc = (DateTime)gameDevSesh1.StartDateUtc,
+                        DurationSeconds = gameDevSesh1.DurationSeconds,
+                        Notes = gameDevSesh1.Notes
+                    });
+
+        mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh2))
+                    .Returns(new SessionGetDto
+                    {
+                        Id = gameDevSesh2.Id,
+                        ActivityId = gameDevSesh2.ActivityId,
+                        StartDateUtc = (DateTime)gameDevSesh2.StartDateUtc,
+                        DurationSeconds = gameDevSesh2.DurationSeconds,
+                        Notes = gameDevSesh2.Notes
+                    });
 
         var sessionService = new SessionService(
-            _dbContextMock.Object,
-            _userServiceMock.Object,
-            _mapperMock.Object);
+            dbContextMock.Object,
+            userServiceMock.Object,
+            mapperMock.Object);
 
         // -- Act --
-        var sessions = await sessionService.GetAllSessionsByActivityIdAsync(JOHN_USER_GUID);
+        var sessions = await sessionService.GetAllSessionsByActivityIdAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID);
 
         // -- Assert --
         Assert.IsNotNull(sessions);
-        Assert.AreEqual(sessions.Count(), 3);
-        var activitiesList = sessions.ToList();
-
-        throw new NotImplementedException();
+        Assert.AreEqual(2, sessions.Count());
+        var sessionsList = sessions.ToList();
+        _assertSessionsEqual(gameDevSesh1, sessionsList[0]);
+        _assertSessionsEqual(gameDevSesh2, sessionsList[1]);
     }
     #endregion
 
     #region GetSessionAsync
+    [TestMethod]
+    public async Task GetActivityAsync_Admin_AnothersSession_Ok()
+    {
+        // -- Arrange --
+        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
+                            .Returns(Task.FromResult(true));
+
+        mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh1))
+                    .Returns(new SessionGetDto
+                    {
+                        Id = gameDevSesh1.Id,
+                        ActivityId = gameDevSesh1.ActivityId,
+                        StartDateUtc = (DateTime)gameDevSesh1.StartDateUtc,
+                        DurationSeconds = gameDevSesh1.DurationSeconds,
+                        Notes = gameDevSesh1.Notes
+                    });
+
+        var sessionService = new SessionService(
+            dbContextMock.Object,
+            userServiceMock.Object,
+            mapperMock.Object);
+
+        // -- Act --
+        var session = await sessionService.GetSessionAsync(JANE_USER_GUID, GAME_DEV_SESH1_GUID);
+
+        // -- Assert --
+        Assert.IsNotNull(session);
+        _assertSessionsEqual(gameDevSesh1, session);
+        _assertSessionsEqual(gameDevSesh1, session);
+    }
+
+    [TestMethod]
+    public async Task GetActivityAsync_NonAdmin_OwnSession_Ok()
+    {
+        // -- Arrange --
+        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
+                            .Returns(Task.FromResult(false));
+
+        mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh1))
+                    .Returns(new SessionGetDto
+                    {
+                        Id = gameDevSesh1.Id,
+                        ActivityId = gameDevSesh1.ActivityId,
+                        StartDateUtc = (DateTime)gameDevSesh1.StartDateUtc,
+                        DurationSeconds = gameDevSesh1.DurationSeconds,
+                        Notes = gameDevSesh1.Notes
+                    });
+
+        var sessionService = new SessionService(
+            dbContextMock.Object,
+            userServiceMock.Object,
+            mapperMock.Object);
+
+        // -- Act --
+        var session = await sessionService.GetSessionAsync(JOHN_USER_GUID, GAME_DEV_SESH1_GUID);
+
+        // -- Assert --
+        Assert.IsNotNull(session);
+        _assertSessionsEqual(gameDevSesh1, session);
+        _assertSessionsEqual(gameDevSesh1, session);
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ForbiddenException))]
+    public async Task GetActivityAsync_NonAdmin_AnothersSession_ThrowForbidden()
+    {
+        // -- Arrange --
+        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
+                            .Returns(Task.FromResult(false));
+
+        var sessionService = new SessionService(
+            dbContextMock.Object,
+            userServiceMock.Object,
+            mapperMock.Object);
+
+        // -- Act --
+        var session = await sessionService.GetSessionAsync(JOHN_USER_GUID, PANIC_SESH_GUID);
+    }
+    // TODO add more tests
     #endregion GetSessionAsync
 
     #region CreateSessionAsync
@@ -87,24 +216,27 @@ public class SessionServiceTests : TestBase
     public async Task DeleteActivityAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
-        _userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
+        userServiceMock.Setup(m => m.IsAdmin(JANE_USER_GUID))
                             .Returns(Task.FromResult(true));
 
         var sessionService = new SessionService(
-            _dbContextMock.Object,
-            _userServiceMock.Object,
-            _mapperMock.Object);
+            dbContextMock.Object,
+            userServiceMock.Object,
+            mapperMock.Object);
 
         // -- Act --
         var isSuccessful = await sessionService.DeleteSessionAsync(JANE_USER_GUID, GAME_DEV_SESH1_GUID);
 
         // -- Assert --
         Assert.IsTrue(isSuccessful);
-        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
 
         // Sessions should be soft-deleted
-        Assert.IsNotNull(_gameDevSesh1.DeletedDateUtc);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)_gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
+        Assert.IsNotNull(gameDevSesh1.DeletedDateUtc);
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
+
+        // The session's activity should not be soft-deleted
+        Assert.IsNull(gameDevAct.DeletedDateUtc);
     }
 
     [TestMethod]
@@ -113,13 +245,13 @@ public class SessionServiceTests : TestBase
     public async Task DeleteActivityAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
         // -- Arrange --
-        _userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
+        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
                             .Returns(Task.FromResult(false));
 
         var sessionService = new SessionService(
-            _dbContextMock.Object,
-            _userServiceMock.Object,
-            _mapperMock.Object);
+            dbContextMock.Object,
+            userServiceMock.Object,
+            mapperMock.Object);
 
         // -- Act --
         var isSuccessful = await sessionService.DeleteSessionAsync(JOHN_USER_GUID, PANIC_SESH_GUID);
@@ -130,24 +262,27 @@ public class SessionServiceTests : TestBase
     public async Task DeleteActivityAsync_NonAdmin_OwnActivity_Ok()
     {
         // -- Arrange --
-        _userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
+        userServiceMock.Setup(m => m.IsAdmin(JOHN_USER_GUID))
                             .Returns(Task.FromResult(false));
 
         var sessionService = new SessionService(
-            _dbContextMock.Object,
-            _userServiceMock.Object,
-            _mapperMock.Object);
+            dbContextMock.Object,
+            userServiceMock.Object,
+            mapperMock.Object);
 
         // -- Act --
         var isSuccessful = await sessionService.DeleteSessionAsync(JOHN_USER_GUID, GAME_DEV_SESH1_GUID);
 
         // -- Assert --
         Assert.IsTrue(isSuccessful);
-        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
 
-        // Sessions should be soft-deleted
-        Assert.IsNotNull(_gameDevSesh1.DeletedDateUtc);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)_gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
+        // Session should be soft-deleted
+        Assert.IsNotNull(gameDevSesh1.DeletedDateUtc);
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
+
+        // The session's activity should not be soft-deleted
+        Assert.IsNull(gameDevAct.DeletedDateUtc);
     }
     #endregion DeleteSessionAsync
 }

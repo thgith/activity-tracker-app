@@ -13,43 +13,43 @@ namespace ActivityTrackerAppTests;
 [TestClass]
 public abstract class TestBase
 {
-    protected static List<User> _usersData;
+    protected static List<User> usersData;
 
-    protected static Activity _panicAct;
-    protected static Session _panicSesh;
-    protected static Activity _baseballAct;
-    protected static Activity _gameDevAct;
-    protected static Session _gameDevSesh1;
-    protected static Session _gameDevSesh2;
-    protected static Activity _pianoAct;
-    protected static Session _pianoSesh1;
-    protected static Session _pianoSesh2;
-    protected static Activity _mcatAct;
-    protected static Activity _sleepingAct;
+    protected static Activity panicAct;
+    protected static Session panicSesh;
+    protected static Activity baseballAct;
+    protected static Activity gameDevAct;
+    protected static Session gameDevSesh1;
+    protected static Session gameDevSesh2;
+    protected static Activity pianoAct;
+    protected static Session pianoSesh1;
+    protected static Session pianoSesh2;
+    protected static Activity mcatAct;
+    protected static Activity sleepingAct;
 
-    protected static List<Activity> _janesActs;
-    protected static List<Activity> _johnsActs;
-    protected static List<Activity> _judysActs;
+    protected static List<Activity> janesActs;
+    protected static List<Activity> johnsActs;
+    protected static List<Activity> judysActs;
 
-    protected static List<Session> _allSessions;
-    protected static List<Activity> _allActs;
+    protected static List<Session> allSessions;
+    protected static List<Activity> allActs;
 
-    protected static Mock<DbSet<User>> _usersDbSetMock;
-    protected static Mock<DbSet<Activity>> _activitiesDbSetMock;
-    protected static Mock<DbSet<Session>> _sessionsDbSetMock;
-    protected static Mock<IDataContext> _dbContextMock;
-    protected static Mock<IUserService> _userServiceMock;
-    protected static Mock<ISessionService> _sessionServiceMock;
-    protected static Mock<IMapper> _mapperMock;
+    protected static Mock<DbSet<User>> usersDbSetMock;
+    protected static Mock<DbSet<Activity>> activitiesDbSetMock;
+    protected static Mock<DbSet<Session>> sessionsDbSetMock;
+    protected static Mock<IDataContext> dbContextMock;
+    protected static Mock<IUserService> userServiceMock;
+    protected static Mock<ISessionService> sessionServiceMock;
+    protected static Mock<IMapper> mapperMock;
 
     // TODO figure out why they don't like this
-    // // Called before all tests
-    // [ClassInitialize()]
-    // public static void InitializeClass(TestContext context)
-    // {
-    //     // Init users here since they won't change through each activity test
-    //     _usersData = new List<User> { GenerateJaneUser(), GenerateJohnUser(), GenerateJudyUser() };
-    // }
+    // Called before all tests
+    [ClassInitialize()]
+    public static void InitializeClass(TestContext context)
+    {
+        // Init users here since they won't change through each activity test
+        usersData = new List<User> { GenerateJaneUser(), GenerateJohnUser(), GenerateJudyUser() };
+    }
 
     // Called before each test
     [TestInitialize]
@@ -66,114 +66,114 @@ public abstract class TestBase
     private void _setUpActivitiesAndSessions()
     {
         // Jane's acts
-        _panicAct = GeneratePanicActivity();
-        _panicSesh = GeneratePanicSession();
-        _panicAct.Sessions = new List<Session>{ _panicSesh };
-        _janesActs = new List<Activity> { _panicAct };
+        panicAct = GeneratePanicActivity();
+        panicSesh = GeneratePanicSession();
+        panicAct.Sessions = new List<Session>{ panicSesh };
+        janesActs = new List<Activity> { panicAct };
 
         // John's acts
-        _gameDevSesh1 = GenerateGameDevSession1();
-        _gameDevSesh2 = GenerateGameDevSession2();
-        _gameDevAct = GenerateGameDevActivity();
-        _gameDevAct.Sessions = new List<Session>{ _gameDevSesh1, _gameDevSesh2 };
+        gameDevSesh1 = GenerateGameDevSession1();
+        gameDevSesh2 = GenerateGameDevSession2();
+        gameDevAct = GenerateGameDevActivity();
+        gameDevAct.Sessions = new List<Session>{ gameDevSesh1, gameDevSesh2 };
 
-        _pianoSesh1 = GeneratePianoSession1();
-        _pianoSesh2 = GenerateGameDevSession2();
-        _pianoAct = GeneratePianoActivity();
-        _pianoAct.Sessions = new List<Session>{ _pianoSesh1, _pianoSesh2 };
+        pianoSesh1 = GeneratePianoSession1();
+        pianoSesh2 = GeneratePianoSession2();
+        pianoAct = GeneratePianoActivity();
+        pianoAct.Sessions = new List<Session>{ pianoSesh1, pianoSesh2 };
 
-        _mcatAct = GenerateMcatActivity();
-        _sleepingAct = GenerateSleepingActivity();
-        _johnsActs = new List<Activity>{ _gameDevAct, _pianoAct, _mcatAct, _sleepingAct };
+        mcatAct = GenerateMcatActivity();
+        sleepingAct = GenerateSleepingActivity();
+        johnsActs = new List<Activity>{ gameDevAct, pianoAct, mcatAct, sleepingAct };
 
         // Judy's acts
-        _baseballAct = GenerateBaseballActivity();
-        _judysActs = new List<Activity>{ _baseballAct };
+        baseballAct = GenerateBaseballActivity();
+        judysActs = new List<Activity>{ baseballAct };
 
-        _allSessions = new List<Session>{ _panicSesh, _gameDevSesh1, _gameDevSesh2, _pianoSesh1, _pianoSesh2 };
-        _allActs = new List<Activity>{ _panicAct, _gameDevAct, _pianoAct, _mcatAct, _sleepingAct, _baseballAct };
+        allSessions = new List<Session>{ panicSesh, gameDevSesh1, gameDevSesh2, pianoSesh1, pianoSesh2 };
+        allActs = new List<Activity>{ panicAct, gameDevAct, pianoAct, mcatAct, sleepingAct, baseballAct };
     }
 
     private void _setUpDbMocks()
     {
-        _dbContextMock = new Mock<IDataContext>();
+        dbContextMock = new Mock<IDataContext>();
         _setUpUsersDbMocks();
         _setUpActivitiesDbMocks();
         _setUpSessionsDbMocks();
 
         void _setUpUsersDbMocks()
         {
-            _usersDbSetMock = _usersData.AsQueryable().BuildMockDbSet();
-            _dbContextMock.Setup(x => x.Users)
-                    .Returns(_usersDbSetMock.Object);
+            usersDbSetMock = usersData.AsQueryable().BuildMockDbSet();
+            dbContextMock.Setup(x => x.Users)
+                    .Returns(usersDbSetMock.Object);
 
 
         }
         void _setUpActivitiesDbMocks()
         {
-            _activitiesDbSetMock = _allActs.AsQueryable().BuildMockDbSet();
-            _dbContextMock.Setup(x => x.Activities)
-                    .Returns(_activitiesDbSetMock.Object);
+            activitiesDbSetMock = allActs.AsQueryable().BuildMockDbSet();
+            dbContextMock.Setup(x => x.Activities)
+                    .Returns(activitiesDbSetMock.Object);
 
         }
         void _setUpSessionsDbMocks()
         {
-            _sessionsDbSetMock = _allSessions.AsQueryable().BuildMockDbSet();
-            _dbContextMock.Setup(x => x.Sessions)
-                    .Returns(_sessionsDbSetMock.Object);
+            sessionsDbSetMock = allSessions.AsQueryable().BuildMockDbSet();
+            dbContextMock.Setup(x => x.Sessions)
+                    .Returns(sessionsDbSetMock.Object);
         }
     }
 
     private void _setUpMapperMocks()
     {
-        _mapperMock = new Mock<IMapper>();
-        _mapperMock.Setup(x => x.Map<ActivityGetDto>(_gameDevAct))
+        mapperMock = new Mock<IMapper>();
+        mapperMock.Setup(x => x.Map<ActivityGetDto>(gameDevAct))
                     .Returns(new ActivityGetDto
                     {
-                        Id = _gameDevAct.Id,
-                        OwnerId = _gameDevAct.OwnerId,
-                        Name = _gameDevAct.Name,
-                        Description = _gameDevAct.Description,
-                        StartDateUtc = _gameDevAct.StartDateUtc,
-                        DueDateUtc = _gameDevAct.DueDateUtc,
-                        CompletedDateUtc = _gameDevAct.CompletedDateUtc,
-                        IsArchived = _gameDevAct.IsArchived,
-                        ColorHex = _gameDevAct.ColorHex,
-                        Tags = _gameDevAct.Tags,
+                        Id = gameDevAct.Id,
+                        OwnerId = gameDevAct.OwnerId,
+                        Name = gameDevAct.Name,
+                        Description = gameDevAct.Description,
+                        StartDateUtc = gameDevAct.StartDateUtc,
+                        DueDateUtc = gameDevAct.DueDateUtc,
+                        CompletedDateUtc = gameDevAct.CompletedDateUtc,
+                        IsArchived = gameDevAct.IsArchived,
+                        ColorHex = gameDevAct.ColorHex,
+                        Tags = gameDevAct.Tags,
                     });
-        _mapperMock.Setup(x => x.Map<ActivityGetDto>(_pianoAct))
+        mapperMock.Setup(x => x.Map<ActivityGetDto>(pianoAct))
                     .Returns(new ActivityGetDto
                     {
-                        Id = _pianoAct.Id,
-                        OwnerId = _pianoAct.OwnerId,
-                        Name = _pianoAct.Name,
-                        Description = _pianoAct.Description,
-                        StartDateUtc = _pianoAct.StartDateUtc,
-                        DueDateUtc = _pianoAct.DueDateUtc,
-                        CompletedDateUtc = _pianoAct.CompletedDateUtc,
-                        IsArchived = _pianoAct.IsArchived,
-                        ColorHex = _pianoAct.ColorHex,
-                        Tags = _pianoAct.Tags,
+                        Id = pianoAct.Id,
+                        OwnerId = pianoAct.OwnerId,
+                        Name = pianoAct.Name,
+                        Description = pianoAct.Description,
+                        StartDateUtc = pianoAct.StartDateUtc,
+                        DueDateUtc = pianoAct.DueDateUtc,
+                        CompletedDateUtc = pianoAct.CompletedDateUtc,
+                        IsArchived = pianoAct.IsArchived,
+                        ColorHex = pianoAct.ColorHex,
+                        Tags = pianoAct.Tags,
                     });
-        _mapperMock.Setup(x => x.Map<ActivityGetDto>(_mcatAct))
+        mapperMock.Setup(x => x.Map<ActivityGetDto>(mcatAct))
                     .Returns(new ActivityGetDto
                     {
-                        Id = _mcatAct.Id,
-                        OwnerId = _mcatAct.OwnerId,
-                        Name = _mcatAct.Name,
-                        Description = _mcatAct.Description,
-                        StartDateUtc = _mcatAct.StartDateUtc,
-                        DueDateUtc = _mcatAct.DueDateUtc,
-                        CompletedDateUtc = _mcatAct.CompletedDateUtc,
-                        IsArchived = _mcatAct.IsArchived,
-                        ColorHex = _mcatAct.ColorHex,
-                        Tags = _mcatAct.Tags,
+                        Id = mcatAct.Id,
+                        OwnerId = mcatAct.OwnerId,
+                        Name = mcatAct.Name,
+                        Description = mcatAct.Description,
+                        StartDateUtc = mcatAct.StartDateUtc,
+                        DueDateUtc = mcatAct.DueDateUtc,
+                        CompletedDateUtc = mcatAct.CompletedDateUtc,
+                        IsArchived = mcatAct.IsArchived,
+                        ColorHex = mcatAct.ColorHex,
+                        Tags = mcatAct.Tags,
                     });
     }
 
     private void _setUpServiceMocks()
     {
-        _userServiceMock = new Mock<IUserService>();
-        _sessionServiceMock = new Mock<ISessionService>();
+        userServiceMock = new Mock<IUserService>();
+        sessionServiceMock = new Mock<ISessionService>();
     }
 }
