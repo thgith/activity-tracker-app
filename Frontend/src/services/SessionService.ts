@@ -1,8 +1,7 @@
 import axios from 'axios';
-import moment from 'moment';
 import { API_URL_BASE } from '../app/constants';
 import { convertDateForApi } from '../app/helpers/helpers';
-import { ISession, ISessionEdit, ISessionNew } from '../features/sessions/ISession';
+import { ISessionEdit, ISessionNew } from '../features/sessions/ISession';
 const SESSION_API_URL = `${API_URL_BASE}Session/`;
 axios.defaults.withCredentials = true;
 

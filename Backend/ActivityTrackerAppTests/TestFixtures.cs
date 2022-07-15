@@ -22,10 +22,12 @@ public static class TestFixtures
         Guid.TryParse("9c789a9a-1a20-4ec8-8375-0c2d3875dcd1", out BASEBALL_ACT_GUID);
 
         // Session GUIDs
-        Guid.TryParse("16f33737-8d96-405e-856a-a47d869b0cfc", out PIANO_SESH1_GUID);
-        Guid.TryParse("11d1ae01-841e-4239-a35c-7391c00a8328", out PIANO_SESH2_GUID);
+        Guid.TryParse("ad0c044c-2dc3-4eed-89bd-7011b737fd2c", out PANIC_SESH_GUID);
         Guid.TryParse("c0a01773-4428-4c27-985f-1bd0be87712b", out GAME_DEV_SESH1_GUID);
         Guid.TryParse("3f90adb9-95dc-4abe-bee6-13b1b2977763", out GAME_DEV_SESH2_GUID);
+        Guid.TryParse("16f33737-8d96-405e-856a-a47d869b0cfc", out PIANO_SESH1_GUID);
+        Guid.TryParse("11d1ae01-841e-4239-a35c-7391c00a8328", out PIANO_SESH2_GUID);
+
 
         JANE_JOIN_DATE_UTC = DateTime.UtcNow;
         JOHN_JOIN_DATE_UTC = DateTime.UtcNow.AddSeconds(1);
@@ -194,25 +196,13 @@ public static class TestFixtures
     }
 
     // Sessions
-    public static Session GeneratePianoSession1()
+    public static Session GeneratePanicSession()
     {
         return new Session
         {
-            Id = PIANO_SESH1_GUID,
-            ActivityId = PIANO_ACT_GUID,
-            Notes = PIANO_SESH1_NOTES,
-            StartDateUtc = DateTime.UtcNow,
-            DeletedDateUtc = null
-        };
-    }
-
-    public static Session GeneratePianoSession2()
-    {
-        return new Session
-        {
-            Id = PIANO_SESH2_GUID,
-            ActivityId = PIANO_ACT_GUID,
-            Notes = PIANO_SESH2_NOTES,
+            Id = PANIC_SESH_GUID,
+            ActivityId = PANIC_ACT_GUID,
+            Notes = "",
             StartDateUtc = DateTime.UtcNow,
             DeletedDateUtc = null
         };
@@ -237,6 +227,30 @@ public static class TestFixtures
             Id = GAME_DEV_SESH2_GUID,
             ActivityId = GAME_DEV_ACT_GUID,
             Notes = GAME_DEV_SESH2_NOTES,
+            StartDateUtc = DateTime.UtcNow,
+            DeletedDateUtc = null
+        };
+    }
+
+    public static Session GeneratePianoSession1()
+    {
+        return new Session
+        {
+            Id = PIANO_SESH1_GUID,
+            ActivityId = PIANO_ACT_GUID,
+            Notes = PIANO_SESH1_NOTES,
+            StartDateUtc = DateTime.UtcNow,
+            DeletedDateUtc = null
+        };
+    }
+
+    public static Session GeneratePianoSession2()
+    {
+        return new Session
+        {
+            Id = PIANO_SESH2_GUID,
+            ActivityId = PIANO_ACT_GUID,
+            Notes = PIANO_SESH2_NOTES,
             StartDateUtc = DateTime.UtcNow,
             DeletedDateUtc = null
         };
@@ -287,10 +301,11 @@ public static class TestFixtures
 
     // Session
     // Session GUIDs
-    public static Guid PIANO_SESH1_GUID;
-    public static Guid PIANO_SESH2_GUID;
+    public static Guid PANIC_SESH_GUID;
     public static Guid GAME_DEV_SESH1_GUID;
     public static Guid GAME_DEV_SESH2_GUID;
+    public static Guid PIANO_SESH1_GUID;
+    public static Guid PIANO_SESH2_GUID;
 
     public const string PIANO_SESH1_NOTES = "Scale exercises";
     public const string PIANO_SESH2_NOTES = "Learning new song";
