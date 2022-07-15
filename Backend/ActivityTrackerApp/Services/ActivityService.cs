@@ -17,6 +17,9 @@ public class ActivityService : IActivityService
     private readonly ISessionService _sessionService;
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public ActivityService(
         IDataContext dbContext,
         IUserService userService,

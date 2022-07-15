@@ -12,6 +12,9 @@ public class SessionController : ApiControllerBase<SessionController>
 {
     private readonly ISessionService _sessionService;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public SessionController(
         ISessionService sessionService,
         IUserService userService,

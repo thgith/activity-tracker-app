@@ -16,6 +16,9 @@ public class UserService : IUserService
     private readonly IConfiguration _config;
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public UserService(
         IDataContext dataContext,
         IJwtService jwtService,
@@ -221,6 +224,7 @@ public class UserService : IUserService
         return true;
     }
 
+    /// <inheritdoc/>
     public async Task<bool> IsAdmin(Guid userId)
     {
         return await _dbContext.Users
@@ -230,11 +234,17 @@ public class UserService : IUserService
                 x.Role == Roles.ADMIN);
     }
 
+    /// <inheritdoc/>
     public async Task<bool> IsEmailTaken(string email)
     {
         return await _dbContext.Users.AnyAsync(x => x.Email.ToLower() == email.ToLower());
     }
 
+    /// <summary>
+    /// Creates the user.
+    /// </summary>
+    /// <param name="userRegisterDto">The registration data.</param>
+    /// <returns>The created user.</returns>
     private async Task<User> _createUserAsync(UserRegisterDto userRegisterDto)
     {
         if (userRegisterDto == null)

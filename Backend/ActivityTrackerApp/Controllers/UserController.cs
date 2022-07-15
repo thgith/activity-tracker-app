@@ -13,6 +13,9 @@ public class UserController : ApiControllerBase<UserController>
 {
     private readonly IHelperService _helperService;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public UserController(
         IHelperService helperService,
         IUserService userService,

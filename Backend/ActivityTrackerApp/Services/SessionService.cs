@@ -14,6 +14,9 @@ public class SessionService : ISessionService
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public SessionService(
         IDataContext dbContext,
         IUserService userService,

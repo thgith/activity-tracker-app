@@ -17,6 +17,9 @@ public abstract class ApiControllerBase<T> : Controller
     protected readonly IJwtService jwtService;
     protected readonly ILogger<T> logger;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public ApiControllerBase(
         IUserService userService,
         IJwtService jwtService,

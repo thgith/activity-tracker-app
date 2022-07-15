@@ -14,6 +14,9 @@ public class AuthController : ApiControllerBase<AuthController>
 {
     private readonly IHelperService _helperService;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public AuthController(
         IHelperService helperService,
         IUserService userService,

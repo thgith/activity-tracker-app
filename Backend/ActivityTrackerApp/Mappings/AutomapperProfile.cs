@@ -9,6 +9,9 @@ namespace ActivityTrackerApp.Mappings;
 /// </summary>
 public class AutomapperProfile : Profile
 {
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public AutomapperProfile()
     {
         _mapUser();

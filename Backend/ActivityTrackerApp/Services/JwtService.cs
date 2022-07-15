@@ -17,6 +17,9 @@ namespace ActivityTrackerApp.Services
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public JwtService(
             IDataContext dataContext,
             IConfiguration config,

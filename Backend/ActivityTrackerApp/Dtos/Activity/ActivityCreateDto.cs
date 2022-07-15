@@ -25,8 +25,8 @@ public class ActivityCreateDto
     /// </summary>
     /// <remarks>
     /// NOTE: if you have type DateTime instead of DateTime?,
-    //        this will return as DateTime.MinValue even if
-    //        it isn't specified in the request unless you set default value
+    ///       this will return as DateTime.MinValue even if
+    ///       it isn't specified in the request unless you set default value
     /// </remarks>
     public DateTime? StartDateUtc { get; set; }
 

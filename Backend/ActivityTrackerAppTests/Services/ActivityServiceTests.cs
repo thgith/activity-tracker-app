@@ -54,15 +54,18 @@ public class ActivityServiceTests
     [TestInitialize]
     public void InitializeTests()
     {
+        // Jane's acts
         _panicAct = GeneratePanicActivity();
         _janesActs = new List<Activity>{ _panicAct };
 
+        // John's acts
         _gameDevAct = GenerateGameDevActivity();
         _pianoAct = GeneratePianoActivity();
         _mcatAct = GenerateMcatActivity();
         _sleepingAct = GenerateSleepingActivity();
         _johnsActs = new List<Activity>{ _gameDevAct, _pianoAct, _mcatAct, _sleepingAct };
 
+        // Judy's acts
         _baseballAct = GenerateBaseballActivity();
         _judysActs = new List<Activity>{ _baseballAct };
 
@@ -144,6 +147,7 @@ public class ActivityServiceTests
         Assert.IsNotNull(activities);
         Assert.AreEqual(activities.Count(), 3);
         var activitiesList = activities.ToList();
+
         // This list should be ordered by join date, so the activities should be in this order
         _assertActivitiesSame(
             activitiesList[0], 
@@ -203,6 +207,7 @@ public class ActivityServiceTests
         Assert.IsNotNull(activities);
         Assert.AreEqual(activities.Count(), 3);
         var activitiesList = activities.ToList();
+        
         // This list should be ordered by join date, so the activities should be in this order
         _assertActivitiesSame(
             activitiesList[0], 

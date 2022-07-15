@@ -5,6 +5,9 @@ namespace ActivityTrackerApp.Services;
 /// <inheritdocs/>
 public class HelperService : IHelperService
 {
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public HelperService()
     {
 

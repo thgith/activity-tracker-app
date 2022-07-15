@@ -10,6 +10,9 @@ public class EmailService : IEmailService
     private readonly ISmtpClient _smtpClient;
     private readonly ILogger _logger;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public EmailService(
         ISmtpClient smtpClient,
         ILogger logger)

@@ -3,7 +3,7 @@ using ActivityTrackerApp.Entities;
 namespace ActivityTrackerApp.Dtos;
 
 /// <summary>
-/// An activity.
+/// An activity. Format from a GET and what is returned to the client.
 /// </summary>
 public class ActivityGetDto : BaseEntity
 {

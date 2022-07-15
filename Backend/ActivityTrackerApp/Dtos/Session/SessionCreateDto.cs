@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace ActivityTrackerApp.Dtos;
 
 /// <summary>
-/// A timed session.
+/// A timed session. Format from a POST request.
 /// </summary>
 public class SessionCreateDto
 {
@@ -13,12 +13,21 @@ public class SessionCreateDto
     [Required]
     public Guid ActivityId { get; set; }
 
+    /// <summary>
+    /// The date the session was started.
+    /// </summary>
     [Required]
     public DateTime? StartDateUtc { get; set; }
 
+    /// <summary>
+    /// How long the session is in seconds.
+    /// </summary>
     [Required]
     public uint DurationSeconds { get; set; } = 0;
 
+    /// <summary>
+    /// Optional additional notes.
+    /// </summary>
     [MaxLength(1024)]
     public string Notes { get; set; }
 }

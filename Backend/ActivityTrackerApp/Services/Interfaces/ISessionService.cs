@@ -1,5 +1,4 @@
 using ActivityTrackerApp.Dtos;
-using ActivityTrackerApp.Entities;
 
 namespace ActivityTrackerApp.Services
 {
@@ -54,7 +53,7 @@ namespace ActivityTrackerApp.Services
         Task<SessionGetDto> UpdateSessionAsync(
             Guid currUserId,
             Guid sessionId,
-            SessionUpdateDto updateSessionDto);
+            SessionUpdateDto updatedSessionDto);
 
         /// <summary>
         /// Deletes the session with the ID.
@@ -63,7 +62,7 @@ namespace ActivityTrackerApp.Services
         /// <param name="sessionId">The ID of the session to delete.</param>
         /// <returns>Whether the delete was successful.</returns>
         Task<bool> DeleteSessionAsync(
-            Guid currUserid,
+            Guid currUserId,
             Guid sessionId); 
 
     }

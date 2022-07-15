@@ -12,6 +12,9 @@ public class ActivityController : ApiControllerBase<ActivityController>
 {        
     private readonly IActivityService _activityService;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public ActivityController(
         IActivityService activityService,
         IUserService userService,

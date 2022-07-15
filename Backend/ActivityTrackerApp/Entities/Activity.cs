@@ -59,8 +59,7 @@ public class Activity : BaseEntity
     /// A list of tags associated with the activity.
     /// Used for sorting and filtering.
     /// </summary>
-    /// <remarks>No more than 10 tags allowed.</remarks>
-    // [MaxLength(10)]
+    /// <remarks>No more than 10 tags allowed. TODO: Need to add this check</remarks>
     public IList<string>? Tags { get; set; }
 
     /// <summary>
