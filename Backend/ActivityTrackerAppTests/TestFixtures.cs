@@ -7,16 +7,25 @@ public static class TestFixtures
 {
     static TestFixtures()
     {
+        // NOTE: These are just random GUIDs
+        // User GUIDs
         Guid.TryParse("281b92b4-46e0-444f-aabe-da7aca9986a9", out JANE_USER_GUID);
         Guid.TryParse("e15d9f9a-4e5c-4311-b9c4-72cecdc2d672", out JOHN_USER_GUID);
         Guid.TryParse("748d904a-84d4-4b81-9d69-23f5c7a9a746", out JUDY_USER_GUID);
 
+        // Activity GUIDs
         Guid.TryParse("5bbf779e-acd0-4c35-be31-f4b67af0133f", out PANIC_ACT_GUID);
         Guid.TryParse("de2e1178-0125-40ad-b6a3-f922a080489b", out PIANO_ACT_GUID);
         Guid.TryParse("3295ff98-14d1-4955-b4d0-97bed10c5833", out GAME_DEV_ACT_GUID);
         Guid.TryParse("b1f4699e-2694-4de4-bb85-200dc1fb94bd", out MCAT_ACT_GUID);
         Guid.TryParse("c5e095cf-10b3-4924-9735-f7eed8903ceb", out SLEEPING_ACT_GUID);
         Guid.TryParse("9c789a9a-1a20-4ec8-8375-0c2d3875dcd1", out BASEBALL_ACT_GUID);
+
+        // Session GUIDs
+        Guid.TryParse("16f33737-8d96-405e-856a-a47d869b0cfc", out PIANO_SESH1_GUID);
+        Guid.TryParse("11d1ae01-841e-4239-a35c-7391c00a8328", out PIANO_SESH2_GUID);
+        Guid.TryParse("c0a01773-4428-4c27-985f-1bd0be87712b", out GAME_DEV_SESH1_GUID);
+        Guid.TryParse("3f90adb9-95dc-4abe-bee6-13b1b2977763", out GAME_DEV_SESH2_GUID);
 
         JANE_JOIN_DATE_UTC = DateTime.UtcNow;
         JOHN_JOIN_DATE_UTC = DateTime.UtcNow.AddSeconds(1);
@@ -184,6 +193,55 @@ public static class TestFixtures
         };
     }
 
+    // Sessions
+    public static Session GeneratePianoSession1()
+    {
+        return new Session
+        {
+            Id = PIANO_SESH1_GUID,
+            ActivityId = PIANO_ACT_GUID,
+            Notes = PIANO_SESH1_NOTES,
+            StartDateUtc = DateTime.UtcNow,
+            DeletedDateUtc = null
+        };
+    }
+
+    public static Session GeneratePianoSession2()
+    {
+        return new Session
+        {
+            Id = PIANO_SESH2_GUID,
+            ActivityId = PIANO_ACT_GUID,
+            Notes = PIANO_SESH2_NOTES,
+            StartDateUtc = DateTime.UtcNow,
+            DeletedDateUtc = null
+        };
+    }
+
+    public static Session GenerateGameDevSession1()
+    {
+        return new Session
+        {
+            Id = GAME_DEV_SESH1_GUID,
+            ActivityId = GAME_DEV_ACT_GUID,
+            Notes = GAME_DEV_SESH1_NOTES,
+            StartDateUtc = DateTime.UtcNow,
+            DeletedDateUtc = null
+        };
+    }
+
+    public static Session GenerateGameDevSession2()
+    {
+        return new Session
+        {
+            Id = GAME_DEV_SESH2_GUID,
+            ActivityId = GAME_DEV_ACT_GUID,
+            Notes = GAME_DEV_SESH2_NOTES,
+            StartDateUtc = DateTime.UtcNow,
+            DeletedDateUtc = null
+        };
+    }
+
     // User
     public static Guid JANE_USER_GUID;
     public static Guid JOHN_USER_GUID;
@@ -228,6 +286,12 @@ public static class TestFixtures
     public const string PROGRAMMING_TAG = "programming";
 
     // Session
+    // Session GUIDs
+    public static Guid PIANO_SESH1_GUID;
+    public static Guid PIANO_SESH2_GUID;
+    public static Guid GAME_DEV_SESH1_GUID;
+    public static Guid GAME_DEV_SESH2_GUID;
+
     public const string PIANO_SESH1_NOTES = "Scale exercises";
     public const string PIANO_SESH2_NOTES = "Learning new song";
     public const string GAME_DEV_SESH1_NOTES = "Game jam";

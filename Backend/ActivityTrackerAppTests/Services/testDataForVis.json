@@ -1,0 +1,161 @@
+{
+    "_comments": "This is just to visualize the test fixtures data",
+    "data": [
+        {
+            "user": {
+                "id": "281b92b4-46e0-444f-aabe-da7aca9986a9",
+                "firstName": "Jane",
+                "lastName": "Doe",
+                "email": "janedoe@test.com",
+                "passwordHash": "some hash here",
+                "joinDateUtc": "2022-07-15T01:26:26Z",
+                "deletedDateUtc": null,
+                "role": "admin"
+            },
+            "activities": [
+                {
+                    "id": "3295ff98-14d1-4955-b4d0-97bed10c5833",
+                    "ownerId": "e15d9f9a-4e5c-4311-b9c4-72cecdc2d672",
+                    "name": "PANIC",
+                    "description": "PANIC PANIC",
+                    "startDateUtc": "2022-07-15T01:27:26Z",
+                    "dueDateUtc": null,
+                    "deletedDateUtc": null,
+                    "isArchived": false,
+                    "colorHex": null,
+                    "tags": null,
+                    "sessions": null
+                }
+            ]
+        },
+        {
+            "user": {
+                "id": "e15d9f9a-4e5c-4311-b9c4-72cecdc2d672",
+                "firstName": "John",
+                "lastName": "Doe",
+                "email": "johndoe@test.com",
+                "passwordHash": "some hash here",
+                "joinDateUtc": "2022-07-15T01:26:26Z",
+                "deletedDateUtc": null,
+                "role": "member"
+            },
+            "activities": [
+                {
+                    "id": "3295ff98-14d1-4955-b4d0-97bed10c5833",
+                    "ownerId": "e15d9f9a-4e5c-4311-b9c4-72cecdc2d672",
+                    "name": "Game Development",
+                    "description": "Time spent on game development",
+                    "startDateUtc": "2022-07-15T01:27:26Z",
+                    "dueDateUtc": null,
+                    "deletedDateUtc": null,
+                    "isArchived": false,
+                    "colorHex": null,
+                    "tags": [
+                        "personal",
+                        "programming"
+                    ],
+                    "sessions": [
+                        {
+                            "id": "c0a01773-4428-4c27-985f-1bd0be87712b",
+                            "activityId": "3295ff98-14d1-4955-b4d0-97bed10c5833",
+                            "notes": "Game jam",
+                            "startDateUtc": "2022-07-15T01:27:26Z",
+                            "deletedDateUtc": null 
+                        },
+                        {
+                            "id": "3f90adb9-95dc-4abe-bee6-13b1b2977763",
+                            "activityId": "3295ff98-14d1-4955-b4d0-97bed10c5833",
+                            "notes": "More game jam",
+                            "startDateUtc": "2022-07-15T01:27:26Z",
+                            "deletedDateUtc": null 
+                        }
+                    ]
+                },
+                {
+                    "id": "de2e1178-0125-40ad-b6a3-f922a080489b",
+                    "ownerId": "e15d9f9a-4e5c-4311-b9c4-72cecdc2d672",
+                    "name": "Piano",
+                    "description": "Time spent practicing piano",
+                    "startDateUtc": "2022-07-15T01:27:26Z",
+                    "dueDateUtc": null,
+                    "deletedDateUtc": null,
+                    "isArchived": false,
+                    "colorHex": "#0000ff",
+                    "tags": [
+                        "personal"
+                    ],
+                    "sessions": [
+                        {
+                            "id": "16f33737-8d96-405e-856a-a47d869b0cfc",
+                            "activityId": "de2e1178-0125-40ad-b6a3-f922a080489b",
+                            "notes": "Scale exercises",
+                            "startDateUtc": "2022-07-15T01:27:26Z",
+                            "deletedDateUtc": null 
+                        },
+                        {
+                            "id": "11d1ae01-841e-4239-a35c-7391c00a8328",
+                            "activityId": "de2e1178-0125-40ad-b6a3-f922a080489b",
+                            "notes": "Learning new song",
+                            "startDateUtc": "2022-07-15T01:27:26Z",
+                            "deletedDateUtc": null 
+                        }
+                    ]
+                },
+                {
+                    "id": "b1f4699e-2694-4de4-bb85-200dc1fb94bd",
+                    "ownerId": "e15d9f9a-4e5c-4311-b9c4-72cecdc2d672",
+                    "name": "MCAT",
+                    "description": "Studying for the MCAT",
+                    "startDateUtc": "2022-07-15T01:27:26Z",
+                    "dueDateUtc": "2022-09-15T01:27:26Z",
+                    "deletedDateUtc": null,
+                    "isArchived": false,
+                    "colorHex": "#ff0000",
+                    "tags": [
+                        "school"
+                    ],
+                    "sessions": null
+                },
+                {
+                    "id": "c5e095cf-10b3-4924-9735-f7eed8903ceb",
+                    "ownerId": "e15d9f9a-4e5c-4311-b9c4-72cecdc2d672",
+                    "name": "Sleeping",
+                    "description": "",
+                    "startDateUtc": "2022-07-15T01:27:26Z",
+                    "dueDateUtc": null,
+                    "deletedDateUtc": "2022-07-15T01:27:26Z",
+                    "isArchived": false,
+                    "colorHex": null,
+                    "sessions": null
+                }
+            ]
+        },
+        {
+            "user": {
+                "id": "9c789a9a-1a20-4ec8-8375-0c2d3875dcd1",
+                "firstName": "Judy",
+                "lastName": "Doe",
+                "email": "judydoe@test.com",
+                "passwordHash": "some hash here",
+                "joinDateUtc": "2022-07-15T01:28:26Z",
+                "deletedDateUtc": "2022-07-15T01:28:26Z",
+                "role": "member"
+            },
+            "activities": [
+                {
+                    "id": "3295ff98-14d1-4955-b4d0-97bed10c5833",
+                    "ownerId": "e15d9f9a-4e5c-4311-b9c4-72cecdc2d672",
+                    "name": "Baseball",
+                    "description": "Playing baseball",
+                    "startDateUtc": "2022-07-15T01:28:26Z",
+                    "dueDateUtc": null,
+                    "deletedDateUtc": "2022-07-15T01:28:26Z",
+                    "isArchived": false,
+                    "colorHex": null,
+                    "tags": null,
+                    "sessions": null
+                }
+            ]
+        }
+    ]
+}

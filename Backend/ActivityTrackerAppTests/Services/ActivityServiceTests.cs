@@ -11,6 +11,7 @@ using ActivityTrackerApp.Exceptions;
 
 namespace ActivityTrackerAppTests;
 
+// TODO: Add sessions
 // NOTE: Prob should add more checks to check side effects (call count, etc),
 //       but this is fine for now
 [TestClass]
