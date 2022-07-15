@@ -11,7 +11,12 @@ using ActivityTrackerApp.Exceptions;
 
 namespace ActivityTrackerAppTests;
 
-// TODO: Add sessions
+// TODO: Add sessions and test
+// TODO test 
+//  startDateUtc null
+//  startDateUtc > dueDateUtc
+//  startDateUtc > completedDateUtc
+//  etc other paths
 // NOTE: Prob should add more checks to check side effects (call count, etc),
 //       but this is fine for now
 [TestClass]
