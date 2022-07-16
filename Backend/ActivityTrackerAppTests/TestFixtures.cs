@@ -5,6 +5,8 @@ namespace ActivityTrackerAppTests.Fixtures;
 
 public static class TestFixtures
 {
+    public const string MIN_DATE_STR = "1/1/0001 12:00:00 AM";
+
     // NOTE: These are just random GUIDs
     // User GUID strings
     public const string JANE_USER_GUID_STR = "281b92b4-46e0-444f-aabe-da7aca9986a9";

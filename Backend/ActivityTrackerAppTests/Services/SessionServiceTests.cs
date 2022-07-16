@@ -135,7 +135,7 @@ public class SessionServiceTests : TestBase
     [DataRow(GAME_DEV_ACT_GUID_STR, "", (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_ACT_GUID_STR, "", (uint)999999999, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_ACT_GUID_STR, "2022-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
-    [DataRow(GAME_DEV_ACT_GUID_STR, "1/1/0001 12:00:00 AM", (uint)200, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_ACT_GUID_STR, MIN_DATE_STR, (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_ACT_GUID_STR, "2025-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
     [TestCategory("CreateSessionAsync")]
     public async Task CreateSessionAsync_Admin_AnothersSession_Ok(
@@ -181,7 +181,7 @@ public class SessionServiceTests : TestBase
     [DataRow(GAME_DEV_ACT_GUID_STR, "", (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_ACT_GUID_STR, "", (uint)999999999, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_ACT_GUID_STR, "2022-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
-    [DataRow(GAME_DEV_ACT_GUID_STR, "1/1/0001 12:00:00 AM", (uint)200, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_ACT_GUID_STR, MIN_DATE_STR, (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_ACT_GUID_STR, "2025-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
     [TestCategory("CreateSessionAsync")]
     public async Task CreateSessionAsync_NonAdmin_OwnSession_Ok(
@@ -253,7 +253,7 @@ public class SessionServiceTests : TestBase
     [DataRow(GAME_DEV_SESH1_GUID_STR, "", (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_SESH1_GUID_STR, "", (uint)999999999, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_SESH1_GUID_STR, "2022-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
-    [DataRow(GAME_DEV_SESH1_GUID_STR, "1/1/0001 12:00:00 AM", (uint)200, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_SESH1_GUID_STR, MIN_DATE_STR, (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_SESH1_GUID_STR, "2025-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
     [TestCategory("UpdateSessionAsync")]
     public async Task UpdateSessionAsync_Admin_AnothersSession_Ok(
@@ -313,7 +313,7 @@ public class SessionServiceTests : TestBase
     [DataRow(GAME_DEV_SESH1_GUID_STR, "", (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_SESH1_GUID_STR, "", (uint)999999999, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_SESH1_GUID_STR, "2022-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
-    [DataRow(GAME_DEV_SESH1_GUID_STR, "1/1/0001 12:00:00 AM", (uint)200, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_SESH1_GUID_STR, MIN_DATE_STR, (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_SESH1_GUID_STR, "2025-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
     [TestCategory("UpdateSessionAsync")]
     public async Task UpdateSessionAsync_NonAdmin_OwnSession_Ok(
@@ -418,52 +418,52 @@ public class SessionServiceTests : TestBase
             mapperMock.Object);
     }
 
-    private void _assertSessionsEqual(Session expectedSession, SessionGetDto actualSession)
+    private void _assertSessionsEqual(Session expectedSession, SessionGetDto returnedSession)
     {
-        Assert.IsNotNull(actualSession);
-        Assert.AreEqual(expectedSession.Id, actualSession.Id);
-        Assert.AreEqual(expectedSession.ActivityId, actualSession.ActivityId);
-        DatesEqualWithinSeconds((DateTime)expectedSession.StartDateUtc, actualSession.StartDateUtc);
-        Assert.AreEqual(expectedSession.DurationSeconds, actualSession.DurationSeconds);
-        Assert.AreEqual(expectedSession.Notes, actualSession.Notes);
+        Assert.IsNotNull(returnedSession);
+        Assert.AreEqual(expectedSession.Id, returnedSession.Id);
+        Assert.AreEqual(expectedSession.ActivityId, returnedSession.ActivityId);
+        DatesEqualWithinSeconds((DateTime)expectedSession.StartDateUtc, returnedSession.StartDateUtc);
+        Assert.AreEqual(expectedSession.DurationSeconds, returnedSession.DurationSeconds);
+        Assert.AreEqual(expectedSession.Notes, returnedSession.Notes);
     }
 
-    private void _assertReturnedFromCreate(SessionCreateDto newSessionDto, SessionGetDto session)
+    private void _assertReturnedFromCreate(SessionCreateDto createDto, SessionGetDto returnedSession)
     {
-        Assert.IsNotNull(session);
-        Assert.IsNotNull(session.Id);
-        Assert.AreNotEqual(Guid.Empty, session.Id);
-        Assert.AreEqual(newSessionDto.ActivityId, session.ActivityId);
-        DatesEqualWithinSeconds((DateTime)newSessionDto.StartDateUtc, (DateTime)session.StartDateUtc);
-        Assert.AreEqual(newSessionDto.DurationSeconds, session.DurationSeconds);
-        Assert.AreEqual(newSessionDto.Notes, session.Notes);
+        Assert.IsNotNull(returnedSession);
+        Assert.IsNotNull(returnedSession.Id);
+        Assert.AreNotEqual(Guid.Empty, returnedSession.Id);
+        Assert.AreEqual(createDto.ActivityId, returnedSession.ActivityId);
+        DatesEqualWithinSeconds((DateTime)createDto.StartDateUtc, (DateTime)returnedSession.StartDateUtc);
+        Assert.AreEqual(createDto.DurationSeconds, returnedSession.DurationSeconds);
+        Assert.AreEqual(createDto.Notes, returnedSession.Notes);
     }
 
-    private void _assertDbFromCreate(SessionCreateDto newSessionDto)
+    private void _assertDbFromCreate(SessionCreateDto createDto)
     {
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
         Assert.AreEqual(6, allSessions.Count());
         var savedSesh = allSessions.Last();
         Assert.IsNotNull(savedSesh.Id);
         Assert.AreNotEqual(Guid.Empty, savedSesh.Id);
-        Assert.AreEqual(newSessionDto.ActivityId, savedSesh.ActivityId);
-        DatesEqualWithinSeconds((DateTime)newSessionDto.StartDateUtc, (DateTime)savedSesh.StartDateUtc);
-        Assert.AreEqual(newSessionDto.DurationSeconds, savedSesh.DurationSeconds);
-        Assert.AreEqual(newSessionDto.Notes, savedSesh.Notes);
+        Assert.AreEqual(createDto.ActivityId, savedSesh.ActivityId);
+        DatesEqualWithinSeconds((DateTime)createDto.StartDateUtc, (DateTime)savedSesh.StartDateUtc);
+        Assert.AreEqual(createDto.DurationSeconds, savedSesh.DurationSeconds);
+        Assert.AreEqual(createDto.Notes, savedSesh.Notes);
     }
 
-    private void _assertReturnedFromUpdate(Guid activityId, SessionUpdateDto updateSessionDto, SessionGetDto session)
+    private void _assertReturnedFromUpdate(Guid activityId, SessionUpdateDto updateDto, SessionGetDto returnedSession)
     {
-        Assert.IsNotNull(session);
-        Assert.IsNotNull(session.Id);
-        Assert.AreNotEqual(Guid.Empty, session.Id);
-        Assert.AreEqual(activityId, session.ActivityId);
-        DatesEqualWithinSeconds((DateTime)updateSessionDto.StartDateUtc, (DateTime)session.StartDateUtc);
-        Assert.AreEqual(updateSessionDto.DurationSeconds, session.DurationSeconds);
-        Assert.AreEqual(updateSessionDto.Notes, session.Notes);
+        Assert.IsNotNull(returnedSession);
+        Assert.IsNotNull(returnedSession.Id);
+        Assert.AreNotEqual(Guid.Empty, returnedSession.Id);
+        Assert.AreEqual(activityId, returnedSession.ActivityId);
+        DatesEqualWithinSeconds((DateTime)updateDto.StartDateUtc, (DateTime)returnedSession.StartDateUtc);
+        Assert.AreEqual(updateDto.DurationSeconds, returnedSession.DurationSeconds);
+        Assert.AreEqual(updateDto.Notes, returnedSession.Notes);
     }
 
-    private void _assertDbFromUpdate(Guid sessionId, Guid activityId, SessionUpdateDto updateSessionDto)
+    private void _assertDbFromUpdate(Guid sessionId, Guid activityId, SessionUpdateDto updateDto)
     {
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
         Assert.AreEqual(5, allSessions.Count());
@@ -471,8 +471,8 @@ public class SessionServiceTests : TestBase
         Assert.IsNotNull(savedSesh.Id);
         Assert.AreNotEqual(Guid.Empty, savedSesh.Id);
         Assert.AreEqual(activityId, savedSesh.ActivityId);
-        DatesEqualWithinSeconds((DateTime)updateSessionDto.StartDateUtc, (DateTime)savedSesh.StartDateUtc);
-        Assert.AreEqual(updateSessionDto.DurationSeconds, savedSesh.DurationSeconds);
-        Assert.AreEqual(updateSessionDto.Notes, savedSesh.Notes);
+        DatesEqualWithinSeconds((DateTime)updateDto.StartDateUtc, (DateTime)savedSesh.StartDateUtc);
+        Assert.AreEqual(updateDto.DurationSeconds, savedSesh.DurationSeconds);
+        Assert.AreEqual(updateDto.Notes, savedSesh.Notes);
     }
 }

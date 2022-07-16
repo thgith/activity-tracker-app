@@ -212,15 +212,7 @@ public class ActivityServiceTests : TestBase
 
         // -- Assert --
         // Verify returned object is as expected
-        Assert.IsNotNull(activity);
-        Assert.AreEqual(actCreateDto.Name, activity.Name);
-        Assert.AreEqual(actCreateDto.Description, activity.Description);
-        DatesEqualWithinSeconds((DateTime)actCreateDto.StartDateUtc, (DateTime)activity.StartDateUtc);
-        DatesEqualWithinSeconds((DateTime)actCreateDto.DueDateUtc, (DateTime)activity.DueDateUtc);
-        DatesEqualWithinSeconds((DateTime)actCreateDto.CompletedDateUtc, (DateTime)activity.CompletedDateUtc);
-        Assert.AreEqual(actCreateDto.ColorHex, activity.ColorHex);
-        Assert.IsFalse(activity.IsArchived);
-        Assert.IsNull(activity.Tags);
+        _verifyReturnedFromCreate(actCreateDto, activity);
 
         // Verify DB changed
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
@@ -250,6 +242,102 @@ public class ActivityServiceTests : TestBase
         var activity = await activityService.CreateActivityAsync(JOHN_USER_GUID, JANE_USER_GUID, actCreateDto);
     }
 
+    [TestMethod]
+    [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", null, "2022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", null, "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", null, null, "#3366ff")]
+    // StartDateUtc null so will be UtcNow.
+    [DataRow("NEW NAME", "NEW DESC", null, null, null, "#3366ff")]
+    [TestCategory("CreateActivityAsync")]
+    public async Task CreateActivityAsync_NonAdmin_OwnActivity_Ok(
+        string name,
+        string description,
+        string startDateUtcStr,
+        string dueDateUtcStr,
+        string completedDateUtcStr,
+        string colorHex)
+    {
+        // -- Arrange --
+        DateTime.TryParse(startDateUtcStr, out var startDateUtc);
+        DateTime.TryParse(dueDateUtcStr, out var dueDateUtc);
+        DateTime.TryParse(completedDateUtcStr, out var completedDateUtc);
+
+        var actCreateDto = new ActivityCreateDto
+        {
+            Name = name,
+            Description = description,
+            StartDateUtc = startDateUtc,
+            DueDateUtc = dueDateUtc,
+            CompletedDateUtc = completedDateUtc,
+            ColorHex = colorHex,
+            Tags = null
+        };
+
+        var activityService = _createActivityService();
+
+        // -- Act --
+        var activity = await activityService.CreateActivityAsync(JOHN_USER_GUID, JOHN_USER_GUID, actCreateDto);
+
+        // -- Assert --
+        // Verify returned object is as expected
+        _verifyReturnedFromCreate(actCreateDto, activity);
+
+        // Verify DB changed
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+    }
+
+    [TestMethod]
+    // StartDateUtc null so will be UtcNow. StartDateUtc is greater than DueDateUtc.
+    [DataRow("NEW NAME", "NEW DESC", null, "1022-07-13T01:27:26Z", "3022-07-14T01:27:26Z", "#3366ff")]
+    // StartDateUtc null so will be UtcNow.  StartDateUtc is greater than CompletedDateUtc.
+    [DataRow("NEW NAME", "NEW DESC", null, "3022-07-13T01:27:26Z", "1022-07-14T01:27:26Z", "#3366ff")]
+    // None null. StartDateUtc is greater than CompletedDateUtc.
+    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", "3022-07-13T01:27:26Z", "1022-07-14T01:27:26Z", "#3366ff")]
+    // CompletedDateUtc null. StartDateUtc is greater than DueDateUtc.
+    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", "1022-07-14T01:27:26Z", null, "#3366ff")]
+    // DueDateUtc null. StartDateUtc is greater than CompletedDateUtc.
+    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", null, "1022-07-14T01:27:26Z", "#3366ff")]
+    [TestCategory("CreateActivityAsync")]
+    [TestCategory("InvalidData")]
+    [ExpectedException(typeof(InvalidDataException))]
+    public async Task CreateActivityAsync_NonAdmin_OwnActivity_ThrowInvalidData(
+        string name,
+        string description,
+        string startDateUtcStr,
+        string dueDateUtcStr,
+        string completedDateUtcStr,
+        string colorHex)
+    {
+        // -- Arrange --
+        DateTime.TryParse(startDateUtcStr, out var startDateUtc);
+        DateTime.TryParse(dueDateUtcStr, out var dueDateUtc);
+        DateTime.TryParse(completedDateUtcStr, out var completedDateUtc);
+
+        var actCreateDto = new ActivityCreateDto
+        {
+            Name = name,
+            Description = description,
+            StartDateUtc = startDateUtc,
+            DueDateUtc = dueDateUtc,
+            CompletedDateUtc = completedDateUtc,
+            ColorHex = colorHex,
+            Tags = null
+        };
+
+        var activityService = _createActivityService();
+
+        // -- Act --
+        var activity = await activityService.CreateActivityAsync(JOHN_USER_GUID, JOHN_USER_GUID, actCreateDto);
+
+        // -- Assert --
+        // Verify returned object is as expected
+        _verifyReturnedFromCreate(actCreateDto, activity);
+
+        // Verify DB changed
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+    }
+
     // TODO more tests
     #endregion CreateActivityAsync
 
@@ -257,8 +345,12 @@ public class ActivityServiceTests : TestBase
 
     [TestMethod]
     [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", null, "2022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", null, "#3366ff")]
+    [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", null, null, "#3366ff")]
+    // StartDateUtc null so will be UtcNow.
+    [DataRow("UPDATED NAME", "UPDATED DESC", null, null, null, "#3366ff")]
     [TestCategory("UpdateActivityAsync")]
-
     public async Task UpdateActivityAsync_Admin_AnothersActivity_Ok(
         string name,
         string description,
@@ -290,7 +382,47 @@ public class ActivityServiceTests : TestBase
 
         // -- Assert --
         // Verify the returned object is as expected
-        _verifyReturnedFromUpdate(actUpdateDto, activity);
+        _verifyReturnedFromUpdate(GAME_DEV_ACT_GUID, actUpdateDto, activity);
+
+        // Verify the DB is changed
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+    }
+    [TestMethod]
+    [DataRow("UPDATED NAME", "UPDATE DESC", MIN_DATE_STR, null, null, "#3366ff")]
+    [TestCategory("UpdateActivityAsync")]
+
+    public async Task UpdateActivityAsync_NonAdmin_OwnActivity_StartDateMinDate_Ok(
+        string name,
+        string description,
+        string startDateUtcStr,
+        string dueDateUtcStr,
+        string completedDateUtcStr,
+        string colorHex)
+    {
+        // -- Arrange --
+        DateTime.TryParse(startDateUtcStr, out var startDateUtc);
+        DateTime.TryParse(dueDateUtcStr, out var dueDateUtc);
+        DateTime.TryParse(completedDateUtcStr, out var completedDateUtc);
+
+        var actUpdateDto = new ActivityUpdateDto
+        {
+            Name = name,
+            Description = description,
+            StartDateUtc = startDateUtc,
+            DueDateUtc = dueDateUtc,
+            CompletedDateUtc = completedDateUtc,
+            ColorHex = colorHex,
+            Tags = null
+        };
+
+        var activityService = _createActivityService();
+
+        // -- Act --
+        var activity = await activityService.UpdateActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID, actUpdateDto);
+
+        // -- Assert --
+        // Verify the returned object is as expected
+        _verifyReturnedFromUpdate(GAME_DEV_ACT_GUID, actUpdateDto, activity);
 
         // Verify the DB is changed
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
@@ -298,6 +430,11 @@ public class ActivityServiceTests : TestBase
 
     [TestMethod]
     [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", null, "2022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", null, "#3366ff")]
+    [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", null, null, "#3366ff")]
+    // StartDateUtc null so will be UtcNow.
+    [DataRow("UPDATED NAME", "UPDATED DESC", null, null, null, "#3366ff")]
     [TestCategory("UpdateActivityAsync")]
     public async Task UpdateActivityAsync_NonAdmin_OwnActivity_Ok(
         string name,
@@ -330,7 +467,58 @@ public class ActivityServiceTests : TestBase
 
         // -- Assert --
         // Verify the returned object is as expected
-        _verifyReturnedFromUpdate(actUpdateDto, activity);
+        _verifyReturnedFromUpdate(GAME_DEV_ACT_GUID, actUpdateDto, activity);
+
+        // Verify the DB is changed
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+    }
+
+    [TestMethod]
+    // StartDateUtc null so will be UtcNow. StartDateUtc is greater than DueDateUtc.
+    [DataRow("NEW NAME", "NEW DESC", null, "1022-07-13T01:27:26Z", "3022-07-14T01:27:26Z", "#3366ff")]
+    // StartDateUtc null so will be UtcNow.  StartDateUtc is greater than CompletedDateUtc.
+    [DataRow("NEW NAME", "NEW DESC", null, "3022-07-13T01:27:26Z", "1022-07-14T01:27:26Z", "#3366ff")]
+    // None null. StartDateUtc is greater than CompletedDateUtc.
+    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", "3022-07-13T01:27:26Z", "1022-07-14T01:27:26Z", "#3366ff")]
+    // CompletedDateUtc null. StartDateUtc is greater than DueDateUtc.
+    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", "1022-07-14T01:27:26Z", null, "#3366ff")]
+    // DueDateUtc null. StartDateUtc is greater than CompletedDateUtc.
+    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", null, "1022-07-14T01:27:26Z", "#3366ff")]
+    [TestCategory("UpdateActivityAsync")]
+    [TestCategory("InvalidData")]
+    [ExpectedException(typeof(InvalidDataException))]
+    public async Task UpdateActivityAsync_NonAdmin_OwnActivity_ThrowInvalidData(
+        string name,
+        string description,
+        string startDateUtcStr,
+        string dueDateUtcStr,
+        string completedDateUtcStr,
+        string colorHex)
+    {
+        // -- Arrange --
+        DateTime.TryParse(startDateUtcStr, out var startDateUtc);
+        DateTime.TryParse(dueDateUtcStr, out var dueDateUtc);
+        DateTime.TryParse(completedDateUtcStr, out var completedDateUtc);
+
+        var actUpdateDto = new ActivityUpdateDto
+        {
+            Name = name,
+            Description = description,
+            StartDateUtc = startDateUtc,
+            DueDateUtc = dueDateUtc,
+            CompletedDateUtc = completedDateUtc,
+            ColorHex = colorHex,
+            Tags = null
+        };
+
+        var activityService = _createActivityService();
+
+        // -- Act --
+        var activity = await activityService.UpdateActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID, actUpdateDto);
+
+        // -- Assert --
+        // Verify the returned object is as expected
+        _verifyReturnedFromUpdate(GAME_DEV_ACT_GUID, actUpdateDto, activity);
 
         // Verify the DB is changed
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
@@ -483,17 +671,79 @@ public class ActivityServiceTests : TestBase
         }
     }
 
-    private void _verifyReturnedFromUpdate(ActivityUpdateDto updateDto, ActivityGetDto returnedActivity)
+    private void _verifyReturnedFromCreate(ActivityCreateDto createDto, ActivityGetDto returnedActivity)
+    {
+        Assert.IsNotNull(returnedActivity);
+        Assert.AreEqual(createDto.Name, returnedActivity.Name);
+        Assert.AreEqual(createDto.Description, returnedActivity.Description);
+        DatesEqualWithinSeconds((DateTime)createDto.StartDateUtc, (DateTime)returnedActivity.StartDateUtc);
+        _checkDueDateUtc();
+        _checkCompletedDateUtc();
+        Assert.AreEqual(createDto.ColorHex, returnedActivity.ColorHex);
+        Assert.IsFalse(returnedActivity.IsArchived);
+        Assert.IsNull(returnedActivity.Tags);
+
+        void _checkDueDateUtc()
+        {
+            if (createDto.DueDateUtc == null || createDto.DueDateUtc == DateTime.MinValue)
+            {
+                Assert.IsNull(returnedActivity.DueDateUtc);
+            }
+            else
+            {
+                Assert.IsNotNull(returnedActivity.DueDateUtc);
+                DatesEqualWithinSeconds((DateTime)createDto.DueDateUtc, (DateTime)returnedActivity.DueDateUtc);
+            }
+        }
+        void _checkCompletedDateUtc()
+        {
+            if (createDto.CompletedDateUtc == null || createDto.CompletedDateUtc == DateTime.MinValue)
+            {
+                Assert.IsNull(returnedActivity.CompletedDateUtc);
+            }
+            else
+            {
+                DatesEqualWithinSeconds((DateTime)createDto.CompletedDateUtc, (DateTime)returnedActivity.CompletedDateUtc);
+            }
+        }
+    }
+
+    private void _verifyReturnedFromUpdate(Guid activityId, ActivityUpdateDto updateDto, ActivityGetDto returnedActivity)
     {
         Assert.IsNotNull(returnedActivity);
         Assert.AreEqual(updateDto.Name, returnedActivity.Name);
         Assert.AreEqual(updateDto.Description, returnedActivity.Description);
-        // TODO: NEED TO WRAP DateTime to be able to mock it
-        // Assert.IsTrue(DatesEqualWithinSeconds((DateTime) activity.StartDateUtc, DateTime.UtcNow));
-        DatesEqualWithinSeconds((DateTime)updateDto.DueDateUtc, (DateTime)returnedActivity.DueDateUtc);
-        DatesEqualWithinSeconds((DateTime)updateDto.CompletedDateUtc, (DateTime)returnedActivity.CompletedDateUtc);
+        DatesEqualWithinSeconds((DateTime)updateDto.StartDateUtc, (DateTime)returnedActivity.StartDateUtc);
+        _checkDueDateUtc();
+        _checkCompletedDateUtc();
+
         Assert.AreEqual(updateDto.ColorHex, returnedActivity.ColorHex);
         Assert.IsFalse(returnedActivity.IsArchived);
-        Assert.AreEqual(2, returnedActivity.Tags.Count());
+        // Didn't change the tags here. TODO need to check when tags is null and tags is added and deleted
+        Assert.AreEqual(allActs.First(x => x.Id == activityId).Tags.Count(), returnedActivity.Tags.Count());
+
+        void _checkDueDateUtc()
+        {
+            if (updateDto.DueDateUtc == null || updateDto.DueDateUtc == DateTime.MinValue)
+            {
+                Assert.IsNull(returnedActivity.DueDateUtc);
+            }
+            else
+            {
+                Assert.IsNotNull(returnedActivity.DueDateUtc);
+                DatesEqualWithinSeconds((DateTime)updateDto.DueDateUtc, (DateTime)returnedActivity.DueDateUtc);
+            }
+        }
+        void _checkCompletedDateUtc()
+        {
+            if (updateDto.CompletedDateUtc == null || updateDto.CompletedDateUtc == DateTime.MinValue)
+            {
+                Assert.IsNull(returnedActivity.CompletedDateUtc);
+            }
+            else
+            {
+                DatesEqualWithinSeconds((DateTime)updateDto.CompletedDateUtc, (DateTime)returnedActivity.CompletedDateUtc);
+            }
+        }
     }
 }

@@ -221,8 +221,18 @@ public class ActivityService : IActivityService
         }
 
         // If start date is set in request, replace; otherwise, use current one stored.
-        // Technically, this should be auto set at creation, but just in case set if null
-        var startDateUtc = updatedActivityDto.StartDateUtc ?? activity.StartDateUtc ?? DateTime.UtcNow;
+        DateTime startDateUtc;
+        if (updatedActivityDto.StartDateUtc == null || updatedActivityDto.StartDateUtc == DateTime.MinValue)
+        {
+            // Technically, activity.StartDateUtc should be auto set at creation, but just in case set if null
+            // Set default start date if not specified
+            startDateUtc = activity.StartDateUtc ?? DateTime.UtcNow;
+        }
+        else
+        {
+            startDateUtc = (DateTime)updatedActivityDto.StartDateUtc;
+        }
+
         var shortenedStartDateUtc = new DateTime(startDateUtc.Year, startDateUtc.Month, startDateUtc.Day, startDateUtc.Hour, startDateUtc.Minute, startDateUtc.Second, DateTimeKind.Utc);
         activity.StartDateUtc = shortenedStartDateUtc;
 
@@ -230,7 +240,7 @@ public class ActivityService : IActivityService
         var dueDateUtc = updatedActivityDto.DueDateUtc ?? activity.DueDateUtc;
         if (dueDateUtc != null)
         {
-            // The user set the date to empty
+            // The user set the date to empty, so clear out the date
             if (updatedActivityDto.DueDateUtc == DateTime.MinValue)
             {
                 activity.DueDateUtc = null;
@@ -258,7 +268,7 @@ public class ActivityService : IActivityService
         var completedDateUtc = updatedActivityDto.CompletedDateUtc ?? activity.CompletedDateUtc;
         if (completedDateUtc != null)
         {
-            // The user set the date to empty
+            // The user set the date to empty, so clear out the date
             if (updatedActivityDto.CompletedDateUtc == DateTime.MinValue)
             {
                 activity.CompletedDateUtc = null;
