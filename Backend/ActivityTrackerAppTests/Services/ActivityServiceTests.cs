@@ -1,12 +1,9 @@
-using ActivityTrackerApp.Database;
 using ActivityTrackerApp.Entities;
 using ActivityTrackerApp.Services;
 using static ActivityTrackerAppTests.Fixtures.TestFixtures;
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
+using static ActivityTrackerAppTests.Helpers.TestHelpers;
 using Moq;
 using ActivityTrackerApp.Dtos;
-using MockQueryable.Moq;
 using ActivityTrackerApp.Exceptions;
 
 namespace ActivityTrackerAppTests;
@@ -53,6 +50,8 @@ public class ActivityServiceTests : TestBase
         _assertActivitiesSame(activitiesList[0], gameDevAct);
         _assertActivitiesSame(activitiesList[1], pianoAct);
         _assertActivitiesSame(activitiesList[2], mcatAct);
+
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 
     [TestMethod]
@@ -74,6 +73,8 @@ public class ActivityServiceTests : TestBase
         _assertActivitiesSame(activitiesList[0], gameDevAct);
         _assertActivitiesSame(activitiesList[1], pianoAct);
         _assertActivitiesSame(activitiesList[2], mcatAct);
+
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 
     [TestMethod]
@@ -107,33 +108,42 @@ public class ActivityServiceTests : TestBase
 
     #region GetActivityAsync
     [TestMethod]
+    [DataRow(GAME_DEV_ACT_GUID_STR)]
+    [DataRow(PIANO_ACT_GUID_STR)]
+    [DataRow(MCAT_ACT_GUID_STR)]
     [TestCategory("GetActivityAsync")]
-    public async Task GetActivityAsync_Admin_AnothersActivity_Ok()
+    public async Task GetActivityAsync_Admin_AnothersActivity_Ok(string activityIdStr)
     {
         // -- Arrange --
         var activityService = _createActivityService();
 
         // -- Act --
-        var activity = await activityService.GetActivityAsync(JANE_USER_GUID, GAME_DEV_ACT_GUID);
+        Guid.TryParse(activityIdStr, out var activityGuid);
+        var activity = await activityService.GetActivityAsync(JANE_USER_GUID, activityGuid);
 
         // -- Assert --
         Assert.IsNotNull(activity);
-        _assertActivitiesSame(activity, gameDevAct);
+        _assertActivitiesSame(activity, allActs.First(x => x.Id == activityGuid));
     }
 
     [TestMethod]
+    [DataRow(GAME_DEV_ACT_GUID_STR)]
+    [DataRow(PIANO_ACT_GUID_STR)]
+    [DataRow(MCAT_ACT_GUID_STR)]
     [TestCategory("GetActivityAsync")]
-    public async Task GetActivityAsync_NonAdmin_OwnActivity_Ok()
+    public async Task GetActivityAsync_NonAdmin_OwnActivity_Ok(string activityIdStr)
     {
         // -- Arrange --
         var activityService = _createActivityService();
 
         // -- Act --
-        var activity = await activityService.GetActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID);
+        Guid.TryParse(activityIdStr, out var activityGuid);
+        var activity = await activityService.GetActivityAsync(JOHN_USER_GUID, activityGuid);
 
         // -- Assert --
         Assert.IsNotNull(activity);
-        _assertActivitiesSame(activity, gameDevAct);
+        _assertActivitiesSame(activity, allActs.First(x => x.Id == activityGuid));
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 
     [TestMethod]
@@ -161,6 +171,7 @@ public class ActivityServiceTests : TestBase
 
         // -- Assert --
         Assert.IsNull(activity);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 
     #endregion GetActivityAsync
@@ -469,44 +480,44 @@ public class ActivityServiceTests : TestBase
     }
 
     private void _assertActivitiesSame(
-        ActivityGetDto activityGetDto,
-        Activity activity)
+        ActivityGetDto actualActivity,
+        Activity expectedActivity)
     {
-        Assert.IsTrue(activityGetDto != null);
-        Assert.AreEqual(activity.Id, activityGetDto.Id);
-        Assert.AreEqual(activity.OwnerId, activityGetDto.OwnerId);
-        Assert.AreEqual(activity.Name, activityGetDto.Name);
-        Assert.AreEqual(activity.Description, activityGetDto.Description);
-        Assert.AreEqual(activity.ColorHex, activityGetDto.ColorHex);
-        Assert.AreEqual(activity.IsArchived, activityGetDto.IsArchived);
+        Assert.IsTrue(actualActivity != null);
+        Assert.AreEqual(expectedActivity.Id, actualActivity.Id);
+        Assert.AreEqual(expectedActivity.OwnerId, actualActivity.OwnerId);
+        Assert.AreEqual(expectedActivity.Name, actualActivity.Name);
+        Assert.AreEqual(expectedActivity.Description, actualActivity.Description);
+        Assert.AreEqual(expectedActivity.ColorHex, actualActivity.ColorHex);
+        Assert.AreEqual(expectedActivity.IsArchived, actualActivity.IsArchived);
 
-        if (activity.Tags == null)
+        if (expectedActivity.Tags == null)
         {
-            Assert.IsNull(activityGetDto.Tags);
+            Assert.IsNull(actualActivity.Tags);
         }
         else
         {
-            Assert.IsNotNull(activityGetDto.Tags);
-            Assert.AreEqual(activity.Tags.Count(), activityGetDto.Tags.Count());
-            foreach (var tag in activity.Tags)
+            Assert.IsNotNull(actualActivity.Tags);
+            Assert.AreEqual(expectedActivity.Tags.Count(), actualActivity.Tags.Count());
+            foreach (var tag in expectedActivity.Tags)
             {
-                activityGetDto.Tags.Contains(tag);
+                actualActivity.Tags.Contains(tag);
             }
-            foreach (var tag in activityGetDto.Tags)
+            foreach (var tag in actualActivity.Tags)
             {
-                activity.Tags.Contains(tag);
+                expectedActivity.Tags.Contains(tag);
             }
         }
 
         // Check that the dates are equal within a minute
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)activityGetDto.StartDateUtc, DateTime.UtcNow));
-        if (activityGetDto.DueDateUtc != null)
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)actualActivity.StartDateUtc, DateTime.UtcNow));
+        if (actualActivity.DueDateUtc != null)
         {
-            Assert.IsTrue(DatesEqualWithinSeconds((DateTime)activityGetDto.DueDateUtc, DateTime.UtcNow));
+            Assert.IsTrue(DatesEqualWithinSeconds((DateTime)actualActivity.DueDateUtc, DateTime.UtcNow));
         }
-        if (activityGetDto.CompletedDateUtc != null)
+        if (actualActivity.CompletedDateUtc != null)
         {
-            Assert.IsTrue(DatesEqualWithinSeconds((DateTime)activityGetDto.CompletedDateUtc, DateTime.UtcNow, 60));
+            Assert.IsTrue(DatesEqualWithinSeconds((DateTime)actualActivity.CompletedDateUtc, DateTime.UtcNow, 60));
         }
     }
 }

@@ -128,9 +128,9 @@ public abstract class TestBase
     {
         mapperMock = new Mock<IMapper>();
 
+        // Activity Get mapping
         mapperMock.Setup(x => x.Map<ActivityGetDto>(It.Is<Activity>(x => x == null)))
             .Returns<ActivityGetDto>(null);
-
         mapperMock.Setup(x => x.Map<ActivityGetDto>(It.Is<Activity>(x => x != null)))
             .Returns((Activity activity) =>
                 new ActivityGetDto
@@ -144,8 +144,35 @@ public abstract class TestBase
                     CompletedDateUtc = activity.CompletedDateUtc,
                     IsArchived = activity.IsArchived,
                     ColorHex = activity.ColorHex,
-                    Tags = activity.Tags,
+                    Tags = activity.Tags
                 });
+
+        // Session 
+        mapperMock.Setup(x => x.Map<Session>(It.Is<SessionCreateDto>(x => x == null)))
+            .Returns<Session>(null);
+        mapperMock.Setup(x => x.Map<Session>(It.Is<SessionCreateDto>(x => x != null)))
+            .Returns((SessionCreateDto sessionCreateDto) =>
+                new Session
+                {
+                    ActivityId = sessionCreateDto.ActivityId,
+                    StartDateUtc = (DateTime)sessionCreateDto.StartDateUtc,
+                    DurationSeconds = sessionCreateDto.DurationSeconds,
+                    Notes = sessionCreateDto.Notes
+                });
+
+        // Session Get mapping
+        mapperMock.Setup(x => x.Map<Session>(It.Is<Session>(x => x == null)))
+            .Returns<SessionGetDto>(null);
+        mapperMock.Setup(x => x.Map<SessionGetDto>(It.IsAny<Session>()))
+                    .Returns((Session session) =>
+                        new SessionGetDto
+                        {
+                            Id = session.Id,
+                            ActivityId = session.ActivityId,
+                            StartDateUtc = (DateTime)session.StartDateUtc,
+                            DurationSeconds = session.DurationSeconds,
+                            Notes = session.Notes
+                        });
     }
 
     private void _setUpServiceMocks()
