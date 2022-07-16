@@ -27,26 +27,6 @@ public class SessionServiceTests : TestBase
     public async Task GetAllSessionsByActivityIdAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
-        mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh1))
-                    .Returns(new SessionGetDto
-                    {
-                        Id = gameDevSesh1.Id,
-                        ActivityId = gameDevSesh1.ActivityId,
-                        StartDateUtc = (DateTime)gameDevSesh1.StartDateUtc,
-                        DurationSeconds = gameDevSesh1.DurationSeconds,
-                        Notes = gameDevSesh1.Notes
-                    });
-
-        mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh2))
-                    .Returns(new SessionGetDto
-                    {
-                        Id = gameDevSesh2.Id,
-                        ActivityId = gameDevSesh2.ActivityId,
-                        StartDateUtc = (DateTime)gameDevSesh2.StartDateUtc,
-                        DurationSeconds = gameDevSesh2.DurationSeconds,
-                        Notes = gameDevSesh2.Notes
-                    });
-
         var sessionService = _createSessionService();
 
         // -- Act --
@@ -67,26 +47,6 @@ public class SessionServiceTests : TestBase
     public async Task GetAllSessionsByActivityIdAsync_NonAdmin_OwnSession_Ok()
     {
         // -- Arrange --
-        mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh1))
-                    .Returns(new SessionGetDto
-                    {
-                        Id = gameDevSesh1.Id,
-                        ActivityId = gameDevSesh1.ActivityId,
-                        StartDateUtc = (DateTime)gameDevSesh1.StartDateUtc,
-                        DurationSeconds = gameDevSesh1.DurationSeconds,
-                        Notes = gameDevSesh1.Notes
-                    });
-
-        mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh2))
-                    .Returns(new SessionGetDto
-                    {
-                        Id = gameDevSesh2.Id,
-                        ActivityId = gameDevSesh2.ActivityId,
-                        StartDateUtc = (DateTime)gameDevSesh2.StartDateUtc,
-                        DurationSeconds = gameDevSesh2.DurationSeconds,
-                        Notes = gameDevSesh2.Notes
-                    });
-
         var sessionService = _createSessionService();
 
         // -- Act --
@@ -122,16 +82,6 @@ public class SessionServiceTests : TestBase
     public async Task GetSessionAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
-        mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh1))
-                    .Returns(new SessionGetDto
-                    {
-                        Id = gameDevSesh1.Id,
-                        ActivityId = gameDevSesh1.ActivityId,
-                        StartDateUtc = (DateTime)gameDevSesh1.StartDateUtc,
-                        DurationSeconds = gameDevSesh1.DurationSeconds,
-                        Notes = gameDevSesh1.Notes
-                    });
-
         var sessionService = _createSessionService();
 
         // -- Act --
@@ -150,16 +100,6 @@ public class SessionServiceTests : TestBase
     public async Task GetSessionAsync_NonAdmin_OwnSession_Ok()
     {
         // -- Arrange --
-        mapperMock.Setup(x => x.Map<SessionGetDto>(gameDevSesh1))
-                    .Returns(new SessionGetDto
-                    {
-                        Id = gameDevSesh1.Id,
-                        ActivityId = gameDevSesh1.ActivityId,
-                        StartDateUtc = (DateTime)gameDevSesh1.StartDateUtc,
-                        DurationSeconds = gameDevSesh1.DurationSeconds,
-                        Notes = gameDevSesh1.Notes
-                    });
-
         var sessionService = _createSessionService();
 
         // -- Act --
@@ -209,26 +149,6 @@ public class SessionServiceTests : TestBase
         // Replicate the save setting a new GUID for the new session
         dbContextMock.Setup(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()))
                         .Callback((CancellationToken _) => { allSessions.Last().Id = Guid.NewGuid(); });
-
-        mapperMock.Setup(x => x.Map<Session>(newSessionDto))
-                    .Returns(new Session
-                    {
-                        ActivityId = newSessionDto.ActivityId,
-                        StartDateUtc = (DateTime)newSessionDto.StartDateUtc,
-                        DurationSeconds = newSessionDto.DurationSeconds,
-                        Notes = newSessionDto.Notes
-                    });
-
-        mapperMock.Setup(x => x.Map<SessionGetDto>(It.IsAny<Session>()))
-                    .Returns((Session session) =>
-                        new SessionGetDto
-                        {
-                            Id = session.Id,
-                            ActivityId = session.ActivityId,
-                            StartDateUtc = (DateTime)session.StartDateUtc,
-                            DurationSeconds = session.DurationSeconds,
-                            Notes = session.Notes
-                        });
 
         var sessionService = _createSessionService();
 
@@ -347,14 +267,6 @@ public class SessionServiceTests : TestBase
             DurationSeconds = durationSeconds,
             Notes = notes
         };
-
-        mapperMock.Setup(x => x.Map<Session>(updateSessionDto))
-                    .Returns(new Session
-                    {
-                        StartDateUtc = (DateTime)updateSessionDto.StartDateUtc,
-                        DurationSeconds = (uint)updateSessionDto.DurationSeconds,
-                        Notes = updateSessionDto.Notes
-                    });
 
         var sessionService = _createSessionService();
 
