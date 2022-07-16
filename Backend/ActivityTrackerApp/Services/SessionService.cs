@@ -134,6 +134,19 @@ public class SessionService : ISessionService
         // Convert DTO to entity
         var session = _mapper.Map<Session>(newSessionDto);
 
+        DateTime startDateUtc;
+        // Set default start date if not specified
+        if (newSessionDto.StartDateUtc == null || newSessionDto.StartDateUtc == DateTime.MinValue)
+        {
+            startDateUtc = DateTime.UtcNow;
+        }
+        else
+        {
+            startDateUtc = (DateTime)newSessionDto.StartDateUtc;
+        }
+        var shortenedStartDateUtc = new DateTime(startDateUtc.Year, startDateUtc.Month, startDateUtc.Day, startDateUtc.Hour, startDateUtc.Minute, startDateUtc.Second, DateTimeKind.Utc);
+        session.StartDateUtc = shortenedStartDateUtc;
+
         // Add session
         await _dbContext.Sessions.AddAsync(session);
 
