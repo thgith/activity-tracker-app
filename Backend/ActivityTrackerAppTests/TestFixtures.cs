@@ -5,6 +5,8 @@ namespace ActivityTrackerAppTests.Fixtures;
 
 public static class TestFixtures
 {
+    public const string PREHISTORIC_DATE_STR = "1022-07-13T01:27:26Z";
+    public const string FUTURE_DATE_STR = "3022-07-13T01:27:26Z";
     public const string MIN_DATE_STR = "1/1/0001 12:00:00 AM";
 
     // NOTE: These are just random GUIDs

@@ -9,12 +9,6 @@ using ActivityTrackerApp.Exceptions;
 namespace ActivityTrackerAppTests;
 
 // TODO: Need to test diff data edge cases
-// TODO test 
-//  startDateUtc null
-//  startDateUtc > dueDateUtc
-//  startDateUtc > completedDateUtc
-//  startDateUtc is MIN_DATE
-//  etc other paths
 // NOTE: Prob should add more checks to check side effects (call count, etc)
 [TestClass]
 public class ActivityServiceTests : TestBase
@@ -243,6 +237,7 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
+    [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", "2022-07-12T01:27:26Z", "2022-07-12T01:27:26Z", "#3366ff")]
     [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
     [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", null, "2022-07-14T01:27:26Z", "#3366ff")]
     [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", null, "#3366ff")]
@@ -289,15 +284,15 @@ public class ActivityServiceTests : TestBase
 
     [TestMethod]
     // StartDateUtc null so will be UtcNow. StartDateUtc is greater than DueDateUtc.
-    [DataRow("NEW NAME", "NEW DESC", null, "1022-07-13T01:27:26Z", "3022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", null, PREHISTORIC_DATE_STR, FUTURE_DATE_STR, "#3366ff")]
     // StartDateUtc null so will be UtcNow.  StartDateUtc is greater than CompletedDateUtc.
-    [DataRow("NEW NAME", "NEW DESC", null, "3022-07-13T01:27:26Z", "1022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", null, FUTURE_DATE_STR, PREHISTORIC_DATE_STR, "#3366ff")]
     // None null. StartDateUtc is greater than CompletedDateUtc.
-    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", "3022-07-13T01:27:26Z", "1022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", FUTURE_DATE_STR, PREHISTORIC_DATE_STR, "#3366ff")]
     // CompletedDateUtc null. StartDateUtc is greater than DueDateUtc.
-    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", "1022-07-14T01:27:26Z", null, "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", PREHISTORIC_DATE_STR, null, "#3366ff")]
     // DueDateUtc null. StartDateUtc is greater than CompletedDateUtc.
-    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", null, "1022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", null, PREHISTORIC_DATE_STR, "#3366ff")]
     [TestCategory("CreateActivityAsync")]
     [TestCategory("InvalidData")]
     [ExpectedException(typeof(InvalidDataException))]
@@ -344,6 +339,7 @@ public class ActivityServiceTests : TestBase
     #region UpdateActivityAsync
 
     [TestMethod]
+    [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-12T01:27:26Z", "2022-07-12T01:27:26Z", "#3366ff")]
     [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
     [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", null, "2022-07-14T01:27:26Z", "#3366ff")]
     [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", null, "#3366ff")]
@@ -429,6 +425,7 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
+    [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-12T01:27:26Z", "2022-07-12T01:27:26Z", "#3366ff")]
     [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
     [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", null, "2022-07-14T01:27:26Z", "#3366ff")]
     [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", null, "#3366ff")]
@@ -475,15 +472,15 @@ public class ActivityServiceTests : TestBase
 
     [TestMethod]
     // StartDateUtc null so will be UtcNow. StartDateUtc is greater than DueDateUtc.
-    [DataRow("NEW NAME", "NEW DESC", null, "1022-07-13T01:27:26Z", "3022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", null, PREHISTORIC_DATE_STR, FUTURE_DATE_STR, "#3366ff")]
     // StartDateUtc null so will be UtcNow.  StartDateUtc is greater than CompletedDateUtc.
-    [DataRow("NEW NAME", "NEW DESC", null, "3022-07-13T01:27:26Z", "1022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", null, FUTURE_DATE_STR, PREHISTORIC_DATE_STR, "#3366ff")]
     // None null. StartDateUtc is greater than CompletedDateUtc.
-    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", "3022-07-13T01:27:26Z", "1022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", FUTURE_DATE_STR, PREHISTORIC_DATE_STR, "#3366ff")]
     // CompletedDateUtc null. StartDateUtc is greater than DueDateUtc.
-    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", "1022-07-14T01:27:26Z", null, "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", PREHISTORIC_DATE_STR, null, "#3366ff")]
     // DueDateUtc null. StartDateUtc is greater than CompletedDateUtc.
-    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", null, "1022-07-14T01:27:26Z", "#3366ff")]
+    [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", null, PREHISTORIC_DATE_STR, "#3366ff")]
     [TestCategory("UpdateActivityAsync")]
     [TestCategory("InvalidData")]
     [ExpectedException(typeof(InvalidDataException))]
