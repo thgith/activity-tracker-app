@@ -147,18 +147,22 @@ public abstract class TestBase
                     Tags = activity.Tags
                 });
 
-        // Session 
-        mapperMock.Setup(x => x.Map<Session>(It.Is<SessionCreateDto>(x => x == null)))
-            .Returns<Session>(null);
-        mapperMock.Setup(x => x.Map<Session>(It.Is<SessionCreateDto>(x => x != null)))
-            .Returns((SessionCreateDto sessionCreateDto) =>
-                new Session
-                {
-                    ActivityId = sessionCreateDto.ActivityId,
-                    StartDateUtc = (DateTime)sessionCreateDto.StartDateUtc,
-                    DurationSeconds = sessionCreateDto.DurationSeconds,
-                    Notes = sessionCreateDto.Notes
-                });
+        // Activity Create mapping
+        mapperMock.Setup(x => x.Map<Activity>(It.Is<ActivityCreateDto>(x => x == null)))
+                    .Returns<Activity>(null);
+        mapperMock.Setup(x => x.Map<Activity>(It.Is<ActivityCreateDto>(x => x != null)))
+                    .Returns((ActivityCreateDto actCreateDto) =>
+                    new Activity
+                    {
+                        Name = actCreateDto.Name,
+                        Description = actCreateDto.Description,
+                        StartDateUtc = actCreateDto.StartDateUtc,
+                        DueDateUtc = actCreateDto.DueDateUtc,
+                        CompletedDateUtc = actCreateDto.CompletedDateUtc,
+                        IsArchived = false,
+                        ColorHex = actCreateDto.ColorHex,
+                        Tags = actCreateDto.Tags,
+                    });
 
         // Session Get mapping
         mapperMock.Setup(x => x.Map<Session>(It.Is<Session>(x => x == null)))
@@ -173,6 +177,19 @@ public abstract class TestBase
                             DurationSeconds = session.DurationSeconds,
                             Notes = session.Notes
                         });
+                        
+        // Session Create mapping
+        mapperMock.Setup(x => x.Map<Session>(It.Is<SessionCreateDto>(x => x == null)))
+            .Returns<Session>(null);
+        mapperMock.Setup(x => x.Map<Session>(It.Is<SessionCreateDto>(x => x != null)))
+            .Returns((SessionCreateDto sessionCreateDto) =>
+                new Session
+                {
+                    ActivityId = sessionCreateDto.ActivityId,
+                    StartDateUtc = (DateTime)sessionCreateDto.StartDateUtc,
+                    DurationSeconds = sessionCreateDto.DurationSeconds,
+                    Notes = sessionCreateDto.Notes
+                });
     }
 
     private void _setUpServiceMocks()

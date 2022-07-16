@@ -179,37 +179,31 @@ public class ActivityServiceTests : TestBase
     #region CreateActivityAsync
 
     [TestMethod]
+    [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
     [TestCategory("CreateActivityAsync")]
-    public async Task CreateActivityAsync_Admin_AnothersActivity_Ok()
+    public async Task CreateActivityAsync_Admin_AnothersActivity_Ok(
+        string name,
+        string description,
+        string startDateUtcStr,
+        string dueDateUtcStr,
+        string completedDateUtcStr,
+        string colorHex)
     {
         // -- Arrange --
+        DateTime.TryParse(startDateUtcStr, out var startDateUtc);
+        DateTime.TryParse(dueDateUtcStr, out var dueDateUtc);
+        DateTime.TryParse(completedDateUtcStr, out var completedDateUtc);
+
         var actCreateDto = new ActivityCreateDto
         {
-            Name = "NEW ACT",
-            Description = "A new activity",
-            StartDateUtc = null,
-            DueDateUtc = null,
-            CompletedDateUtc = null,
-            ColorHex = "#f00000",
+            Name = name,
+            Description = description,
+            StartDateUtc = startDateUtc,
+            DueDateUtc = dueDateUtc,
+            CompletedDateUtc = completedDateUtc,
+            ColorHex = colorHex,
             Tags = null
         };
-
-        var actEntity = new Activity
-        {
-            Id = Guid.NewGuid(),
-            OwnerId = JOHN_USER_GUID,
-            Name = actCreateDto.Name,
-            Description = actCreateDto.Description,
-            StartDateUtc = actCreateDto.StartDateUtc,
-            DueDateUtc = actCreateDto.DueDateUtc,
-            CompletedDateUtc = actCreateDto.CompletedDateUtc,
-            IsArchived = false,
-            ColorHex = actCreateDto.ColorHex,
-            Tags = actCreateDto.Tags,
-        };
-
-        mapperMock.Setup(x => x.Map<Activity>(actCreateDto))
-                    .Returns(actEntity);
 
         var activityService = _createActivityService();
 
@@ -221,10 +215,9 @@ public class ActivityServiceTests : TestBase
         Assert.IsNotNull(activity);
         Assert.AreEqual(actCreateDto.Name, activity.Name);
         Assert.AreEqual(actCreateDto.Description, activity.Description);
-        // TODO: NEED TO WRAP DateTime to be able to mock it
-        // Assert.IsTrue(DatesEqualWithinSeconds((DateTime) activity.StartDateUtc, DateTime.UtcNow));
-        Assert.IsNull(activity.DueDateUtc);
-        Assert.IsNull(activity.CompletedDateUtc);
+        DatesEqualWithinSeconds((DateTime)actCreateDto.StartDateUtc, (DateTime)activity.StartDateUtc);
+        DatesEqualWithinSeconds((DateTime)actCreateDto.DueDateUtc, (DateTime)activity.DueDateUtc);
+        DatesEqualWithinSeconds((DateTime)actCreateDto.CompletedDateUtc, (DateTime)activity.CompletedDateUtc);
         Assert.AreEqual(actCreateDto.ColorHex, activity.ColorHex);
         Assert.IsFalse(activity.IsArchived);
         Assert.IsNull(activity.Tags);
@@ -263,38 +256,32 @@ public class ActivityServiceTests : TestBase
     #region UpdateActivityAsync
 
     [TestMethod]
+    [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
     [TestCategory("UpdateActivityAsync")]
 
-    public async Task UpdateActivityAsync_Admin_AnothersActivity_Ok()
+    public async Task UpdateActivityAsync_Admin_AnothersActivity_Ok(
+        string name,
+        string description,
+        string startDateUtcStr,
+        string dueDateUtcStr,
+        string completedDateUtcStr,
+        string colorHex)
     {
         // -- Arrange --
+        DateTime.TryParse(startDateUtcStr, out var startDateUtc);
+        DateTime.TryParse(dueDateUtcStr, out var dueDateUtc);
+        DateTime.TryParse(completedDateUtcStr, out var completedDateUtc);
+
         var actUpdateDto = new ActivityUpdateDto
         {
-            Name = "UPDATE GAME ACT",
-            Description = "A new activity",
-            StartDateUtc = DateTime.UtcNow.AddDays(-3),
-            DueDateUtc = DateTime.UtcNow.AddDays(-2),
-            CompletedDateUtc = DateTime.UtcNow.AddDays(-1),
-            ColorHex = "#3366ff",
+            Name = name,
+            Description = description,
+            StartDateUtc = startDateUtc,
+            DueDateUtc = dueDateUtc,
+            CompletedDateUtc = completedDateUtc,
+            ColorHex = colorHex,
             Tags = null
         };
-
-        var actEntity = new Activity
-        {
-            Id = Guid.NewGuid(),
-            OwnerId = JOHN_USER_GUID,
-            Name = actUpdateDto.Name,
-            Description = actUpdateDto.Description,
-            StartDateUtc = actUpdateDto.StartDateUtc,
-            DueDateUtc = actUpdateDto.DueDateUtc,
-            CompletedDateUtc = actUpdateDto.CompletedDateUtc,
-            IsArchived = false,
-            ColorHex = actUpdateDto.ColorHex,
-            Tags = actUpdateDto.Tags,
-        };
-
-        mapperMock.Setup(x => x.Map<Activity>(actUpdateDto))
-                    .Returns(actEntity);
 
         var activityService = _createActivityService();
 
@@ -303,53 +290,38 @@ public class ActivityServiceTests : TestBase
 
         // -- Assert --
         // Verify the returned object is as expected
-        Assert.IsNotNull(activity);
-        Assert.AreEqual(actUpdateDto.Name, activity.Name);
-        Assert.AreEqual(actUpdateDto.Description, activity.Description);
-        // TODO: NEED TO WRAP DateTime to be able to mock it
-        // Assert.IsTrue(DatesEqualWithinSeconds((DateTime) activity.StartDateUtc, DateTime.UtcNow));
-        DatesEqualWithinSeconds((DateTime)actUpdateDto.DueDateUtc, (DateTime)activity.DueDateUtc);
-        DatesEqualWithinSeconds((DateTime)actUpdateDto.CompletedDateUtc, (DateTime)activity.CompletedDateUtc);
-        Assert.AreEqual(actUpdateDto.ColorHex, activity.ColorHex);
-        Assert.IsFalse(activity.IsArchived);
-        Assert.AreEqual(2, activity.Tags.Count());
+        _verifyReturnedFromUpdate(actUpdateDto, activity);
 
         // Verify the DB is changed
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
     }
 
     [TestMethod]
+    [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
     [TestCategory("UpdateActivityAsync")]
-    public async Task UpdateActivityAsync_NonAdmin_OwnActivity_Ok()
+    public async Task UpdateActivityAsync_NonAdmin_OwnActivity_Ok(
+        string name,
+        string description,
+        string startDateUtcStr,
+        string dueDateUtcStr,
+        string completedDateUtcStr,
+        string colorHex)
     {
         // -- Arrange --
+        DateTime.TryParse(startDateUtcStr, out var startDateUtc);
+        DateTime.TryParse(dueDateUtcStr, out var dueDateUtc);
+        DateTime.TryParse(completedDateUtcStr, out var completedDateUtc);
+
         var actUpdateDto = new ActivityUpdateDto
         {
-            Name = "UPDATE GAME ACT",
-            Description = "A new activity",
-            StartDateUtc = DateTime.UtcNow.AddDays(-3),
-            DueDateUtc = DateTime.UtcNow.AddDays(-2),
-            CompletedDateUtc = DateTime.UtcNow.AddDays(-1),
-            ColorHex = "#3366ff",
+            Name = name,
+            Description = description,
+            StartDateUtc = startDateUtc,
+            DueDateUtc = dueDateUtc,
+            CompletedDateUtc = completedDateUtc,
+            ColorHex = colorHex,
             Tags = null
         };
-
-        var actEntity = new Activity
-        {
-            Id = Guid.NewGuid(),
-            OwnerId = JOHN_USER_GUID,
-            Name = actUpdateDto.Name,
-            Description = actUpdateDto.Description,
-            StartDateUtc = actUpdateDto.StartDateUtc,
-            DueDateUtc = actUpdateDto.DueDateUtc,
-            CompletedDateUtc = actUpdateDto.CompletedDateUtc,
-            IsArchived = false,
-            ColorHex = actUpdateDto.ColorHex,
-            Tags = actUpdateDto.Tags,
-        };
-
-        mapperMock.Setup(x => x.Map<Activity>(actUpdateDto))
-                    .Returns(actEntity);
 
         var activityService = _createActivityService();
 
@@ -358,16 +330,7 @@ public class ActivityServiceTests : TestBase
 
         // -- Assert --
         // Verify the returned object is as expected
-        Assert.IsNotNull(activity);
-        Assert.AreEqual(actUpdateDto.Name, activity.Name);
-        Assert.AreEqual(actUpdateDto.Description, activity.Description);
-        // TODO: NEED TO WRAP DateTime to be able to mock it
-        // Assert.IsTrue(DatesEqualWithinSeconds((DateTime) activity.StartDateUtc, DateTime.UtcNow));
-        DatesEqualWithinSeconds((DateTime)actUpdateDto.DueDateUtc, (DateTime)activity.DueDateUtc);
-        DatesEqualWithinSeconds((DateTime)actUpdateDto.CompletedDateUtc, (DateTime)activity.CompletedDateUtc);
-        Assert.AreEqual(actUpdateDto.ColorHex, activity.ColorHex);
-        Assert.IsFalse(activity.IsArchived);
-        Assert.AreEqual(2, activity.Tags.Count());
+        _verifyReturnedFromUpdate(actUpdateDto, activity);
 
         // Verify the DB is changed
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
@@ -424,7 +387,6 @@ public class ActivityServiceTests : TestBase
         Assert.IsNotNull(gameDevSesh2.DeletedDateUtc);
         Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
         Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh2.DeletedDateUtc, DateTime.UtcNow));
-
     }
 
     [TestMethod]
@@ -447,7 +409,7 @@ public class ActivityServiceTests : TestBase
     public async Task DeleteActivityAsync_NonAdmin_OwnActivity_Ok()
     {
         // -- Arrange --
-        var activityService =_createActivityService();
+        var activityService = _createActivityService();
 
         // -- Act --
         var isSuccessful = await activityService.DeleteActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID);
@@ -519,5 +481,19 @@ public class ActivityServiceTests : TestBase
         {
             Assert.IsTrue(DatesEqualWithinSeconds((DateTime)actualActivity.CompletedDateUtc, DateTime.UtcNow, 60));
         }
+    }
+
+    private void _verifyReturnedFromUpdate(ActivityUpdateDto updateDto, ActivityGetDto returnedActivity)
+    {
+        Assert.IsNotNull(returnedActivity);
+        Assert.AreEqual(updateDto.Name, returnedActivity.Name);
+        Assert.AreEqual(updateDto.Description, returnedActivity.Description);
+        // TODO: NEED TO WRAP DateTime to be able to mock it
+        // Assert.IsTrue(DatesEqualWithinSeconds((DateTime) activity.StartDateUtc, DateTime.UtcNow));
+        DatesEqualWithinSeconds((DateTime)updateDto.DueDateUtc, (DateTime)returnedActivity.DueDateUtc);
+        DatesEqualWithinSeconds((DateTime)updateDto.CompletedDateUtc, (DateTime)returnedActivity.CompletedDateUtc);
+        Assert.AreEqual(updateDto.ColorHex, returnedActivity.ColorHex);
+        Assert.IsFalse(returnedActivity.IsArchived);
+        Assert.AreEqual(2, returnedActivity.Tags.Count());
     }
 }

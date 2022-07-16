@@ -130,16 +130,30 @@ public class SessionServiceTests : TestBase
 
     #region CreateSessionAsync
     [TestMethod]
+    [DataRow(GAME_DEV_ACT_GUID_STR, "", (uint)0, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_ACT_GUID_STR, "", (uint)0, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_ACT_GUID_STR, "", (uint)60, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_ACT_GUID_STR, "", (uint)200, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_ACT_GUID_STR, "", (uint)999999999, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_ACT_GUID_STR, "2022-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_ACT_GUID_STR, "1753-01-01T00:00:00Z", (uint)200, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_ACT_GUID_STR, "2025-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
     [TestCategory("CreateSessionAsync")]
-    public async Task CreateSessionAsync_Admin_AnothersSession_Ok()
+    public async Task CreateSessionAsync_Admin_AnothersSession_Ok(
+        string activityIdStr,
+        string startDateUtcStr,
+        uint durationSeconds,
+        string notes)
     {
         // -- Arrange --
+        Guid.TryParse(activityIdStr, out var activityGuid);
+        DateTime.TryParse(startDateUtcStr, out var startDateUtc);
         var newSessionDto = new SessionCreateDto
         {
-            ActivityId = GAME_DEV_ACT_GUID,
-            StartDateUtc = DateTime.UtcNow,
-            DurationSeconds = 155,
-            Notes = "notes"
+            ActivityId = activityGuid,
+            StartDateUtc = startDateUtc,
+            DurationSeconds = durationSeconds,
+            Notes = notes
         };
 
         // Replicate the add adding to the DB collection
@@ -188,8 +202,14 @@ public class SessionServiceTests : TestBase
 
     #region UpdateSessionAsync
     [TestMethod]
-    [DataRow(GAME_DEV_SESH1_GUID_STR, "", (uint)255, SHORT_GENERIC_NOTES)]
-    [DataRow(GAME_DEV_SESH2_GUID_STR, "", (uint)255, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_SESH1_GUID_STR, "", (uint)0, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_SESH2_GUID_STR, "", (uint)0, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_SESH1_GUID_STR, "", (uint)60, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_SESH1_GUID_STR, "", (uint)200, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_SESH1_GUID_STR, "", (uint)999999999, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_SESH1_GUID_STR, "2022-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_SESH1_GUID_STR, "1753-01-01T00:00:00Z", (uint)200, SHORT_GENERIC_NOTES)]
+    [DataRow(GAME_DEV_SESH1_GUID_STR, "2025-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
     [TestCategory("UpdateSessionAsync")]
     public async Task UpdateSessionAsync_Admin_AnothersSession_Ok(
         string sessionIdStr,
