@@ -133,6 +133,7 @@ public class UserServiceTests
 
     #region GetAllUsersAsync
     [TestMethod]
+    [TestCategory(nameof(UserService.GetAllUsersAsync))]
     public async Task GetAllUsersAsync_Admin_Ok()
     {
         // -- Arrange --
@@ -155,6 +156,8 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.GetAllUsersAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task GetAllUsersAsync_NotAdmin_ThrowForbidden()
     {
@@ -166,6 +169,7 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.GetUserAsync))]
     public async Task GetUserAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
@@ -185,6 +189,7 @@ public class UserServiceTests
 
     #region GetUserAsync
     [TestMethod]
+    [TestCategory(nameof(UserService.GetUserAsync))]
     public async Task GetUserAsync_Admin_AnotherNonExistentUser_ReturnNull()
     {
         // -- Arrange --
@@ -201,6 +206,7 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.GetUserAsync))]
     public async Task GetUserAsync_Admin_AnotherDeletedUser_ReturnNull()
     {
         // -- Arrange --
@@ -217,6 +223,7 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.GetUserAsync))]
     public async Task GetUserAsync_NonAdmin_SameUser_Ok()
     {
         // -- Arrange --
@@ -234,6 +241,8 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.GetUserAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task GetUserAsync_NonAdmin_AnotherUser_ThrowForbidden()
     {
@@ -252,6 +261,7 @@ public class UserServiceTests
     // The model annotations and some ctrl checks handle a lot of the err
     // checking, so for now this is fine.
     [TestMethod]
+    [TestCategory(nameof(UserService.RegisterUserAsync))]
     public async Task RegisterUserAsync_Ok()
     {
         // -- Arrange --
@@ -310,6 +320,8 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.RegisterUserAsync))]
+    [TestCategory(nameof(InvalidDataException))]
     [ExpectedException(typeof(InvalidDataException))]
     public async Task RegisterUserAsync_NullObject_ThrowInvalidData()
     {
@@ -323,6 +335,7 @@ public class UserServiceTests
 
     #region UpdateUserAsync
     [TestMethod]
+    [TestCategory(nameof(UserService.UpdateUserAsync))]
     public async Task UpdateUserAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
@@ -357,6 +370,7 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.UpdateUserAsync))]
     public async Task UpdateUserAsync_NonAdmin_SameUser_Ok()
     {
         // -- Arrange --
@@ -391,29 +405,25 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.UpdateUserAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task UpdateUserAsync_NonAdmin_AnotherUser_ThrowForbidden()
     {
         // -- Arrange --
         var userService = _createUserService();
 
-        var userUpdateDto = new UserUpdateDto
-        {
-            FirstName = NEW_FIRST_NAME,
-            LastName = NEW_LAST_NAME,
-            Email = NEW_EMAIL,
-            Password = NEW_PASSWORD
-        };
-
         // -- Act --
         var returnedDto = await userService.UpdateUserAsync(
             JOHN_USER_GUID,
             JANE_USER_GUID,
-            userUpdateDto
+            new UserUpdateDto()
         );
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.UpdateUserAsync))]
+    [TestCategory(nameof(InvalidDataException))]
     [ExpectedException(typeof(InvalidDataException))]
     public async Task UpdateUserAsync_NonAdmin_SameUser_NullUpdateObject_ThrowInvalidData()
     {
@@ -429,18 +439,17 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.UpdateUserAsync))]
     public async Task UpdateUserAsync_NonAdmin_SameUser_EmptyUpdateObject_Ok()
     {
         // -- Arrange --
         var userService = _createUserService();
 
-        var userUpdateDto = new UserUpdateDto();
-
         // -- Act --
         var returnedDto = await userService.UpdateUserAsync(
             JOHN_USER_GUID,
             JOHN_USER_GUID,
-            userUpdateDto
+            new UserUpdateDto()
         );
 
         // -- Assert --
@@ -456,6 +465,7 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.UpdateUserAsync))]
     public async Task UpdateUserAsync_Admin_NonexistentUser_ReturnNull()
     {
         // -- Arrange --
@@ -479,6 +489,7 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.UpdateUserAsync))]
     public async Task UpdateUserAsync_Admin_DeletedUser_ReturnNull()
     {
         // -- Arrange --
@@ -509,6 +520,7 @@ public class UserServiceTests
     #region DeleteUserAsync
     // TODO check deletes cascade for activities and sessions
     [TestMethod]
+    [TestCategory(nameof(UserService.DeleteUserAsync))]
     public async Task DeleteUserAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
@@ -521,11 +533,12 @@ public class UserServiceTests
         Assert.IsTrue(isSuccess);
         Assert.IsNotNull(_johnUser.DeletedDateUtc);
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-        // Check that the dates are equal within a minute
+        // Check that the dates are equal within a threshold
         Assert.IsTrue(DatesEqualWithinSeconds((DateTime)_johnUser.DeletedDateUtc, DateTime.UtcNow));
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.DeleteUserAsync))]
     public async Task DeleteUserAsync_Admin_AnotherNonExistentUser_ReturnFalse()
     {
         // -- Arrange --
@@ -540,6 +553,7 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.DeleteUserAsync))]
     public async Task DeleteUserAsync_Admin_AnotherDeletedUser_ReturnFalse()
     {
         // -- Arrange --
@@ -554,6 +568,7 @@ public class UserServiceTests
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.DeleteUserAsync))]
     public async Task DeleteUserAsync_NonAdmin_SameUser_Ok()
     {
         // -- Arrange --
@@ -566,11 +581,13 @@ public class UserServiceTests
         Assert.IsTrue(isSuccess);
         Assert.IsNotNull(_johnUser.DeletedDateUtc);
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-        // Check that the dates are equal within a minute
+        // Check that the dates are equal within a threshold
         Assert.IsTrue(DatesEqualWithinSeconds((DateTime)_johnUser.DeletedDateUtc, DateTime.UtcNow));
     }
 
     [TestMethod]
+    [TestCategory(nameof(UserService.DeleteUserAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task DeleteUserAsync_NonAdmin_AnotherUser_ThrowForbidden()
     {
@@ -590,7 +607,7 @@ public class UserServiceTests
         Assert.AreEqual(lastName, user.LastName);
         Assert.AreEqual(email, user.Email);
 
-        // Check that the dates are equal within a minute
+        // Check that the dates are equal within a threshold
         Assert.IsTrue(DatesEqualWithinSeconds((DateTime)user.JoinDateUtc, DateTime.UtcNow));
     }
 
@@ -601,6 +618,5 @@ public class UserServiceTests
             _jwtServiceMock.Object,
             _configMock.Object,
             _mapperMock.Object);
-
     }
 }

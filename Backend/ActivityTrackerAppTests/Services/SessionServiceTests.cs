@@ -23,7 +23,7 @@ public class SessionServiceTests : TestBase
 
     #region GetAllSessionsAsync
     [TestMethod]
-    [TestCategory("GetAllSessionsByActivityIdAsync")]
+    [TestCategory(nameof(SessionService.GetAllSessionsByActivityIdAsync))]
     public async Task GetAllSessionsByActivityIdAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
@@ -43,7 +43,7 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("GetAllSessionsByActivityIdAsync")]
+    [TestCategory(nameof(SessionService.GetAllSessionsByActivityIdAsync))]
     public async Task GetAllSessionsByActivityIdAsync_NonAdmin_OwnSession_Ok()
     {
         // -- Arrange --
@@ -63,8 +63,8 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("GetAllSessionsByActivityIdAsync")]
-    [TestCategory("Forbidden")]
+    [TestCategory(nameof(SessionService.GetAllSessionsByActivityIdAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task GetAllSessionsByActivityIdAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
@@ -78,7 +78,7 @@ public class SessionServiceTests : TestBase
 
     #region GetSessionAsync
     [TestMethod]
-    [TestCategory("GetSessionAsync")]
+    [TestCategory(nameof(SessionService.GetSessionAsync))]
     public async Task GetSessionAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
@@ -96,7 +96,7 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("GetSessionAsync")]
+    [TestCategory(nameof(SessionService.GetSessionAsync))]
     public async Task GetSessionAsync_NonAdmin_OwnSession_Ok()
     {
         // -- Arrange --
@@ -114,8 +114,8 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("GetSessionAsync")]
-    [TestCategory("Forbidden")]
+    [TestCategory(nameof(SessionService.GetSessionAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task GetSessionAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
@@ -137,7 +137,7 @@ public class SessionServiceTests : TestBase
     [DataRow(GAME_DEV_ACT_GUID_STR, "2022-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_ACT_GUID_STR, MIN_DATE_STR, (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_ACT_GUID_STR, "2025-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
-    [TestCategory("CreateSessionAsync")]
+    [TestCategory(nameof(SessionService.CreateSessionAsync))]
     public async Task CreateSessionAsync_Admin_AnothersSession_Ok(
         string activityIdStr,
         string startDateUtcStr,
@@ -183,7 +183,7 @@ public class SessionServiceTests : TestBase
     [DataRow(GAME_DEV_ACT_GUID_STR, "2022-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_ACT_GUID_STR, MIN_DATE_STR, (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_ACT_GUID_STR, "2025-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
-    [TestCategory("CreateSessionAsync")]
+    [TestCategory(nameof(SessionService.CreateSessionAsync))]
     public async Task CreateSessionAsync_NonAdmin_OwnSession_Ok(
         string activityIdStr,
         string startDateUtcStr,
@@ -223,18 +223,15 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("CreateSessionAsync")]
-    [TestCategory("Forbidden")]
+    [TestCategory(nameof(SessionService.CreateSessionAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task CreateSessionAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
         // -- Arrange --
         var newSessionDto = new SessionCreateDto
         {
-            ActivityId = PANIC_ACT_GUID,
-            StartDateUtc = DateTime.UtcNow,
-            DurationSeconds = 155,
-            Notes = "notes"
+            ActivityId = PANIC_ACT_GUID
         };
 
         var sessionService = _createSessionService();
@@ -255,8 +252,8 @@ public class SessionServiceTests : TestBase
     [DataRow(GAME_DEV_SESH1_GUID_STR, "2022-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_SESH1_GUID_STR, MIN_DATE_STR, (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_SESH1_GUID_STR, "2025-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
-    [TestCategory("UpdateSessionAsync")]
-    public async Task UpdateSessionAsync_Admin_AnothersSession_Ok(
+    [TestCategory(nameof(SessionService.UpdateSessionAsync))]
+        public async Task UpdateSessionAsync_Admin_AnothersSession_Ok(
         string sessionIdStr,
         string startDateUtcStr,
         uint durationSeconds,
@@ -287,18 +284,13 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("UpdateSessionAsync")]
-    [TestCategory("Forbidden")]
+    [TestCategory(nameof(SessionService.UpdateSessionAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task UpdateSessionAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
         // -- Arrange --
-        var updateSessionDto = new SessionUpdateDto
-        {
-            StartDateUtc = DateTime.UtcNow,
-            DurationSeconds = 200,
-            Notes = "notes"
-        };
+        var updateSessionDto = new SessionUpdateDto();
 
         var sessionService = _createSessionService();
 
@@ -315,7 +307,7 @@ public class SessionServiceTests : TestBase
     [DataRow(GAME_DEV_SESH1_GUID_STR, "2022-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_SESH1_GUID_STR, MIN_DATE_STR, (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_SESH1_GUID_STR, "2025-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
-    [TestCategory("UpdateSessionAsync")]
+    [TestCategory(nameof(SessionService.UpdateSessionAsync))]
     public async Task UpdateSessionAsync_NonAdmin_OwnSession_Ok(
         string sessionIdStr,
         string startDateUtcStr,
@@ -351,8 +343,7 @@ public class SessionServiceTests : TestBase
 
     #region DeleteSessionAsync
     [TestMethod]
-    [TestCategory("DeleteSessionAsync")]
-
+    [TestCategory(nameof(SessionService.DeleteSessionAsync))]
     public async Task DeleteActivityAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
@@ -374,8 +365,8 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("DeleteSessionAsync")]
-    [TestCategory("Forbidden")]
+    [TestCategory(nameof(SessionService.DeleteSessionAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task DeleteActivityAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
@@ -387,8 +378,7 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("DeleteActivityAsync")]
-
+    [TestCategory(nameof(SessionService.DeleteSessionAsync))]
     public async Task DeleteActivityAsync_NonAdmin_OwnActivity_Ok()
     {
         // -- Arrange --

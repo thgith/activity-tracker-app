@@ -26,7 +26,7 @@ public class ActivityServiceTests : TestBase
 
     #region GetAllActivitiesAsync
     [TestMethod]
-    [TestCategory("GetAllActivitiesAsync")]
+    [TestCategory(nameof(ActivityService.GetAllActivitiesForUserAsync))]
     public async Task GetAllActivitiesAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
@@ -41,15 +41,15 @@ public class ActivityServiceTests : TestBase
         var activitiesList = activities.ToList();
 
         // This list should be ordered by join date, so the activities should be in this order
-        _assertActivitiesSame(activitiesList[0], gameDevAct);
-        _assertActivitiesSame(activitiesList[1], pianoAct);
-        _assertActivitiesSame(activitiesList[2], mcatAct);
+        _assertActivitiesSame(gameDevAct, activitiesList[0]);
+        _assertActivitiesSame(pianoAct, activitiesList[1]);
+        _assertActivitiesSame(mcatAct, activitiesList[2]);
 
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 
     [TestMethod]
-    [TestCategory("GetAllActivitiesAsync")]
+    [TestCategory(nameof(ActivityService.GetAllActivitiesForUserAsync))]
     public async Task GetAllActivitiesAsync_NonAdmin_OwnActivities_Ok()
     {
         // -- Arrange --
@@ -64,16 +64,16 @@ public class ActivityServiceTests : TestBase
         var activitiesList = activities.ToList();
 
         // This list should be ordered by join date, so the activities should be in this order
-        _assertActivitiesSame(activitiesList[0], gameDevAct);
-        _assertActivitiesSame(activitiesList[1], pianoAct);
-        _assertActivitiesSame(activitiesList[2], mcatAct);
+        _assertActivitiesSame(gameDevAct, activitiesList[0]);
+        _assertActivitiesSame(pianoAct, activitiesList[1]);
+        _assertActivitiesSame(mcatAct, activitiesList[2]);
 
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 
     [TestMethod]
-    [TestCategory("GetActivityAsync")]
-    [TestCategory("Forbidden")]
+    [TestCategory(nameof(ActivityService.GetActivityAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task GetAllActivitiesAsync_NonAdmin_AnothersActivities_ThrowForbidden()
     {
@@ -85,7 +85,7 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("GetActivityAsync")]
+    [TestCategory(nameof(ActivityService.GetActivityAsync))]
     public async Task GetAllActivitiesAsync_Admin_AnothersActivity_DeletedActivity_ReturnEmpty()
     {
         // -- Arrange --
@@ -105,7 +105,7 @@ public class ActivityServiceTests : TestBase
     [DataRow(GAME_DEV_ACT_GUID_STR)]
     [DataRow(PIANO_ACT_GUID_STR)]
     [DataRow(MCAT_ACT_GUID_STR)]
-    [TestCategory("GetActivityAsync")]
+    [TestCategory(nameof(ActivityService.GetActivityAsync))]
     public async Task GetActivityAsync_Admin_AnothersActivity_Ok(string activityIdStr)
     {
         // -- Arrange --
@@ -117,14 +117,14 @@ public class ActivityServiceTests : TestBase
 
         // -- Assert --
         Assert.IsNotNull(activity);
-        _assertActivitiesSame(activity, allActs.First(x => x.Id == activityGuid));
+        _assertActivitiesSame(allActs.First(x => x.Id == activityGuid), activity);
     }
 
     [TestMethod]
     [DataRow(GAME_DEV_ACT_GUID_STR)]
     [DataRow(PIANO_ACT_GUID_STR)]
     [DataRow(MCAT_ACT_GUID_STR)]
-    [TestCategory("GetActivityAsync")]
+    [TestCategory(nameof(ActivityService.GetActivityAsync))]
     public async Task GetActivityAsync_NonAdmin_OwnActivity_Ok(string activityIdStr)
     {
         // -- Arrange --
@@ -136,13 +136,13 @@ public class ActivityServiceTests : TestBase
 
         // -- Assert --
         Assert.IsNotNull(activity);
-        _assertActivitiesSame(activity, allActs.First(x => x.Id == activityGuid));
+        _assertActivitiesSame(allActs.First(x => x.Id == activityGuid), activity);
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 
     [TestMethod]
-    [TestCategory("GetActivityAsync")]
-    [TestCategory("Forbidden")]
+    [TestCategory(nameof(ActivityService.GetActivityAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task GetActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
     {
@@ -154,7 +154,7 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("GetActivityAsync")]
+    [TestCategory(nameof(ActivityService.GetActivityAsync))]
     public async Task GetActivityAsync_Admin_AnothersActivity_DeletedActivity_ReturnEmpty()
     {
         // -- Arrange --
@@ -174,7 +174,7 @@ public class ActivityServiceTests : TestBase
 
     [TestMethod]
     [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
-    [TestCategory("CreateActivityAsync")]
+    [TestCategory(nameof(ActivityService.CreateActivityAsync))]
     public async Task CreateActivityAsync_Admin_AnothersActivity_Ok(
         string name,
         string description,
@@ -213,23 +213,13 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("CreateActivityAsync")]
-    [TestCategory("Forbidden")]
+    [TestCategory(nameof(ActivityService.CreateActivityAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task CreateActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
     {
         // -- Arrange --
-        var actCreateDto = new ActivityCreateDto
-        {
-            Name = "NEW ACT",
-            Description = "A new activity",
-            StartDateUtc = null,
-            DueDateUtc = null,
-            CompletedDateUtc = null,
-            ColorHex = "#f00000",
-            Tags = null
-        };
-
+        var actCreateDto = new ActivityCreateDto();
         var activityService = _createActivityService();
 
         // -- Act --
@@ -244,7 +234,7 @@ public class ActivityServiceTests : TestBase
     [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", null, null, "#3366ff")]
     // StartDateUtc null so will be UtcNow.
     [DataRow("NEW NAME", "NEW DESC", null, null, null, "#3366ff")]
-    [TestCategory("CreateActivityAsync")]
+    [TestCategory(nameof(ActivityService.CreateActivityAsync))]
     public async Task CreateActivityAsync_NonAdmin_OwnActivity_Ok(
         string name,
         string description,
@@ -346,7 +336,7 @@ public class ActivityServiceTests : TestBase
     [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", null, null, "#3366ff")]
     // StartDateUtc null so will be UtcNow.
     [DataRow("UPDATED NAME", "UPDATED DESC", null, null, null, "#3366ff")]
-    [TestCategory("UpdateActivityAsync")]
+    [TestCategory(nameof(ActivityService.UpdateActivityAsync))]
     public async Task UpdateActivityAsync_Admin_AnothersActivity_Ok(
         string name,
         string description,
@@ -385,7 +375,7 @@ public class ActivityServiceTests : TestBase
     }
     [TestMethod]
     [DataRow("UPDATED NAME", "UPDATE DESC", MIN_DATE_STR, null, null, "#3366ff")]
-    [TestCategory("UpdateActivityAsync")]
+    [TestCategory(nameof(ActivityService.UpdateActivityAsync))]
 
     public async Task UpdateActivityAsync_NonAdmin_OwnActivity_StartDateMinDate_Ok(
         string name,
@@ -432,7 +422,7 @@ public class ActivityServiceTests : TestBase
     [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", null, null, "#3366ff")]
     // StartDateUtc null so will be UtcNow.
     [DataRow("UPDATED NAME", "UPDATED DESC", null, null, null, "#3366ff")]
-    [TestCategory("UpdateActivityAsync")]
+    [TestCategory(nameof(ActivityService.UpdateActivityAsync))]
     public async Task UpdateActivityAsync_NonAdmin_OwnActivity_Ok(
         string name,
         string description,
@@ -481,8 +471,8 @@ public class ActivityServiceTests : TestBase
     [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", PREHISTORIC_DATE_STR, null, "#3366ff")]
     // DueDateUtc null. StartDateUtc is greater than CompletedDateUtc.
     [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", null, PREHISTORIC_DATE_STR, "#3366ff")]
-    [TestCategory("UpdateActivityAsync")]
-    [TestCategory("InvalidData")]
+    [TestCategory(nameof(ActivityService.UpdateActivityAsync))]
+    [TestCategory(nameof(InvalidDataException))]
     [ExpectedException(typeof(InvalidDataException))]
     public async Task UpdateActivityAsync_NonAdmin_OwnActivity_ThrowInvalidData(
         string name,
@@ -522,23 +512,13 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("UpdateActivityAsync")]
-    [TestCategory("Forbidden")]
+    [TestCategory(nameof(ActivityService.UpdateActivityAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task UpdateActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
     {
         // -- Arrange --
-        var actUpdateDto = new ActivityUpdateDto
-        {
-            Name = "UPDATE GAME ACT",
-            Description = "A new activity",
-            StartDateUtc = DateTime.UtcNow.AddDays(-3),
-            DueDateUtc = DateTime.UtcNow.AddDays(-2),
-            CompletedDateUtc = DateTime.UtcNow.AddDays(-1),
-            ColorHex = "#3366ff",
-            Tags = null
-        };
-
+        var actUpdateDto = new ActivityUpdateDto();
         var activityService = _createActivityService();
 
         // -- Act --
@@ -550,7 +530,7 @@ public class ActivityServiceTests : TestBase
 
     #region DeleteActivityAsync
     [TestMethod]
-    [TestCategory("DeleteActivityAsync")]
+    [TestCategory(nameof(ActivityService.DeleteActivityAsync))]
     public async Task DeleteActivityAsync_Admin_AnothersActivity_Ok()
     {
         // -- Arrange --
@@ -575,8 +555,8 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("DeleteActivityAsync")]
-    [TestCategory("Forbidden")]
+    [TestCategory(nameof(ActivityService.DeleteActivityAsync))]
+    [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
 
     public async Task DeleteActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
@@ -589,7 +569,7 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
-    [TestCategory("DeleteActivityAsync")]
+    [TestCategory(nameof(ActivityService.DeleteActivityAsync))]
 
     public async Task DeleteActivityAsync_NonAdmin_OwnActivity_Ok()
     {
@@ -627,44 +607,56 @@ public class ActivityServiceTests : TestBase
     }
 
     private void _assertActivitiesSame(
-        ActivityGetDto actualActivity,
-        Activity expectedActivity)
+        Activity expectedActivity,
+        ActivityGetDto returnedActivity)
     {
-        Assert.IsTrue(actualActivity != null);
-        Assert.AreEqual(expectedActivity.Id, actualActivity.Id);
-        Assert.AreEqual(expectedActivity.OwnerId, actualActivity.OwnerId);
-        Assert.AreEqual(expectedActivity.Name, actualActivity.Name);
-        Assert.AreEqual(expectedActivity.Description, actualActivity.Description);
-        Assert.AreEqual(expectedActivity.ColorHex, actualActivity.ColorHex);
-        Assert.AreEqual(expectedActivity.IsArchived, actualActivity.IsArchived);
-
-        if (expectedActivity.Tags == null)
-        {
-            Assert.IsNull(actualActivity.Tags);
-        }
-        else
-        {
-            Assert.IsNotNull(actualActivity.Tags);
-            Assert.AreEqual(expectedActivity.Tags.Count(), actualActivity.Tags.Count());
-            foreach (var tag in expectedActivity.Tags)
-            {
-                actualActivity.Tags.Contains(tag);
-            }
-            foreach (var tag in actualActivity.Tags)
-            {
-                expectedActivity.Tags.Contains(tag);
-            }
-        }
+        Assert.IsTrue(returnedActivity != null);
+        Assert.AreEqual(expectedActivity.Id, returnedActivity.Id);
+        Assert.AreEqual(expectedActivity.OwnerId, returnedActivity.OwnerId);
+        Assert.AreEqual(expectedActivity.Name, returnedActivity.Name);
+        Assert.AreEqual(expectedActivity.Description, returnedActivity.Description);
+        Assert.AreEqual(expectedActivity.ColorHex, returnedActivity.ColorHex);
+        Assert.AreEqual(expectedActivity.IsArchived, returnedActivity.IsArchived);
+        _checkTags();
+        _checkDates();
 
         // Check that the dates are equal within a minute
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)actualActivity.StartDateUtc, DateTime.UtcNow));
-        if (actualActivity.DueDateUtc != null)
+        void _checkDates()
         {
-            Assert.IsTrue(DatesEqualWithinSeconds((DateTime)actualActivity.DueDateUtc, DateTime.UtcNow));
+            Assert.IsTrue(DatesEqualWithinSeconds((DateTime)returnedActivity.StartDateUtc, DateTime.UtcNow));
+            if (returnedActivity.DueDateUtc != null)
+            {
+                Assert.IsTrue(DatesEqualWithinSeconds((DateTime)returnedActivity.DueDateUtc, DateTime.UtcNow));
+            }
+            if (returnedActivity.CompletedDateUtc != null)
+            {
+                Assert.IsTrue(DatesEqualWithinSeconds((DateTime)returnedActivity.CompletedDateUtc, DateTime.UtcNow, 60));
+            }
         }
-        if (actualActivity.CompletedDateUtc != null)
+
+        void _checkTags()
         {
-            Assert.IsTrue(DatesEqualWithinSeconds((DateTime)actualActivity.CompletedDateUtc, DateTime.UtcNow, 60));
+            if (expectedActivity.Tags == null)
+            {
+                Assert.IsNull(returnedActivity.Tags);
+            }
+            else
+            {
+                Assert.IsNotNull(returnedActivity.Tags);
+                Assert.AreEqual(expectedActivity.Tags.Count(), returnedActivity.Tags.Count());
+
+                // Check tags in the expected activity contain all tags in the returned
+                foreach (var tag in expectedActivity.Tags)
+                {
+                    returnedActivity.Tags.Contains(tag);
+                }
+
+                // Check tags in the returned activity contain all tags in the expected
+                foreach (var tag in returnedActivity.Tags)
+                {
+                    expectedActivity.Tags.Contains(tag);
+                }
+            }
         }
     }
 
