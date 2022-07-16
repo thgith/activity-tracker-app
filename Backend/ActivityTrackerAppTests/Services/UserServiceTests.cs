@@ -13,6 +13,7 @@ using Moq;
 
 namespace ActivityTrackerAppTests;
 
+// TODO to check cascade delete and password reset
 // NOTE: Prob should add more checks to check side effects (call count, etc),
 //       but this is fine for now
 [TestClass]
@@ -22,6 +23,7 @@ public class UserServiceTests
     private static User _johnUser;
     private static User _judyUser;
     private static List<User> _usersData;
+    private static Mock<DbSet<Activity>> _activitiesDbSetMock;
     private static Mock<DbSet<User>> _usersDbSetMock;
     private static Mock<IDataContext> _dbContextMock;
     private static Mock<IConfiguration> _configMock;
@@ -39,20 +41,93 @@ public class UserServiceTests
     public void InitializeTests()
     {
         // Init users here b/c they may change throughout each user test
+        _setUpUsers();
+        _setUpMocks();
+
+    }
+    private void _setUpUsers()
+    {
         _janeUser = GenerateJaneUser();
         _johnUser = GenerateJohnUser();
         // Deleted user
         _judyUser = GenerateJudyUser();
         _usersData = new List<User> { _janeUser, _johnUser, _judyUser };
+    }
 
-        // Set up mock objects
+    private void _setUpMocks()
+    {
         _usersDbSetMock = _usersData.AsQueryable().BuildMockDbSet();
-        _dbContextMock = new Mock<IDataContext>();
-        _dbContextMock.Setup(x => x.Users)
-                .Returns(_usersDbSetMock.Object);
         _jwtServiceMock = new Mock<IJwtService>();
         _configMock = new Mock<IConfiguration>();
-        _mapperMock = new Mock<IMapper>();
+
+        _setUpDbMock();
+        _setUpMapperMock();
+
+        void _setUpDbMock()
+        {
+            _dbContextMock = new Mock<IDataContext>();
+            _dbContextMock.Setup(x => x.Users)
+                    .Returns(_usersDbSetMock.Object);
+
+            // TODO should test cascade delete
+            _activitiesDbSetMock = (new List<Activity>()).AsQueryable().BuildMockDbSet();
+            _dbContextMock.Setup(x => x.Activities)
+                    .Returns(_activitiesDbSetMock.Object);
+        }
+
+        void _setUpMapperMock()
+        {
+            _mapperMock = new Mock<IMapper>();
+
+            _mapperMock.Setup(x => x.Map<UserGetDto>(It.Is<User>(x => x == null)))
+                .Returns<UserGetDto>(null);
+
+            _mapperMock.Setup(x => x.Map<UserGetDto>(It.Is<User>(x => x != null)))
+                .Returns((User user) =>
+                    new UserGetDto
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        JoinDateUtc = user.JoinDateUtc
+                    }
+                );
+
+            _mapperMock.Setup(x => x.Map<UserGetDto>(It.Is<User>(x => x == null)))
+                .Returns<UserGetDto>(null);
+
+            _mapperMock.Setup(x => x.Map<UserGetDto>(It.Is<User>(x => x != null)))
+                .Returns((User user) =>
+                    new UserGetDto
+                    {
+                        Id = user.Id,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        JoinDateUtc = user.JoinDateUtc
+                    }
+                );
+
+            _mapperMock.Setup(m => m.Map<User>(It.Is<UserRegisterDto>(x => x == null)))
+                        .Returns<User>(null);
+
+            _mapperMock.Setup(m => m.Map<User>(It.Is<UserRegisterDto>(x => x != null)))
+                        .Returns((UserRegisterDto userDto) =>
+                            new User
+                            {
+                                Id = Guid.Empty,
+                                FirstName = userDto.FirstName,
+                                LastName = userDto.LastName,
+                                Email = userDto.Email,
+                                PasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password),
+                                // Technically we do more with this date, but this is close enough
+                                JoinDateUtc = DateTime.UtcNow,
+                                DeletedDateUtc = null,
+                                Role = Roles.MEMBER
+                            }
+                        );
+        }
     }
 
     #region GetAllUsersAsync
@@ -60,27 +135,6 @@ public class UserServiceTests
     public async Task GetAllUsersAsync_Admin_Ok()
     {
         // -- Arrange --
-        _mapperMock.Setup(x => x.Map<UserGetDto>(_janeUser))
-                    .Returns(
-                        new UserGetDto
-                        {
-                            FirstName = JANE_FIRST_NAME,
-                            LastName = COMMON_LAST_NAME,
-                            Email = JANE_EMAIL,
-                            JoinDateUtc = JANE_JOIN_DATE_UTC
-                        }
-                    );
-        _mapperMock.Setup(x => x.Map<UserGetDto>(_johnUser))
-                    .Returns(
-                        new UserGetDto
-                        {
-                            FirstName = JOHN_FIRST_NAME,
-                            LastName = COMMON_LAST_NAME,
-                            Email = JOHN_EMAIL,
-                            JoinDateUtc = JOHN_JOIN_DATE_UTC
-                        }
-                    );
-
         var userService = new UserService(
             _dbContextMock.Object,
             _jwtServiceMock.Object,
@@ -97,8 +151,8 @@ public class UserServiceTests
 
         // This list should be ordered by join date, so the users should be in this order
         // Didn't get deleted user
-        _assertUsersSame(usersList[0], JANE_FIRST_NAME, COMMON_LAST_NAME, JANE_EMAIL);
-        _assertUsersSame(usersList[1], JOHN_FIRST_NAME, COMMON_LAST_NAME, JOHN_EMAIL);
+        _assertUsersSame(usersList[0], JANE_USER_GUID, JANE_FIRST_NAME, COMMON_LAST_NAME, JANE_EMAIL);
+        _assertUsersSame(usersList[1], JOHN_USER_GUID, JOHN_FIRST_NAME, COMMON_LAST_NAME, JOHN_EMAIL);
     }
 
     [TestMethod]
@@ -120,17 +174,6 @@ public class UserServiceTests
     public async Task GetUserAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
-        _mapperMock.Setup(x => x.Map<UserGetDto>(_johnUser))
-                    .Returns(
-                        new UserGetDto
-                        {
-                            FirstName = JOHN_FIRST_NAME,
-                            LastName = COMMON_LAST_NAME,
-                            Email = JOHN_EMAIL,
-                            JoinDateUtc = JOHN_JOIN_DATE_UTC
-                        }
-                    );
-
         var userService = new UserService(
             _dbContextMock.Object,
             _jwtServiceMock.Object,
@@ -143,7 +186,7 @@ public class UserServiceTests
 
         // -- Assert --
         Assert.IsNotNull(user);
-        _assertUsersSame(user, JOHN_FIRST_NAME, COMMON_LAST_NAME, JOHN_EMAIL);
+        _assertUsersSame(user, JOHN_USER_GUID, JOHN_FIRST_NAME, COMMON_LAST_NAME, JOHN_EMAIL);
     }
     #endregion
 
@@ -188,17 +231,6 @@ public class UserServiceTests
     public async Task GetUserAsync_NonAdmin_SameUser_Ok()
     {
         // -- Arrange --
-        _mapperMock.Setup(x => x.Map<UserGetDto>(_johnUser))
-                    .Returns(
-                        new UserGetDto
-                        {
-                            FirstName = JOHN_FIRST_NAME,
-                            LastName = COMMON_LAST_NAME,
-                            Email = JOHN_EMAIL,
-                            JoinDateUtc = JOHN_JOIN_DATE_UTC
-                        }
-                    );
-
         var userService = new UserService(
             _dbContextMock.Object,
             _jwtServiceMock.Object,
@@ -211,7 +243,7 @@ public class UserServiceTests
 
         // -- Assert --
         Assert.IsNotNull(user);
-        _assertUsersSame(user, JOHN_FIRST_NAME, COMMON_LAST_NAME, JOHN_EMAIL);
+        _assertUsersSame(user, JOHN_USER_GUID, JOHN_FIRST_NAME, COMMON_LAST_NAME, JOHN_EMAIL);
     }
 
     [TestMethod]
@@ -219,17 +251,6 @@ public class UserServiceTests
     public async Task GetUserAsync_NonAdmin_AnotherUser_ThrowForbidden()
     {
         // -- Arrange --
-        _mapperMock.Setup(x => x.Map<UserGetDto>(_johnUser))
-                    .Returns(
-                        new UserGetDto
-                        {
-                            FirstName = JOHN_FIRST_NAME,
-                            LastName = COMMON_LAST_NAME,
-                            Email = JOHN_EMAIL,
-                            JoinDateUtc = JOHN_JOIN_DATE_UTC
-                        }
-                    );
-
         var userService = new UserService(
             _dbContextMock.Object,
             _jwtServiceMock.Object,
@@ -248,35 +269,11 @@ public class UserServiceTests
     [TestMethod]
     public async Task RegisterUserAsync_Ok()
     {
-        var dummyToken = "dummytoken";
         // -- Arrange --
+        var dummyToken = "dummytoken";
+        var newUserGuid = Guid.NewGuid();
         _jwtServiceMock.Setup(m => m.GenerateJwtToken(It.IsAny<User>(), 300))
                         .Returns(dummyToken);
-        _mapperMock.Setup(m => m.Map<User>(It.IsAny<UserRegisterDto>()))
-                    .Returns(
-                        new User
-                        {
-                            Id = Guid.NewGuid(),
-                            FirstName = LILA_FIRST_NAME,
-                            LastName = COMMON_LAST_NAME,
-                            Email = LILA_EMAIL,
-                            PasswordHash = BCrypt.Net.BCrypt.HashPassword(COMMON_OLD_PASSWORD),
-                            // Technically we do more with this date, but this is close enough
-                            JoinDateUtc = DateTime.UtcNow,
-                            DeletedDateUtc = null,
-                            Role = Roles.MEMBER
-                        }
-                    );
-        _mapperMock.Setup(m => m.Map<UserGetDto>(It.IsAny<User>()))
-                    .Returns(
-                    new UserGetDto
-                        {
-                            FirstName = LILA_FIRST_NAME,
-                            LastName = COMMON_LAST_NAME,
-                            Email = LILA_EMAIL,
-                            JoinDateUtc = DateTime.UtcNow
-                        }
-                    );
 
         var userService = new UserService(
             _dbContextMock.Object,
@@ -285,16 +282,20 @@ public class UserServiceTests
             _mapperMock.Object);
 
         var registerUserDto = new UserRegisterDto
-            {
-                FirstName = LILA_FIRST_NAME,
-                LastName = COMMON_LAST_NAME,
-                Email = LILA_EMAIL,
-                Password = COMMON_OLD_PASSWORD
-            };
+        {
+            FirstName = LILA_FIRST_NAME,
+            LastName = COMMON_LAST_NAME,
+            Email = LILA_EMAIL,
+            Password = COMMON_OLD_PASSWORD
+        };
 
         // Add the user that is actually saved to our test data to check against later
         _usersDbSetMock.Setup(m => m.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()))
                         .Callback((User user, CancellationToken _) => { _usersData.Add(user); });
+
+        // Replicate the save setting a new GUID for the new user
+        _dbContextMock.Setup(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()))
+                        .Callback((CancellationToken _) => { _usersData.Last().Id = newUserGuid; });
 
         // -- Act --
         var returnedEntityWithToken = await userService.RegisterUserAsync(registerUserDto);
@@ -306,22 +307,23 @@ public class UserServiceTests
         Assert.IsNotNull(returnedToken);
 
         // Check that the returned object is as expected
-        _assertUsersSame(returnedEntity, LILA_FIRST_NAME, COMMON_LAST_NAME, LILA_EMAIL);
+        _assertUsersSame(returnedEntity, newUserGuid, LILA_FIRST_NAME, COMMON_LAST_NAME, LILA_EMAIL);
         Assert.AreEqual(dummyToken, returnedToken);
 
         _usersDbSetMock.Verify(m => m.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Once);
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-        
+
         // This saved user should have been added during the AddAsync callback
         Assert.AreEqual(_usersData.Count(), 4);
         var newUserLila = _usersData.Last();
 
         // Check that the data was saved to the DB correctly
+        Assert.AreNotEqual(Guid.Empty, newUserLila.Id);
         Assert.AreEqual(LILA_FIRST_NAME, newUserLila.FirstName);
         Assert.AreEqual(COMMON_LAST_NAME, newUserLila.LastName);
         Assert.AreEqual(LILA_EMAIL, newUserLila.Email);
         BCrypt.Net.BCrypt.Verify(COMMON_OLD_PASSWORD, newUserLila.PasswordHash);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) newUserLila.JoinDateUtc, DateTime.UtcNow));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)newUserLila.JoinDateUtc, DateTime.UtcNow));
         Assert.IsNull(newUserLila.DeletedDateUtc);
         Assert.AreEqual(Roles.MEMBER, newUserLila.Role);
     }
@@ -347,14 +349,6 @@ public class UserServiceTests
     public async Task UpdateUserAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
-        _mapperMock.Setup(m => m.Map<UserGetDto>(It.IsAny<User>()))
-            .Returns(new UserGetDto
-            {
-                FirstName = NEW_FIRST_NAME,
-                LastName = NEW_LAST_NAME,
-                Email = NEW_EMAIL,
-                JoinDateUtc = _johnUser.JoinDateUtc
-            });
         var userService = new UserService(
             _dbContextMock.Object,
             _jwtServiceMock.Object,
@@ -378,10 +372,11 @@ public class UserServiceTests
         Assert.IsNotNull(returnedDto);
 
         // Check that the returned user is as expected
-        _assertUsersSame(returnedDto, NEW_FIRST_NAME, NEW_LAST_NAME, NEW_EMAIL);
+        _assertUsersSame(returnedDto, JOHN_USER_GUID, NEW_FIRST_NAME, NEW_LAST_NAME, NEW_EMAIL);
 
         // Check that the returned user is as expected
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        Assert.AreEqual(JOHN_USER_GUID, _johnUser.Id);
         Assert.AreEqual(NEW_FIRST_NAME, _johnUser.FirstName);
         Assert.AreEqual(NEW_LAST_NAME, _johnUser.LastName);
         Assert.AreEqual(NEW_EMAIL, _johnUser.Email);
@@ -392,14 +387,6 @@ public class UserServiceTests
     public async Task UpdateUserAsync_NonAdmin_SameUser_Ok()
     {
         // -- Arrange --
-        _mapperMock.Setup(m => m.Map<UserGetDto>(It.IsAny<User>()))
-                    .Returns(new UserGetDto
-                    {
-                        FirstName = NEW_FIRST_NAME,
-                        LastName = NEW_LAST_NAME,
-                        Email = NEW_EMAIL,
-                        JoinDateUtc = _johnUser.JoinDateUtc
-                    });
         var userService = new UserService(
             _dbContextMock.Object,
             _jwtServiceMock.Object,
@@ -423,10 +410,11 @@ public class UserServiceTests
         Assert.IsNotNull(returnedDto);
 
         // Check that the returned user is as expected
-        _assertUsersSame(returnedDto, NEW_FIRST_NAME, NEW_LAST_NAME, NEW_EMAIL);
+        _assertUsersSame(returnedDto, JOHN_USER_GUID, NEW_FIRST_NAME, NEW_LAST_NAME, NEW_EMAIL);
 
         // Check that the saved user is as expected
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        Assert.AreEqual(JOHN_USER_GUID, _johnUser.Id);
         Assert.AreEqual(NEW_FIRST_NAME, _johnUser.FirstName);
         Assert.AreEqual(NEW_LAST_NAME, _johnUser.LastName);
         Assert.AreEqual(NEW_EMAIL, _johnUser.Email);
@@ -445,12 +433,12 @@ public class UserServiceTests
             _mapperMock.Object);
 
         var userUpdateDto = new UserUpdateDto
-            {
-                FirstName = NEW_FIRST_NAME,
-                LastName = NEW_LAST_NAME,
-                Email = NEW_EMAIL,
-                Password = NEW_PASSWORD
-            };
+        {
+            FirstName = NEW_FIRST_NAME,
+            LastName = NEW_LAST_NAME,
+            Email = NEW_EMAIL,
+            Password = NEW_PASSWORD
+        };
 
         // -- Act --
         var returnedDto = await userService.UpdateUserAsync(
@@ -498,7 +486,9 @@ public class UserServiceTests
         );
 
         // -- Assert --
-        Assert.IsNull(returnedDto);
+        Assert.IsNotNull(returnedDto);
+        _assertUsersSame(returnedDto, JOHN_USER_GUID, JOHN_FIRST_NAME, COMMON_LAST_NAME, JOHN_EMAIL);
+
         // Check that the user in DB didn't change
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
         Assert.AreEqual(JOHN_FIRST_NAME, _johnUser.FirstName);
@@ -517,9 +507,9 @@ public class UserServiceTests
             _configMock.Object,
             _mapperMock.Object);
         var userUpdateDto = new UserUpdateDto()
-            {
-                FirstName = "NewPerson"
-            };
+        {
+            FirstName = "DoesNotExist"
+        };
 
         // -- Act --
         var returnedDto = await userService.UpdateUserAsync(
@@ -532,7 +522,7 @@ public class UserServiceTests
         Assert.IsNull(returnedDto);
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
-    
+
     [TestMethod]
     public async Task UpdateUserAsync_Admin_DeletedUser_ReturnNull()
     {
@@ -543,9 +533,9 @@ public class UserServiceTests
             _configMock.Object,
             _mapperMock.Object);
         var userUpdateDto = new UserUpdateDto()
-            {
-                FirstName = "Juju"
-            };
+        {
+            FirstName = "Juju"
+        };
 
         // -- Act --
         var returnedDto = await userService.UpdateUserAsync(
@@ -584,7 +574,7 @@ public class UserServiceTests
         Assert.IsNotNull(_johnUser.DeletedDateUtc);
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
         // Check that the dates are equal within a minute
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) _johnUser.DeletedDateUtc, DateTime.UtcNow));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)_johnUser.DeletedDateUtc, DateTime.UtcNow));
     }
 
     [TestMethod]
@@ -641,7 +631,7 @@ public class UserServiceTests
         Assert.IsNotNull(_johnUser.DeletedDateUtc);
         _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
         // Check that the dates are equal within a minute
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) _johnUser.DeletedDateUtc, DateTime.UtcNow));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)_johnUser.DeletedDateUtc, DateTime.UtcNow));
     }
 
     [TestMethod]
@@ -660,14 +650,15 @@ public class UserServiceTests
     }
     #endregion
 
-    private void _assertUsersSame(UserGetDto user, string firstName, string lastName, string email)
+    private void _assertUsersSame(UserGetDto user, Guid id, string firstName, string lastName, string email)
     {
         Assert.IsTrue(user != null);
+        Assert.AreEqual(id, user.Id);
         Assert.AreEqual(firstName, user.FirstName);
         Assert.AreEqual(lastName, user.LastName);
         Assert.AreEqual(email, user.Email);
 
         // Check that the dates are equal within a minute
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) user.JoinDateUtc, DateTime.UtcNow));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)user.JoinDateUtc, DateTime.UtcNow));
     }
 }

@@ -44,12 +44,12 @@ public abstract class TestBase
 
     // TODO figure out why they don't like this
     // Called before all tests
-    [ClassInitialize()]
-    public static void InitializeClass(TestContext context)
-    {
-        // Init users here since they won't change through each activity test
-        usersData = new List<User> { GenerateJaneUser(), GenerateJohnUser(), GenerateJudyUser() };
-    }
+    // [ClassInitialize()]
+    // public static void InitializeClass(TestContext context)
+    // {
+    //     // Init users here since they won't change through each activity test
+    //     usersData = new List<User> { GenerateJaneUser(), GenerateJohnUser(), GenerateJudyUser() };
+    // }
 
     // Called before each test
     [TestInitialize]

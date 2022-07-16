@@ -154,7 +154,7 @@ need to hit the `/api/v1/Auth/register` endpoint first to be authenticated for t
 - You can go to `https://localhost:7109/swagger` to view the available API endpoints
 
 ## How to Run Tests
-- Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hovering over the class/test methods. A couple of tests are broken due to some changes right now, but the layout will be basically the same.
+- Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hovering over the class/test methods.
 
 ---
 ## To Dos
