@@ -18,9 +18,7 @@ namespace ActivityTrackerAppTests;
 //  startDateUtc > completedDateUtc
 //  startDateUtc is MIN_DATE
 //  etc other paths
-// NOTE: Prob should add more checks to check side effects (call count, etc),
-//       but this is fine for now
-
+// NOTE: Prob should add more checks to check side effects (call count, etc)
 [TestClass]
 public class ActivityServiceTests : TestBase
 {
@@ -41,11 +39,7 @@ public class ActivityServiceTests : TestBase
     public async Task GetAllActivitiesAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activities = await activityService.GetAllActivitiesForUserAsync(JANE_USER_GUID, JOHN_USER_GUID);
@@ -56,42 +50,9 @@ public class ActivityServiceTests : TestBase
         var activitiesList = activities.ToList();
 
         // This list should be ordered by join date, so the activities should be in this order
-        _assertActivitiesSame(
-            activitiesList[0],
-            gameDevAct.Id,
-            gameDevAct.OwnerId,
-            gameDevAct.Name,
-            gameDevAct.Description,
-            gameDevAct.StartDateUtc,
-            gameDevAct.DueDateUtc,
-            gameDevAct.CompletedDateUtc,
-            gameDevAct.ColorHex,
-            gameDevAct.IsArchived,
-            gameDevAct.Tags);
-        _assertActivitiesSame(
-            activitiesList[1],
-            pianoAct.Id,
-            pianoAct.OwnerId,
-            pianoAct.Name,
-            pianoAct.Description,
-            pianoAct.StartDateUtc,
-            pianoAct.DueDateUtc,
-            pianoAct.CompletedDateUtc,
-            pianoAct.ColorHex,
-            pianoAct.IsArchived,
-            pianoAct.Tags);
-        _assertActivitiesSame(
-            activitiesList[2],
-            mcatAct.Id,
-            mcatAct.OwnerId,
-            mcatAct.Name,
-            mcatAct.Description,
-            mcatAct.StartDateUtc,
-            mcatAct.DueDateUtc,
-            mcatAct.CompletedDateUtc,
-            mcatAct.ColorHex,
-            mcatAct.IsArchived,
-            mcatAct.Tags);
+        _assertActivitiesSame(activitiesList[0], gameDevAct);
+        _assertActivitiesSame(activitiesList[1], pianoAct);
+        _assertActivitiesSame(activitiesList[2], mcatAct);
     }
 
     [TestMethod]
@@ -99,11 +60,7 @@ public class ActivityServiceTests : TestBase
     public async Task GetAllActivitiesAsync_NonAdmin_OwnActivities_Ok()
     {
         // -- Arrange --
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activities = await activityService.GetAllActivitiesForUserAsync(JOHN_USER_GUID, JOHN_USER_GUID);
@@ -114,42 +71,9 @@ public class ActivityServiceTests : TestBase
         var activitiesList = activities.ToList();
 
         // This list should be ordered by join date, so the activities should be in this order
-        _assertActivitiesSame(
-            activitiesList[0],
-            gameDevAct.Id,
-            gameDevAct.OwnerId,
-            gameDevAct.Name,
-            gameDevAct.Description,
-            gameDevAct.StartDateUtc,
-            gameDevAct.DueDateUtc,
-            gameDevAct.CompletedDateUtc,
-            gameDevAct.ColorHex,
-            gameDevAct.IsArchived,
-            gameDevAct.Tags);
-        _assertActivitiesSame(
-            activitiesList[1],
-            pianoAct.Id,
-            pianoAct.OwnerId,
-            pianoAct.Name,
-            pianoAct.Description,
-            pianoAct.StartDateUtc,
-            pianoAct.DueDateUtc,
-            pianoAct.CompletedDateUtc,
-            pianoAct.ColorHex,
-            pianoAct.IsArchived,
-            pianoAct.Tags);
-        _assertActivitiesSame(
-            activitiesList[2],
-            mcatAct.Id,
-            mcatAct.OwnerId,
-            mcatAct.Name,
-            mcatAct.Description,
-            mcatAct.StartDateUtc,
-            mcatAct.DueDateUtc,
-            mcatAct.CompletedDateUtc,
-            mcatAct.ColorHex,
-            mcatAct.IsArchived,
-            mcatAct.Tags);
+        _assertActivitiesSame(activitiesList[0], gameDevAct);
+        _assertActivitiesSame(activitiesList[1], pianoAct);
+        _assertActivitiesSame(activitiesList[2], mcatAct);
     }
 
     [TestMethod]
@@ -159,11 +83,7 @@ public class ActivityServiceTests : TestBase
     public async Task GetAllActivitiesAsync_NonAdmin_AnothersActivities_ThrowForbidden()
     {
         // -- Arrange --
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activities = await activityService.GetAllActivitiesForUserAsync(JOHN_USER_GUID, JANE_USER_GUID);
@@ -174,11 +94,7 @@ public class ActivityServiceTests : TestBase
     public async Task GetAllActivitiesAsync_Admin_AnothersActivity_DeletedActivity_ReturnEmpty()
     {
         // -- Arrange --
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activities = await activityService.GetAllActivitiesForUserAsync(JANE_USER_GUID, JUDY_USER_GUID);
@@ -192,32 +108,17 @@ public class ActivityServiceTests : TestBase
     #region GetActivityAsync
     [TestMethod]
     [TestCategory("GetActivityAsync")]
-    public async Task GetActivityAsync_Admin_AnotherUser_Ok()
+    public async Task GetActivityAsync_Admin_AnothersActivity_Ok()
     {
         // -- Arrange --
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activity = await activityService.GetActivityAsync(JANE_USER_GUID, GAME_DEV_ACT_GUID);
 
         // -- Assert --
         Assert.IsNotNull(activity);
-        _assertActivitiesSame(
-            activity,
-            gameDevAct.Id,
-            gameDevAct.OwnerId,
-            gameDevAct.Name,
-            gameDevAct.Description,
-            gameDevAct.StartDateUtc,
-            gameDevAct.DueDateUtc,
-            gameDevAct.CompletedDateUtc,
-            gameDevAct.ColorHex,
-            gameDevAct.IsArchived,
-            gameDevAct.Tags);
+        _assertActivitiesSame(activity, gameDevAct);
     }
 
     [TestMethod]
@@ -225,29 +126,14 @@ public class ActivityServiceTests : TestBase
     public async Task GetActivityAsync_NonAdmin_OwnActivity_Ok()
     {
         // -- Arrange --
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activity = await activityService.GetActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID);
 
         // -- Assert --
         Assert.IsNotNull(activity);
-        _assertActivitiesSame(
-            activity,
-            gameDevAct.Id,
-            gameDevAct.OwnerId,
-            gameDevAct.Name,
-            gameDevAct.Description,
-            gameDevAct.StartDateUtc,
-            gameDevAct.DueDateUtc,
-            gameDevAct.CompletedDateUtc,
-            gameDevAct.ColorHex,
-            gameDevAct.IsArchived,
-            gameDevAct.Tags);
+        _assertActivitiesSame(activity, gameDevAct);
     }
 
     [TestMethod]
@@ -257,11 +143,7 @@ public class ActivityServiceTests : TestBase
     public async Task GetActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
     {
         // -- Arrange --
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activity = await activityService.GetActivityAsync(JOHN_USER_GUID, PANIC_ACT_GUID);
@@ -272,11 +154,7 @@ public class ActivityServiceTests : TestBase
     public async Task GetActivityAsync_Admin_AnothersActivity_DeletedActivity_ReturnEmpty()
     {
         // -- Arrange --
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activity = await activityService.GetActivityAsync(JANE_USER_GUID, SLEEPING_ACT_GUID);
@@ -322,11 +200,7 @@ public class ActivityServiceTests : TestBase
         mapperMock.Setup(x => x.Map<Activity>(actCreateDto))
                     .Returns(actEntity);
 
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activity = await activityService.CreateActivityAsync(JANE_USER_GUID, JOHN_USER_GUID, actCreateDto);
@@ -366,11 +240,7 @@ public class ActivityServiceTests : TestBase
             Tags = null
         };
 
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activity = await activityService.CreateActivityAsync(JOHN_USER_GUID, JANE_USER_GUID, actCreateDto);
@@ -415,11 +285,7 @@ public class ActivityServiceTests : TestBase
         mapperMock.Setup(x => x.Map<Activity>(actUpdateDto))
                     .Returns(actEntity);
 
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activity = await activityService.UpdateActivityAsync(JANE_USER_GUID, GAME_DEV_ACT_GUID, actUpdateDto);
@@ -474,11 +340,7 @@ public class ActivityServiceTests : TestBase
         mapperMock.Setup(x => x.Map<Activity>(actUpdateDto))
                     .Returns(actEntity);
 
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activity = await activityService.UpdateActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID, actUpdateDto);
@@ -518,11 +380,7 @@ public class ActivityServiceTests : TestBase
             Tags = null
         };
 
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var activity = await activityService.UpdateActivityAsync(JOHN_USER_GUID, PANIC_ACT_GUID, actUpdateDto);
@@ -537,11 +395,7 @@ public class ActivityServiceTests : TestBase
     public async Task DeleteActivityAsync_Admin_AnothersActivity_Ok()
     {
         // -- Arrange --
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var isSuccessful = await activityService.DeleteActivityAsync(JANE_USER_GUID, GAME_DEV_ACT_GUID);
@@ -570,11 +424,7 @@ public class ActivityServiceTests : TestBase
     public async Task DeleteActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
     {
         // -- Arrange --
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService = _createActivityService();
 
         // -- Act --
         var isSuccessful = await activityService.DeleteActivityAsync(JOHN_USER_GUID, PANIC_ACT_GUID);
@@ -586,11 +436,7 @@ public class ActivityServiceTests : TestBase
     public async Task DeleteActivityAsync_NonAdmin_OwnActivity_Ok()
     {
         // -- Arrange --
-        var activityService = new ActivityService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            sessionServiceMock.Object,
-            mapperMock.Object);
+        var activityService =_createActivityService();
 
         // -- Act --
         var isSuccessful = await activityService.DeleteActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID);
@@ -613,54 +459,54 @@ public class ActivityServiceTests : TestBase
     // TODO more tests
     #endregion DeleteActivityAsync
 
-    private void _assertActivitiesSame(
-        ActivityGetDto activity,
-        Guid id,
-        Guid ownerId,
-        string name,
-        string desc,
-        DateTime? startDateUtc,
-        DateTime? dueDateUtc,
-        DateTime? completedDateUtc,
-        string colorHex,
-        bool isArchived,
-        IList<string>? tags)
+    private ActivityService _createActivityService()
     {
-        Assert.IsTrue(activity != null);
-        Assert.AreEqual(id, activity.Id);
-        Assert.AreEqual(ownerId, activity.OwnerId);
-        Assert.AreEqual(name, activity.Name);
-        Assert.AreEqual(desc, activity.Description);
-        Assert.AreEqual(colorHex, activity.ColorHex);
-        Assert.AreEqual(isArchived, activity.IsArchived);
+        return new ActivityService(
+            dbContextMock.Object,
+            userServiceMock.Object,
+            sessionServiceMock.Object,
+            mapperMock.Object);
+    }
 
-        if (tags == null)
+    private void _assertActivitiesSame(
+        ActivityGetDto activityGetDto,
+        Activity activity)
+    {
+        Assert.IsTrue(activityGetDto != null);
+        Assert.AreEqual(activity.Id, activityGetDto.Id);
+        Assert.AreEqual(activity.OwnerId, activityGetDto.OwnerId);
+        Assert.AreEqual(activity.Name, activityGetDto.Name);
+        Assert.AreEqual(activity.Description, activityGetDto.Description);
+        Assert.AreEqual(activity.ColorHex, activityGetDto.ColorHex);
+        Assert.AreEqual(activity.IsArchived, activityGetDto.IsArchived);
+
+        if (activity.Tags == null)
         {
-            Assert.IsNull(activity.Tags);
+            Assert.IsNull(activityGetDto.Tags);
         }
-        else if (tags != null)
+        else
         {
-            Assert.IsNotNull(activity.Tags);
-            Assert.AreEqual(tags.Count(), activity.Tags.Count());
-            foreach (var tag in tags)
-            {
-                activity.Tags.Contains(tag);
-            }
+            Assert.IsNotNull(activityGetDto.Tags);
+            Assert.AreEqual(activity.Tags.Count(), activityGetDto.Tags.Count());
             foreach (var tag in activity.Tags)
             {
-                tags.Contains(tag);
+                activityGetDto.Tags.Contains(tag);
+            }
+            foreach (var tag in activityGetDto.Tags)
+            {
+                activity.Tags.Contains(tag);
             }
         }
 
         // Check that the dates are equal within a minute
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)activity.StartDateUtc, DateTime.UtcNow));
-        if (activity.DueDateUtc != null)
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)activityGetDto.StartDateUtc, DateTime.UtcNow));
+        if (activityGetDto.DueDateUtc != null)
         {
-            Assert.IsTrue(DatesEqualWithinSeconds((DateTime)activity.DueDateUtc, DateTime.UtcNow));
+            Assert.IsTrue(DatesEqualWithinSeconds((DateTime)activityGetDto.DueDateUtc, DateTime.UtcNow));
         }
-        if (activity.CompletedDateUtc != null)
+        if (activityGetDto.CompletedDateUtc != null)
         {
-            Assert.IsTrue(DatesEqualWithinSeconds((DateTime)activity.CompletedDateUtc, DateTime.UtcNow, 60));
+            Assert.IsTrue(DatesEqualWithinSeconds((DateTime)activityGetDto.CompletedDateUtc, DateTime.UtcNow, 60));
         }
     }
 }

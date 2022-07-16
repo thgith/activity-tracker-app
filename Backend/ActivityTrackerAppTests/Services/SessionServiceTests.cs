@@ -26,6 +26,7 @@ public class SessionServiceTests : TestBase
 
     #region GetAllSessionsAsync
     [TestMethod]
+    [TestCategory("GetAllSessionsByActivityIdAsync")]
     public async Task GetAllSessionsByActivityIdAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
@@ -49,10 +50,7 @@ public class SessionServiceTests : TestBase
                         Notes = gameDevSesh2.Notes
                     });
 
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var sessions = await sessionService.GetAllSessionsByActivityIdAsync(JANE_USER_GUID, GAME_DEV_ACT_GUID);
@@ -66,6 +64,7 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("GetAllSessionsByActivityIdAsync")]
     public async Task GetAllSessionsByActivityIdAsync_NonAdmin_OwnSession_Ok()
     {
         // -- Arrange --
@@ -89,10 +88,7 @@ public class SessionServiceTests : TestBase
                         Notes = gameDevSesh2.Notes
                     });
 
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var sessions = await sessionService.GetAllSessionsByActivityIdAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID);
@@ -104,10 +100,24 @@ public class SessionServiceTests : TestBase
         _assertSessionsEqual(gameDevSesh1, sessionsList[0]);
         _assertSessionsEqual(gameDevSesh2, sessionsList[1]);
     }
+
+    [TestMethod]
+    [TestCategory("GetAllSessionsByActivityIdAsync")]
+    [TestCategory("Forbidden")]
+    [ExpectedException(typeof(ForbiddenException))]
+    public async Task GetAllSessionsByActivityIdAsync_NonAdmin_AnothersSession_ThrowForbidden()
+    {
+        // -- Arrange --
+        var sessionService = _createSessionService();
+
+        // -- Act --
+        var sessions = await sessionService.GetAllSessionsByActivityIdAsync(JOHN_USER_GUID, PANIC_ACT_GUID);
+    }
     #endregion
 
     #region GetSessionAsync
     [TestMethod]
+    [TestCategory("GetSessionAsync")]
     public async Task GetSessionAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
@@ -121,10 +131,7 @@ public class SessionServiceTests : TestBase
                         Notes = gameDevSesh1.Notes
                     });
 
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var session = await sessionService.GetSessionAsync(JANE_USER_GUID, GAME_DEV_SESH1_GUID);
@@ -136,6 +143,7 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("GetSessionAsync")]
     public async Task GetSessionAsync_NonAdmin_OwnSession_Ok()
     {
         // -- Arrange --
@@ -149,10 +157,7 @@ public class SessionServiceTests : TestBase
                         Notes = gameDevSesh1.Notes
                     });
 
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var session = await sessionService.GetSessionAsync(JOHN_USER_GUID, GAME_DEV_SESH1_GUID);
@@ -164,14 +169,13 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("GetSessionAsync")]
+    [TestCategory("Forbidden")]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task GetSessionAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
         // -- Arrange --
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var session = await sessionService.GetSessionAsync(JOHN_USER_GUID, PANIC_SESH_GUID);
@@ -181,6 +185,7 @@ public class SessionServiceTests : TestBase
 
     #region CreateSessionAsync
     [TestMethod]
+    [TestCategory("CreateSessionAsync")]
     public async Task CreateSessionAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
@@ -220,10 +225,7 @@ public class SessionServiceTests : TestBase
                             Notes = session.Notes
                         });
 
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var session = await sessionService.CreateSessionAsync(JOHN_USER_GUID, newSessionDto);
@@ -251,6 +253,8 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("CreateSessionAsync")]
+    [TestCategory("Forbidden")]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task CreateSessionAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
@@ -263,10 +267,7 @@ public class SessionServiceTests : TestBase
             Notes = "notes"
         };
 
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var session = await sessionService.CreateSessionAsync(JOHN_USER_GUID, newSessionDto);
@@ -276,6 +277,7 @@ public class SessionServiceTests : TestBase
 
     #region UpdateSessionAsync
     [TestMethod]
+    [TestCategory("UpdateSessionAsync")]
     public async Task UpdateSessionAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
@@ -315,10 +317,7 @@ public class SessionServiceTests : TestBase
                             Notes = session.Notes
                         });
 
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var session = await sessionService.CreateSessionAsync(JANE_USER_GUID, newSessionDto);
@@ -346,6 +345,8 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("UpdateSessionAsync")]
+    [TestCategory("Forbidden")]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task UpdateSessionAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
@@ -357,16 +358,14 @@ public class SessionServiceTests : TestBase
             Notes = "notes"
         };
 
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var session = await sessionService.UpdateSessionAsync(JOHN_USER_GUID, PANIC_SESH_GUID, updateSessionDto);
     }
 
     [TestMethod]
+    [TestCategory("UpdateSessionAsync")]
     public async Task UpdateSessionAsync_NonAdmin_OwnSession_Ok()
     {
         // -- Arrange --
@@ -404,10 +403,7 @@ public class SessionServiceTests : TestBase
                             Notes = session.Notes
                         });
 
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var session = await sessionService.UpdateSessionAsync(JOHN_USER_GUID, GAME_DEV_SESH1_GUID, updateSessionDto);
@@ -435,14 +431,12 @@ public class SessionServiceTests : TestBase
 
     #region DeleteSessionAsync
     [TestMethod]
+    [TestCategory("DeleteSessionAsync")]
 
     public async Task DeleteActivityAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var isSuccessful = await sessionService.DeleteSessionAsync(JANE_USER_GUID, GAME_DEV_SESH1_GUID);
@@ -460,28 +454,25 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("DeleteSessionAsync")]
+    [TestCategory("Forbidden")]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task DeleteActivityAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
         // -- Arrange --
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var isSuccessful = await sessionService.DeleteSessionAsync(JOHN_USER_GUID, PANIC_SESH_GUID);
     }
 
     [TestMethod]
+    [TestCategory("DeleteActivityAsync")]
 
     public async Task DeleteActivityAsync_NonAdmin_OwnActivity_Ok()
     {
         // -- Arrange --
-        var sessionService = new SessionService(
-            dbContextMock.Object,
-            userServiceMock.Object,
-            mapperMock.Object);
+        var sessionService = _createSessionService();
 
         // -- Act --
         var isSuccessful = await sessionService.DeleteSessionAsync(JOHN_USER_GUID, GAME_DEV_SESH1_GUID);
@@ -498,6 +489,14 @@ public class SessionServiceTests : TestBase
         Assert.IsNull(gameDevAct.DeletedDateUtc);
     }
     #endregion DeleteSessionAsync
+
+    private SessionService _createSessionService()
+    {
+        return new SessionService(
+            dbContextMock.Object,
+            userServiceMock.Object,
+            mapperMock.Object);
+    }
 
     private void _assertSessionsEqual(Session expectedSession, SessionGetDto actualSession)
     {
