@@ -28,6 +28,7 @@ public class SessionController : ApiControllerBase<SessionController>
     /// Get all sessions associated with the user and activity
     /// Users can get their own sessions, but only admins can get other users' sessions.
     /// </summary>
+    /// <param name="activityId">The ID of the activity of the sessions to get.</param>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

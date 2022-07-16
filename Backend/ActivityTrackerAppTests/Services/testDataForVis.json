@@ -24,7 +24,15 @@
                     "isArchived": false,
                     "colorHex": null,
                     "tags": null,
-                    "sessions": null
+                    "sessions": 
+                    [
+                        {
+                            "id": "ad0c044c-2dc3-4eed-89bd-7011b737fd2c",
+                            "startDatUtc": "2022-07-15T01:26:26Z",
+                            "durationSeconds": 2000,
+                            "notes": ""
+                        }
+                    ]
                 }
             ]
         },
@@ -58,15 +66,17 @@
                         {
                             "id": "c0a01773-4428-4c27-985f-1bd0be87712b",
                             "activityId": "3295ff98-14d1-4955-b4d0-97bed10c5833",
-                            "notes": "Game jam",
                             "startDateUtc": "2022-07-15T01:27:26Z",
+                            "durationSeconds": 2000,
+                            "notes": "Game jam",
                             "deletedDateUtc": null 
                         },
                         {
                             "id": "3f90adb9-95dc-4abe-bee6-13b1b2977763",
                             "activityId": "3295ff98-14d1-4955-b4d0-97bed10c5833",
-                            "notes": "More game jam",
                             "startDateUtc": "2022-07-15T01:27:26Z",
+                            "durationSeconds": 3600,
+                            "notes": "More game jam",
                             "deletedDateUtc": null 
                         }
                     ]
@@ -88,15 +98,17 @@
                         {
                             "id": "16f33737-8d96-405e-856a-a47d869b0cfc",
                             "activityId": "de2e1178-0125-40ad-b6a3-f922a080489b",
-                            "notes": "Scale exercises",
                             "startDateUtc": "2022-07-15T01:27:26Z",
+                            "durationSeconds": 6600,
+                            "notes": "Scale exercises",
                             "deletedDateUtc": null 
                         },
                         {
                             "id": "11d1ae01-841e-4239-a35c-7391c00a8328",
                             "activityId": "de2e1178-0125-40ad-b6a3-f922a080489b",
-                            "notes": "Learning new song",
                             "startDateUtc": "2022-07-15T01:27:26Z",
+                            "durationSeconds": 2000,
+                            "notes": "Learning new song",
                             "deletedDateUtc": null 
                         }
                     ]

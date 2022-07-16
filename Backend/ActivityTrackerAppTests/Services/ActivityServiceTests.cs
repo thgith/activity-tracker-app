@@ -16,9 +16,11 @@ namespace ActivityTrackerAppTests;
 //  startDateUtc null
 //  startDateUtc > dueDateUtc
 //  startDateUtc > completedDateUtc
+//  startDateUtc is MIN_DATE
 //  etc other paths
 // NOTE: Prob should add more checks to check side effects (call count, etc),
 //       but this is fine for now
+
 [TestClass]
 public class ActivityServiceTests : TestBase
 {
@@ -35,6 +37,7 @@ public class ActivityServiceTests : TestBase
 
     #region GetAllActivitiesAsync
     [TestMethod]
+    [TestCategory("GetAllActivitiesAsync")]
     public async Task GetAllActivitiesAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
@@ -92,6 +95,7 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("GetAllActivitiesAsync")]
     public async Task GetAllActivitiesAsync_NonAdmin_OwnActivities_Ok()
     {
         // -- Arrange --
@@ -149,6 +153,8 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("GetActivityAsync")]
+    [TestCategory("Forbidden")]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task GetAllActivitiesAsync_NonAdmin_AnothersActivities_ThrowForbidden()
     {
@@ -164,6 +170,7 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("GetActivityAsync")]
     public async Task GetAllActivitiesAsync_Admin_AnothersActivity_DeletedActivity_ReturnEmpty()
     {
         // -- Arrange --
@@ -184,6 +191,7 @@ public class ActivityServiceTests : TestBase
 
     #region GetActivityAsync
     [TestMethod]
+    [TestCategory("GetActivityAsync")]
     public async Task GetActivityAsync_Admin_AnotherUser_Ok()
     {
         // -- Arrange --
@@ -213,6 +221,7 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("GetActivityAsync")]
     public async Task GetActivityAsync_NonAdmin_OwnActivity_Ok()
     {
         // -- Arrange --
@@ -242,6 +251,8 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("GetActivityAsync")]
+    [TestCategory("Forbidden")]
     [ExpectedException(typeof(ForbiddenException))]
     public async Task GetActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
     {
@@ -257,6 +268,7 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("GetActivityAsync")]
     public async Task GetActivityAsync_Admin_AnothersActivity_DeletedActivity_ReturnEmpty()
     {
         // -- Arrange --
@@ -278,6 +290,7 @@ public class ActivityServiceTests : TestBase
     #region CreateActivityAsync
 
     [TestMethod]
+    [TestCategory("CreateActivityAsync")]
     public async Task CreateActivityAsync_Admin_AnothersActivity_Ok()
     {
         // -- Arrange --
@@ -309,21 +322,6 @@ public class ActivityServiceTests : TestBase
         mapperMock.Setup(x => x.Map<Activity>(actCreateDto))
                     .Returns(actEntity);
 
-        mapperMock.Setup(x => x.Map<ActivityGetDto>(actEntity))
-                    .Returns(new ActivityGetDto
-                    {
-                        Id = actEntity.Id,
-                        OwnerId = JOHN_USER_GUID,
-                        Name = actEntity.Name,
-                        Description = actEntity.Description,
-                        StartDateUtc = actEntity.StartDateUtc,
-                        DueDateUtc = actEntity.DueDateUtc,
-                        CompletedDateUtc = actEntity.CompletedDateUtc,
-                        IsArchived = actEntity.IsArchived,
-                        ColorHex = actEntity.ColorHex,
-                        Tags = actEntity.Tags,
-                    });
-
         var activityService = new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,
@@ -334,7 +332,7 @@ public class ActivityServiceTests : TestBase
         var activity = await activityService.CreateActivityAsync(JANE_USER_GUID, JOHN_USER_GUID, actCreateDto);
 
         // -- Assert --
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        // Verify returned object is as expected
         Assert.IsNotNull(activity);
         Assert.AreEqual(actCreateDto.Name, activity.Name);
         Assert.AreEqual(actCreateDto.Description, activity.Description);
@@ -345,17 +343,197 @@ public class ActivityServiceTests : TestBase
         Assert.AreEqual(actCreateDto.ColorHex, activity.ColorHex);
         Assert.IsFalse(activity.IsArchived);
         Assert.IsNull(activity.Tags);
+
+        // Verify DB changed
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+    }
+
+    [TestMethod]
+    [TestCategory("CreateActivityAsync")]
+    [TestCategory("Forbidden")]
+    [ExpectedException(typeof(ForbiddenException))]
+    public async Task CreateActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
+    {
+        // -- Arrange --
+        var actCreateDto = new ActivityCreateDto
+        {
+            Name = "NEW ACT",
+            Description = "A new activity",
+            StartDateUtc = null,
+            DueDateUtc = null,
+            CompletedDateUtc = null,
+            ColorHex = "#f00000",
+            Tags = null
+        };
+
+        var activityService = new ActivityService(
+            dbContextMock.Object,
+            userServiceMock.Object,
+            sessionServiceMock.Object,
+            mapperMock.Object);
+
+        // -- Act --
+        var activity = await activityService.CreateActivityAsync(JOHN_USER_GUID, JANE_USER_GUID, actCreateDto);
     }
 
     // TODO more tests
     #endregion CreateActivityAsync
 
     #region UpdateActivityAsync
-    // TODO add tests
+
+    [TestMethod]
+    [TestCategory("UpdateActivityAsync")]
+
+    public async Task UpdateActivityAsync_Admin_AnothersActivity_Ok()
+    {
+        // -- Arrange --
+        var actUpdateDto = new ActivityUpdateDto
+        {
+            Name = "UPDATE GAME ACT",
+            Description = "A new activity",
+            StartDateUtc = DateTime.UtcNow.AddDays(-3),
+            DueDateUtc = DateTime.UtcNow.AddDays(-2),
+            CompletedDateUtc = DateTime.UtcNow.AddDays(-1),
+            ColorHex = "#3366ff",
+            Tags = null
+        };
+
+        var actEntity = new Activity
+        {
+            Id = Guid.NewGuid(),
+            OwnerId = JOHN_USER_GUID,
+            Name = actUpdateDto.Name,
+            Description = actUpdateDto.Description,
+            StartDateUtc = actUpdateDto.StartDateUtc,
+            DueDateUtc = actUpdateDto.DueDateUtc,
+            CompletedDateUtc = actUpdateDto.CompletedDateUtc,
+            IsArchived = false,
+            ColorHex = actUpdateDto.ColorHex,
+            Tags = actUpdateDto.Tags,
+        };
+
+        mapperMock.Setup(x => x.Map<Activity>(actUpdateDto))
+                    .Returns(actEntity);
+
+        var activityService = new ActivityService(
+            dbContextMock.Object,
+            userServiceMock.Object,
+            sessionServiceMock.Object,
+            mapperMock.Object);
+
+        // -- Act --
+        var activity = await activityService.UpdateActivityAsync(JANE_USER_GUID, GAME_DEV_ACT_GUID, actUpdateDto);
+
+        // -- Assert --
+        // Verify the returned object is as expected
+        Assert.IsNotNull(activity);
+        Assert.AreEqual(actUpdateDto.Name, activity.Name);
+        Assert.AreEqual(actUpdateDto.Description, activity.Description);
+        // TODO: NEED TO WRAP DateTime to be able to mock it
+        // Assert.IsTrue(DatesEqualWithinSeconds((DateTime) activity.StartDateUtc, DateTime.UtcNow));
+        DatesEqualWithinSeconds((DateTime)actUpdateDto.DueDateUtc, (DateTime)activity.DueDateUtc);
+        DatesEqualWithinSeconds((DateTime)actUpdateDto.CompletedDateUtc, (DateTime)activity.CompletedDateUtc);
+        Assert.AreEqual(actUpdateDto.ColorHex, activity.ColorHex);
+        Assert.IsFalse(activity.IsArchived);
+        Assert.AreEqual(2, activity.Tags.Count());
+
+        // Verify the DB is changed
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+    }
+
+    [TestMethod]
+    [TestCategory("UpdateActivityAsync")]
+    public async Task UpdateActivityAsync_NonAdmin_OwnActivity_Ok()
+    {
+        // -- Arrange --
+        var actUpdateDto = new ActivityUpdateDto
+        {
+            Name = "UPDATE GAME ACT",
+            Description = "A new activity",
+            StartDateUtc = DateTime.UtcNow.AddDays(-3),
+            DueDateUtc = DateTime.UtcNow.AddDays(-2),
+            CompletedDateUtc = DateTime.UtcNow.AddDays(-1),
+            ColorHex = "#3366ff",
+            Tags = null
+        };
+
+        var actEntity = new Activity
+        {
+            Id = Guid.NewGuid(),
+            OwnerId = JOHN_USER_GUID,
+            Name = actUpdateDto.Name,
+            Description = actUpdateDto.Description,
+            StartDateUtc = actUpdateDto.StartDateUtc,
+            DueDateUtc = actUpdateDto.DueDateUtc,
+            CompletedDateUtc = actUpdateDto.CompletedDateUtc,
+            IsArchived = false,
+            ColorHex = actUpdateDto.ColorHex,
+            Tags = actUpdateDto.Tags,
+        };
+
+        mapperMock.Setup(x => x.Map<Activity>(actUpdateDto))
+                    .Returns(actEntity);
+
+        var activityService = new ActivityService(
+            dbContextMock.Object,
+            userServiceMock.Object,
+            sessionServiceMock.Object,
+            mapperMock.Object);
+
+        // -- Act --
+        var activity = await activityService.UpdateActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID, actUpdateDto);
+
+        // -- Assert --
+        // Verify the returned object is as expected
+        Assert.IsNotNull(activity);
+        Assert.AreEqual(actUpdateDto.Name, activity.Name);
+        Assert.AreEqual(actUpdateDto.Description, activity.Description);
+        // TODO: NEED TO WRAP DateTime to be able to mock it
+        // Assert.IsTrue(DatesEqualWithinSeconds((DateTime) activity.StartDateUtc, DateTime.UtcNow));
+        DatesEqualWithinSeconds((DateTime)actUpdateDto.DueDateUtc, (DateTime)activity.DueDateUtc);
+        DatesEqualWithinSeconds((DateTime)actUpdateDto.CompletedDateUtc, (DateTime)activity.CompletedDateUtc);
+        Assert.AreEqual(actUpdateDto.ColorHex, activity.ColorHex);
+        Assert.IsFalse(activity.IsArchived);
+        Assert.AreEqual(2, activity.Tags.Count());
+
+        // Verify the DB is changed
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+    }
+
+    [TestMethod]
+    [TestCategory("UpdateActivityAsync")]
+    [TestCategory("Forbidden")]
+    [ExpectedException(typeof(ForbiddenException))]
+    public async Task UpdateActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
+    {
+        // -- Arrange --
+        var actUpdateDto = new ActivityUpdateDto
+        {
+            Name = "UPDATE GAME ACT",
+            Description = "A new activity",
+            StartDateUtc = DateTime.UtcNow.AddDays(-3),
+            DueDateUtc = DateTime.UtcNow.AddDays(-2),
+            CompletedDateUtc = DateTime.UtcNow.AddDays(-1),
+            ColorHex = "#3366ff",
+            Tags = null
+        };
+
+        var activityService = new ActivityService(
+            dbContextMock.Object,
+            userServiceMock.Object,
+            sessionServiceMock.Object,
+            mapperMock.Object);
+
+        // -- Act --
+        var activity = await activityService.UpdateActivityAsync(JOHN_USER_GUID, PANIC_ACT_GUID, actUpdateDto);
+    }
+
+    // TODO add more tests
     #endregion UpdateActivityAsync
 
     #region DeleteActivityAsync
     [TestMethod]
+    [TestCategory("DeleteActivityAsync")]
     public async Task DeleteActivityAsync_Admin_AnothersActivity_Ok()
     {
         // -- Arrange --
@@ -374,17 +552,19 @@ public class ActivityServiceTests : TestBase
 
         // Activity should be soft-deleted
         Assert.IsNotNull(gameDevAct.DeletedDateUtc);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) gameDevAct.DeletedDateUtc, DateTime.UtcNow));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevAct.DeletedDateUtc, DateTime.UtcNow));
 
         // Sessions should be deleted too
         Assert.IsNotNull(gameDevSesh1.DeletedDateUtc);
         Assert.IsNotNull(gameDevSesh2.DeletedDateUtc);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) gameDevSesh2.DeletedDateUtc, DateTime.UtcNow));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh2.DeletedDateUtc, DateTime.UtcNow));
 
     }
 
     [TestMethod]
+    [TestCategory("DeleteActivityAsync")]
+    [TestCategory("Forbidden")]
     [ExpectedException(typeof(ForbiddenException))]
 
     public async Task DeleteActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
@@ -401,6 +581,7 @@ public class ActivityServiceTests : TestBase
     }
 
     [TestMethod]
+    [TestCategory("DeleteActivityAsync")]
 
     public async Task DeleteActivityAsync_NonAdmin_OwnActivity_Ok()
     {
@@ -413,20 +594,20 @@ public class ActivityServiceTests : TestBase
 
         // -- Act --
         var isSuccessful = await activityService.DeleteActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID);
-        
+
         // -- Assert --
         Assert.IsTrue(isSuccessful);
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
 
         // Activity should be soft-deleted
         Assert.IsNotNull(gameDevAct.DeletedDateUtc);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) gameDevAct.DeletedDateUtc, DateTime.UtcNow));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevAct.DeletedDateUtc, DateTime.UtcNow));
 
         // Sessions should be deleted too
         Assert.IsNotNull(gameDevSesh1.DeletedDateUtc);
         Assert.IsNotNull(gameDevSesh2.DeletedDateUtc);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime) gameDevSesh2.DeletedDateUtc, DateTime.UtcNow));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh2.DeletedDateUtc, DateTime.UtcNow));
     }
 
     // TODO more tests

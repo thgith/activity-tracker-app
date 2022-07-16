@@ -127,48 +127,25 @@ public abstract class TestBase
     private void _setUpMapperMocks()
     {
         mapperMock = new Mock<IMapper>();
-        mapperMock.Setup(x => x.Map<ActivityGetDto>(gameDevAct))
-                    .Returns(new ActivityGetDto
-                    {
-                        Id = gameDevAct.Id,
-                        OwnerId = gameDevAct.OwnerId,
-                        Name = gameDevAct.Name,
-                        Description = gameDevAct.Description,
-                        StartDateUtc = gameDevAct.StartDateUtc,
-                        DueDateUtc = gameDevAct.DueDateUtc,
-                        CompletedDateUtc = gameDevAct.CompletedDateUtc,
-                        IsArchived = gameDevAct.IsArchived,
-                        ColorHex = gameDevAct.ColorHex,
-                        Tags = gameDevAct.Tags,
-                    });
-        mapperMock.Setup(x => x.Map<ActivityGetDto>(pianoAct))
-                    .Returns(new ActivityGetDto
-                    {
-                        Id = pianoAct.Id,
-                        OwnerId = pianoAct.OwnerId,
-                        Name = pianoAct.Name,
-                        Description = pianoAct.Description,
-                        StartDateUtc = pianoAct.StartDateUtc,
-                        DueDateUtc = pianoAct.DueDateUtc,
-                        CompletedDateUtc = pianoAct.CompletedDateUtc,
-                        IsArchived = pianoAct.IsArchived,
-                        ColorHex = pianoAct.ColorHex,
-                        Tags = pianoAct.Tags,
-                    });
-        mapperMock.Setup(x => x.Map<ActivityGetDto>(mcatAct))
-                    .Returns(new ActivityGetDto
-                    {
-                        Id = mcatAct.Id,
-                        OwnerId = mcatAct.OwnerId,
-                        Name = mcatAct.Name,
-                        Description = mcatAct.Description,
-                        StartDateUtc = mcatAct.StartDateUtc,
-                        DueDateUtc = mcatAct.DueDateUtc,
-                        CompletedDateUtc = mcatAct.CompletedDateUtc,
-                        IsArchived = mcatAct.IsArchived,
-                        ColorHex = mcatAct.ColorHex,
-                        Tags = mcatAct.Tags,
-                    });
+
+        mapperMock.Setup(x => x.Map<ActivityGetDto>(It.Is<Activity>(x => x == null)))
+            .Returns<ActivityGetDto>(null);
+
+        mapperMock.Setup(x => x.Map<ActivityGetDto>(It.Is<Activity>(x => x != null)))
+            .Returns((Activity activity) =>
+                new ActivityGetDto
+                {
+                    Id = activity.Id,
+                    OwnerId = activity.OwnerId,
+                    Name = activity.Name,
+                    Description = activity.Description,
+                    StartDateUtc = activity.StartDateUtc,
+                    DueDateUtc = activity.DueDateUtc,
+                    CompletedDateUtc = activity.CompletedDateUtc,
+                    IsArchived = activity.IsArchived,
+                    ColorHex = activity.ColorHex,
+                    Tags = activity.Tags,
+                });
     }
 
     private void _setUpServiceMocks()

@@ -11,21 +11,10 @@ using ActivityTrackerApp.Exceptions;
 
 namespace ActivityTrackerAppTests;
 
-// TODO: Need to finish these tests
 // TODO: Need to test diff data edge cases
 [TestClass]
 public class SessionServiceTests : TestBase
 {
-    private void _assertSessionsEqual(Session expectedSession, SessionGetDto actualSession)
-    {
-        Assert.IsNotNull(actualSession);
-        Assert.AreEqual(expectedSession.Id, actualSession.Id);
-        Assert.AreEqual(expectedSession.ActivityId, actualSession.ActivityId);
-        DatesEqualWithinSeconds((DateTime)expectedSession.StartDateUtc, actualSession.StartDateUtc);
-        Assert.AreEqual(expectedSession.DurationSeconds, actualSession.DurationSeconds);
-        Assert.AreEqual(expectedSession.Notes, actualSession.Notes);
-    }
-
     // Called before all tests
     // TODO figure out why it didn't like being in the base class
     [ClassInitialize()]
@@ -509,4 +498,14 @@ public class SessionServiceTests : TestBase
         Assert.IsNull(gameDevAct.DeletedDateUtc);
     }
     #endregion DeleteSessionAsync
+
+    private void _assertSessionsEqual(Session expectedSession, SessionGetDto actualSession)
+    {
+        Assert.IsNotNull(actualSession);
+        Assert.AreEqual(expectedSession.Id, actualSession.Id);
+        Assert.AreEqual(expectedSession.ActivityId, actualSession.ActivityId);
+        DatesEqualWithinSeconds((DateTime)expectedSession.StartDateUtc, actualSession.StartDateUtc);
+        Assert.AreEqual(expectedSession.DurationSeconds, actualSession.DurationSeconds);
+        Assert.AreEqual(expectedSession.Notes, actualSession.Notes);
+    }
 }
