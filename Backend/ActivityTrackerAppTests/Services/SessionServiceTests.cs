@@ -12,15 +12,15 @@ namespace ActivityTrackerAppTests;
 
 // TODO: Need to test diff data edge cases
 [TestClass]
-public class SessionServiceTests : TestBase
+public class SessionServiceTests : ServiceTestsBase
 {
     // Called before all tests
-    // TODO figure out why it didn't like being in the base class
     [ClassInitialize()]
     public static void InitializeClass(TestContext context)
     {
-        // Init users here since they won't change through each activity test
-        usersData = new List<User> { GenerateJaneUser(), GenerateJohnUser(), GenerateJudyUser() };
+        // NOTE: We just call this base method in the child classes
+        //       since [ClassInitialize] method can't be inherited
+        initializeClass();
     }
 
     #region GetAllSessionsAsync
@@ -35,15 +35,7 @@ public class SessionServiceTests : TestBase
         var sessions = await sessionService.GetAllSessionsByActivityIdAsync(JANE_USER_GUID, GAME_DEV_ACT_GUID);
 
         // -- Assert --
-        Assert.IsNotNull(sessions);
-
-        // Only non-deleted sessions
-        Assert.AreEqual(2, sessions.Count());
-        var sessionsList = sessions.ToList();
-        _assertSessionsEqual(gameDevSesh1, sessionsList[0]);
-        _assertSessionsEqual(gameDevSesh2, sessionsList[1]);
-
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertGetAllOk(sessions);
     }
 
     [TestMethod]
@@ -57,15 +49,7 @@ public class SessionServiceTests : TestBase
         var sessions = await sessionService.GetAllSessionsByActivityIdAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID);
 
         // -- Assert --
-        Assert.IsNotNull(sessions);
-
-        // Only non-deleted sessions
-        Assert.AreEqual(2, sessions.Count());
-        var sessionsList = sessions.ToList();
-        _assertSessionsEqual(gameDevSesh1, sessionsList[0]);
-        _assertSessionsEqual(gameDevSesh2, sessionsList[1]);
-
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertGetAllOk(sessions);
     }
 
     [TestMethod]
@@ -94,9 +78,7 @@ public class SessionServiceTests : TestBase
         var session = await sessionService.GetSessionAsync(JANE_USER_GUID, GAME_DEV_SESH1_GUID);
 
         // -- Assert --
-        Assert.IsNotNull(session);
-        _assertSessionsEqual(gameDevSesh1, session);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertGetOk(gameDevSesh1, session);
     }
 
     [TestMethod]
@@ -110,9 +92,7 @@ public class SessionServiceTests : TestBase
         var session = await sessionService.GetSessionAsync(JOHN_USER_GUID, GAME_DEV_SESH1_GUID);
 
         // -- Assert --
-        Assert.IsNotNull(session);
-        _assertSessionsEqual(gameDevSesh1, session);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertGetOk(gameDevSesh1, session);
     }
 
     [TestMethod]
@@ -127,8 +107,7 @@ public class SessionServiceTests : TestBase
         var session = await sessionService.GetSessionAsync(JOHN_USER_GUID, sessionGuid);
 
         // -- Assert --
-        Assert.IsNull(session);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertGetReturnNull(session);
     }
 
     [TestMethod]
@@ -142,8 +121,7 @@ public class SessionServiceTests : TestBase
         var session = await sessionService.GetSessionAsync(JOHN_USER_GUID, GAME_DEV_SESH_DELETED_GUID);
 
         // -- Assert --
-        Assert.IsNull(session);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertGetReturnNull(session);
     }
 
     [TestMethod]
@@ -202,11 +180,7 @@ public class SessionServiceTests : TestBase
         var session = await sessionService.CreateSessionAsync(JANE_USER_GUID, newSessionDto);
 
         // -- Assert --
-        // Check return object
-        _assertReturnedFromCreate(newSessionDto, session);
-
-        // Check the fake DB
-        _assertDbFromCreate(newSessionDto);
+        _assertCreateOk(newSessionDto, session);
     }
 
     [TestMethod]
@@ -249,11 +223,7 @@ public class SessionServiceTests : TestBase
         var session = await sessionService.CreateSessionAsync(JOHN_USER_GUID, newSessionDto);
 
         // -- Assert --
-        // Check return object
-        _assertReturnedFromCreate(newSessionDto, session);
-
-        // Check the fake DB
-        _assertDbFromCreate(newSessionDto);
+        _assertCreateOk(newSessionDto, session);
     }
 
     [TestMethod]
@@ -282,8 +252,7 @@ public class SessionServiceTests : TestBase
         var session = await sessionService.CreateSessionAsync(JOHN_USER_GUID, newSessionDto);
 
         // -- Assert --
-        Assert.IsNull(session);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertCreateReturnNull(session);
     }
 
     [TestMethod]
@@ -312,8 +281,7 @@ public class SessionServiceTests : TestBase
         var session = await sessionService.CreateSessionAsync(JOHN_USER_GUID, newSessionDto);
 
         // -- Assert --
-        Assert.IsNull(session);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertCreateReturnNull(session);
     }
 
     [TestMethod]
@@ -450,8 +418,7 @@ public class SessionServiceTests : TestBase
         var session = await sessionService.UpdateSessionAsync(JOHN_USER_GUID, sessionGuid, updateSessionDto);
 
         // -- Assert --
-        Assert.IsNull(session);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertUpdateReturnNull(session);
     }
 
     [TestMethod]
@@ -480,8 +447,7 @@ public class SessionServiceTests : TestBase
         var session = await sessionService.UpdateSessionAsync(JOHN_USER_GUID, sessionGuid, updateSessionDto);
 
         // -- Assert --
-        Assert.IsNull(session);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertUpdateReturnNull(session);
     }
 
     // TODO add more tests
@@ -566,6 +532,32 @@ public class SessionServiceTests : TestBase
             mapperMock.Object);
     }
 
+    private void _assertGetAllOk(IEnumerable<SessionGetDto> returnedSessions)
+    {
+        Assert.IsNotNull(returnedSessions);
+
+        // Only non-deleted sessions
+        Assert.AreEqual(2, returnedSessions.Count());
+        var sessionsList = returnedSessions.ToList();
+        _assertSessionsEqual(gameDevSesh1, sessionsList[0]);
+        _assertSessionsEqual(gameDevSesh2, sessionsList[1]);
+
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
+    private void _assertGetOk(Session expectedSession, SessionGetDto returnedSession)
+    {
+        Assert.IsNotNull(returnedSession);
+        _assertSessionsEqual(expectedSession, returnedSession);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
+    private void _assertGetReturnNull(SessionGetDto returnedSession)
+    {
+        Assert.IsNull(returnedSession);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
     private void _assertSessionsEqual(Session expectedSession, SessionGetDto returnedSession)
     {
         Assert.IsNotNull(returnedSession);
@@ -574,6 +566,21 @@ public class SessionServiceTests : TestBase
         DatesEqualWithinSeconds((DateTime)expectedSession.StartDateUtc, returnedSession.StartDateUtc);
         Assert.AreEqual(expectedSession.DurationSeconds, returnedSession.DurationSeconds);
         Assert.AreEqual(expectedSession.Notes, returnedSession.Notes);
+    }
+
+    private void _assertCreateOk(SessionCreateDto createDto, SessionGetDto returnedSession)
+    {
+        // Check return object
+        _assertReturnedFromCreate(createDto, returnedSession);
+
+        // Check the fake DB
+        _assertDbFromCreate(createDto);
+    }
+
+    private void _assertCreateReturnNull(SessionGetDto returnedSession)
+    {
+        Assert.IsNull(returnedSession);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 
     private void _assertReturnedFromCreate(SessionCreateDto createDto, SessionGetDto returnedSession)
@@ -607,6 +614,12 @@ public class SessionServiceTests : TestBase
 
         // Check the fake DB
         _assertDbFromUpdate(sessionId, activityId, updateDto);
+    }
+
+    private void _assertUpdateReturnNull(SessionGetDto returnedSession)
+    {
+        Assert.IsNull(returnedSession);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 
     private void _assertReturnedFromUpdate(Guid activityId, SessionUpdateDto updateDto, SessionGetDto returnedSession)

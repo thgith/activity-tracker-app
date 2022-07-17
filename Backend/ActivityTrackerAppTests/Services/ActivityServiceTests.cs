@@ -13,17 +13,24 @@ namespace ActivityTrackerAppTests;
 // TODO: Need to test diff data edge cases
 // NOTE: Prob should add more checks to check side effects (call count, etc)
 [TestClass]
-public class ActivityServiceTests : TestBase
+public class ActivityServiceTests : ServiceTestsBase
 {
-    private static Mock<ISessionService> _sessionsService;
-
+    private static Mock<ISessionService> _sessionsServiceMock;
+    
     // Called before all tests
-    // TODO figure out why it didn't like being in the base class
     [ClassInitialize()]
     public static void InitializeClass(TestContext context)
     {
-        // Init users here since they won't change through each activity test
-        usersData = new List<User> { GenerateJaneUser(), GenerateJohnUser(), GenerateJudyUser() };
+        // NOTE: We just call this base method in the child classes
+        //       since [ClassInitialize] method can't be inherited
+        initializeClass();
+    }
+
+    // Called before each test
+    [TestInitialize()]
+    public void InitializeActivityTests()
+    {
+        _sessionsServiceMock = new Mock<ISessionService>();
     }
 
     #region GetAllActivitiesAsync
@@ -587,7 +594,7 @@ public class ActivityServiceTests : TestBase
         return new ActivityService(
             dbContextMock.Object,
             userServiceMock.Object,
-            sessionServiceMock.Object,
+            _sessionsServiceMock.Object,
             mapperMock.Object);
     }
 

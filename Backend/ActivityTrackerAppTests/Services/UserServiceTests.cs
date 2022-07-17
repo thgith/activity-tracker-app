@@ -50,7 +50,7 @@ public class UserServiceTests
         _setUpUsers();
         _setUpMocks();
     }
-    
+
     private void _setUpUsers()
     {
         _janeUser = GenerateJaneUser();
@@ -84,21 +84,6 @@ public class UserServiceTests
         void _setUpMapperMock()
         {
             _mapperMock = new Mock<IMapper>();
-
-            _mapperMock.Setup(x => x.Map<UserGetDto>(It.Is<User>(x => x == null)))
-                .Returns<UserGetDto>(null);
-
-            _mapperMock.Setup(x => x.Map<UserGetDto>(It.Is<User>(x => x != null)))
-                .Returns((User user) =>
-                    new UserGetDto
-                    {
-                        Id = user.Id,
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = user.Email,
-                        JoinDateUtc = user.JoinDateUtc
-                    }
-                );
 
             _mapperMock.Setup(x => x.Map<UserGetDto>(It.Is<User>(x => x == null)))
                 .Returns<UserGetDto>(null);
@@ -347,7 +332,7 @@ public class UserServiceTests
         var userService = _createUserService();
 
         // -- Act --
-        var returnedDto = await userService.UpdateUserAsync(
+        var user = await userService.UpdateUserAsync(
             JANE_USER_GUID,
             JOHN_USER_GUID,
             new UserUpdateDto
@@ -360,18 +345,7 @@ public class UserServiceTests
         );
 
         // -- Assert --
-        Assert.IsNotNull(returnedDto);
-
-        // Check that the returned user is as expected
-        _assertUsersSame(returnedDto, JOHN_USER_GUID, NEW_FIRST_NAME, NEW_LAST_NAME, NEW_EMAIL);
-
-        // Check that the returned user is as expected
-        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-        Assert.AreEqual(JOHN_USER_GUID, _johnUser.Id);
-        Assert.AreEqual(NEW_FIRST_NAME, _johnUser.FirstName);
-        Assert.AreEqual(NEW_LAST_NAME, _johnUser.LastName);
-        Assert.AreEqual(NEW_EMAIL, _johnUser.Email);
-        BCrypt.Net.BCrypt.Verify(NEW_PASSWORD, _johnUser.PasswordHash);
+        _assertUpdateOk(user);
     }
 
     [TestMethod]
@@ -382,7 +356,7 @@ public class UserServiceTests
         var userService = _createUserService();
 
         // -- Act --
-        var returnedDto = await userService.UpdateUserAsync(
+        var user = await userService.UpdateUserAsync(
             JOHN_USER_GUID,
             JOHN_USER_GUID,
             new UserUpdateDto
@@ -395,18 +369,7 @@ public class UserServiceTests
         );
 
         // -- Assert --
-        Assert.IsNotNull(returnedDto);
-
-        // Check that the returned user is as expected
-        _assertUsersSame(returnedDto, JOHN_USER_GUID, NEW_FIRST_NAME, NEW_LAST_NAME, NEW_EMAIL);
-
-        // Check that the saved user is as expected
-        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-        Assert.AreEqual(JOHN_USER_GUID, _johnUser.Id);
-        Assert.AreEqual(NEW_FIRST_NAME, _johnUser.FirstName);
-        Assert.AreEqual(NEW_LAST_NAME, _johnUser.LastName);
-        Assert.AreEqual(NEW_EMAIL, _johnUser.Email);
-        BCrypt.Net.BCrypt.Verify(NEW_PASSWORD, _johnUser.PasswordHash);
+        _assertUpdateOk(user);
     }
 
     [TestMethod]
@@ -482,15 +445,14 @@ public class UserServiceTests
         };
 
         // -- Act --
-        var returnedDto = await userService.UpdateUserAsync(
+        var user = await userService.UpdateUserAsync(
             JANE_USER_GUID,
             Guid.NewGuid(),
             userUpdateDto
         );
 
         // -- Assert --
-        Assert.IsNull(returnedDto);
-        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertUpdateReturnNull(user);
     }
 
     [TestMethod]
@@ -506,20 +468,16 @@ public class UserServiceTests
         };
 
         // -- Act --
-        var returnedDto = await userService.UpdateUserAsync(
+        var user = await userService.UpdateUserAsync(
             JANE_USER_GUID,
             JUDY_USER_GUID,
             userUpdateDto
         );
 
         // -- Assert --
-        Assert.IsNull(returnedDto);
-        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
-        Assert.AreEqual(JUDY_FIRST_NAME, _judyUser.FirstName);
-        Assert.AreEqual(COMMON_LAST_NAME, _judyUser.LastName);
-        Assert.AreEqual(JUDY_EMAIL, _judyUser.Email);
-        BCrypt.Net.BCrypt.Verify(COMMON_OLD_PASSWORD, _judyUser.PasswordHash);
+        _assertUpdateReturnNull(user);
     }
+
     #endregion
 
     #region DeleteUserAsync
@@ -535,11 +493,7 @@ public class UserServiceTests
         var isSuccess = await userService.DeleteUserAsync(JANE_USER_GUID, JOHN_USER_GUID);
 
         // -- Assert --
-        Assert.IsTrue(isSuccess);
-        Assert.IsNotNull(_johnUser.DeletedDateUtc);
-        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-        // Check that the dates are equal within a threshold
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)_johnUser.DeletedDateUtc, DateTime.UtcNow));
+        _assertDeleteOk(isSuccess);
     }
 
     [TestMethod]
@@ -553,8 +507,7 @@ public class UserServiceTests
         var isSuccess = await userService.DeleteUserAsync(JANE_USER_GUID, Guid.NewGuid());
 
         // -- Assert --
-        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
-        Assert.IsFalse(isSuccess);
+        _assertDeleteReturnFalse(isSuccess);
     }
 
     [TestMethod]
@@ -568,8 +521,7 @@ public class UserServiceTests
         var isSuccess = await userService.DeleteUserAsync(JANE_USER_GUID, JUDY_USER_GUID);
 
         // -- Assert --
-        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
-        Assert.IsFalse(isSuccess);
+        _assertDeleteReturnFalse(isSuccess);
     }
 
     [TestMethod]
@@ -583,11 +535,7 @@ public class UserServiceTests
         var isSuccess = await userService.DeleteUserAsync(JOHN_USER_GUID, JOHN_USER_GUID);
 
         // -- Assert --
-        Assert.IsTrue(isSuccess);
-        Assert.IsNotNull(_johnUser.DeletedDateUtc);
-        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-        // Check that the dates are equal within a threshold
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)_johnUser.DeletedDateUtc, DateTime.UtcNow));
+        _assertDeleteOk(isSuccess);
     }
 
     [TestMethod]
@@ -604,18 +552,6 @@ public class UserServiceTests
     }
     #endregion
 
-    private void _assertUsersSame(UserGetDto user, Guid id, string firstName, string lastName, string email)
-    {
-        Assert.IsTrue(user != null);
-        Assert.AreEqual(id, user.Id);
-        Assert.AreEqual(firstName, user.FirstName);
-        Assert.AreEqual(lastName, user.LastName);
-        Assert.AreEqual(email, user.Email);
-
-        // Check that the dates are equal within a threshold
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)user.JoinDateUtc, DateTime.UtcNow));
-    }
-
     private UserService _createUserService()
     {
         return new UserService(
@@ -623,5 +559,54 @@ public class UserServiceTests
             _jwtServiceMock.Object,
             _configMock.Object,
             _mapperMock.Object);
+    }
+
+    private void _assertUsersSame(UserGetDto returnedUser, Guid id, string firstName, string lastName, string email)
+    {
+        Assert.IsTrue(returnedUser != null);
+        Assert.AreEqual(id, returnedUser.Id);
+        Assert.AreEqual(firstName, returnedUser.FirstName);
+        Assert.AreEqual(lastName, returnedUser.LastName);
+        Assert.AreEqual(email, returnedUser.Email);
+
+        // Check that the dates are equal within a threshold
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)returnedUser.JoinDateUtc, DateTime.UtcNow));
+    }
+
+    private void _assertUpdateOk(UserGetDto returnedUser)
+    {
+        Assert.IsNotNull(returnedUser);
+
+        // Check that the returned user is as expected
+        _assertUsersSame(returnedUser, JOHN_USER_GUID, NEW_FIRST_NAME, NEW_LAST_NAME, NEW_EMAIL);
+
+        // Check that the DB is as expected
+        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        Assert.AreEqual(JOHN_USER_GUID, _johnUser.Id);
+        Assert.AreEqual(NEW_FIRST_NAME, _johnUser.FirstName);
+        Assert.AreEqual(NEW_LAST_NAME, _johnUser.LastName);
+        Assert.AreEqual(NEW_EMAIL, _johnUser.Email);
+        BCrypt.Net.BCrypt.Verify(NEW_PASSWORD, _johnUser.PasswordHash);
+    }
+    
+    private void _assertUpdateReturnNull(UserGetDto returnedUser)
+    {
+        Assert.IsNull(returnedUser);
+        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
+    private void _assertDeleteOk(bool isSuccess)
+    {
+        Assert.IsTrue(isSuccess);
+        Assert.IsNotNull(_johnUser.DeletedDateUtc);
+        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        // Check that the dates are equal within a threshold
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)_johnUser.DeletedDateUtc, DateTime.UtcNow));
+    }
+
+    private void _assertDeleteReturnFalse(bool isSuccess)
+    {
+        _dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        Assert.IsFalse(isSuccess);
     }
 }

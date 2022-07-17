@@ -16,7 +16,7 @@ using static ActivityTrackerAppTests.Fixtures.TestFixtures;
 namespace ActivityTrackerAppTests;
 
 [TestClass]
-public abstract class TestBase
+public abstract class ServiceTestsBase
 {
     protected static List<User> usersData;
 
@@ -45,17 +45,15 @@ public abstract class TestBase
     protected static Mock<DbSet<Session>> sessionsDbSetMock;
     protected static Mock<IDataContext> dbContextMock;
     protected static Mock<IUserService> userServiceMock;
-    protected static Mock<ISessionService> sessionServiceMock;
     protected static Mock<IMapper> mapperMock;
 
-    // TODO figure out why they don't like this
-    // Called before all tests
-    // [ClassInitialize()]
-    // public static void InitializeClass(TestContext context)
-    // {
-    //     // Init users here since they won't change through each activity test
-    //     usersData = new List<User> { GenerateJaneUser(), GenerateJohnUser(), GenerateJudyUser() };
-    // }
+    // NOTE: We just call this in the child classes since [ClassInitialize] method
+    //       can't be inherited
+    protected static void initializeClass()
+    {
+        // Init users here since they won't change through each activity/session test
+        usersData = new List<User> { GenerateJaneUser(), GenerateJohnUser(), GenerateJudyUser() };
+    }
 
     // Called before each test
     [TestInitialize]
@@ -208,7 +206,5 @@ public abstract class TestBase
                             .Returns(Task.FromResult(false));
         userServiceMock.Setup(m => m.IsAdmin(JUDY_USER_GUID))
                             .Returns(Task.FromResult(false));
-
-        sessionServiceMock = new Mock<ISessionService>();
     }
 }
