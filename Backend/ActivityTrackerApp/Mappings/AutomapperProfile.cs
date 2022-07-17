@@ -1,5 +1,6 @@
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
+
 using AutoMapper;
 
 namespace ActivityTrackerApp.Mappings;

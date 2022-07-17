@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using ActivityTrackerApp.Constants;
+
 using Microsoft.EntityFrameworkCore;
+
+using ActivityTrackerApp.Constants;
 
 namespace ActivityTrackerApp.Entities;
 

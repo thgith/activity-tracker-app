@@ -1,8 +1,10 @@
 using System.Security.Claims;
+
+using Microsoft.AspNetCore.Mvc;
+
 using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Exceptions;
 using ActivityTrackerApp.Services;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ActivityTrackerApp.Controllers;
 

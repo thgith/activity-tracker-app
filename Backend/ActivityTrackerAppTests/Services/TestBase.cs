@@ -1,12 +1,17 @@
+using Microsoft.EntityFrameworkCore;
+
 using ActivityTrackerApp.Database;
+using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
 using ActivityTrackerApp.Services;
-using static ActivityTrackerAppTests.Fixtures.TestFixtures;
+
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Moq;
-using ActivityTrackerApp.Dtos;
+
 using MockQueryable.Moq;
+
+using Moq;
+
+using static ActivityTrackerAppTests.Fixtures.TestFixtures;
 
 namespace ActivityTrackerAppTests;
 
@@ -179,7 +184,7 @@ public abstract class TestBase
                             DurationSeconds = session.DurationSeconds,
                             Notes = session.Notes
                         });
-                        
+
         // Session Create mapping
         mapperMock.Setup(x => x.Map<Session>(It.Is<SessionCreateDto>(x => x == null)))
             .Returns<Session>(null);

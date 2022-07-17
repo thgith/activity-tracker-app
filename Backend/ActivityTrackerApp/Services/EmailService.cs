@@ -1,5 +1,7 @@
 using ActivityTrackerApp.Entities;
+
 using MailKit.Net.Smtp;
+
 using MimeKit;
 
 namespace ActivityTrackerApp.Services;

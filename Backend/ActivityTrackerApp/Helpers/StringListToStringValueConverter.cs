@@ -1,5 +1,6 @@
-using ActivityTrackerApp.Entities;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+using ActivityTrackerApp.Entities;
 
 namespace ActivityTrackerApp.Helpers;
 

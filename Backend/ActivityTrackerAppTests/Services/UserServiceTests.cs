@@ -1,16 +1,21 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
 using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Database;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
 using ActivityTrackerApp.Exceptions;
 using ActivityTrackerApp.Services;
+
+using AutoMapper;
+
+using MockQueryable.Moq;
+
+using Moq;
+
 using static ActivityTrackerAppTests.Fixtures.TestFixtures;
 using static ActivityTrackerAppTests.Helpers.TestHelpers;
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using MockQueryable.Moq;
-using Moq;
 
 namespace ActivityTrackerAppTests;
 

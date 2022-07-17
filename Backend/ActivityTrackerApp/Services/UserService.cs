@@ -1,10 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+
 using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Database;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
 using ActivityTrackerApp.Exceptions;
+
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace ActivityTrackerApp.Services;
 

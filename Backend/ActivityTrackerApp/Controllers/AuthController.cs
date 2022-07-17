@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Mvc;
+
 using ActivityTrackerApp.Constants;
 using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Services;
-using Microsoft.AspNetCore.Mvc;
+
 namespace ActivityTrackerApp.Controllers;
 
 /// <summary>

@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+
 using ActivityTrackerApp.Entities;
 
 namespace ActivityTrackerApp.Services

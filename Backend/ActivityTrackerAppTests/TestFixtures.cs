@@ -32,9 +32,9 @@ public static class TestFixtures
     public const string PIANO_SESH2_GUID_STR = "11d1ae01-841e-4239-a35c-7391c00a8328";
     public const string GAME_DEV_SESH_DELETED_GUID_STR = "f9f21b0e-888a-4a0c-827c-5c6ba40de3db";
     public const string JOHNS_DELETED_SESH_ON_DELETED_ACT_GUID_STR = "c9044a48-059c-42f7-82ac-bae88ee49afe";
-    
+
     public static Guid NON_EXISTENT_GUID;
-    
+
     // User
     // User GUIDs
     public static Guid JANE_USER_GUID;

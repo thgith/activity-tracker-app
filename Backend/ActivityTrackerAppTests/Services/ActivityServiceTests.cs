@@ -1,10 +1,12 @@
+using ActivityTrackerApp.Dtos;
 using ActivityTrackerApp.Entities;
+using ActivityTrackerApp.Exceptions;
 using ActivityTrackerApp.Services;
+
+using Moq;
+
 using static ActivityTrackerAppTests.Fixtures.TestFixtures;
 using static ActivityTrackerAppTests.Helpers.TestHelpers;
-using Moq;
-using ActivityTrackerApp.Dtos;
-using ActivityTrackerApp.Exceptions;
 
 namespace ActivityTrackerAppTests;
 
