@@ -368,11 +368,7 @@ public class SessionServiceTests : TestBase
         var session = await sessionService.UpdateSessionAsync(JANE_USER_GUID, sessionGuid, updateSessionDto);
 
         // -- Assert --
-        // Check return object
-        _assertReturnedFromUpdate(GAME_DEV_ACT_GUID, updateSessionDto, session);
-
-        // Check the fake DB
-        _assertDbFromUpdate(sessionGuid, GAME_DEV_ACT_GUID, updateSessionDto);
+        _assertUpdateOk(sessionGuid, GAME_DEV_ACT_GUID, updateSessionDto, session);
     }
 
     [TestMethod]
@@ -423,11 +419,7 @@ public class SessionServiceTests : TestBase
         var session = await sessionService.UpdateSessionAsync(JOHN_USER_GUID, sessionGuid, updateSessionDto);
 
         // -- Assert --
-        // Check return object
-        _assertReturnedFromUpdate(GAME_DEV_ACT_GUID, updateSessionDto, session);
-
-        // Check the fake DB
-        _assertDbFromUpdate(sessionGuid, GAME_DEV_ACT_GUID, updateSessionDto);
+        _assertUpdateOk(sessionGuid, GAME_DEV_ACT_GUID, updateSessionDto, session);
     }
 
     [TestMethod]
@@ -505,15 +497,7 @@ public class SessionServiceTests : TestBase
         var isSuccessful = await sessionService.DeleteSessionAsync(JANE_USER_GUID, GAME_DEV_SESH1_GUID);
 
         // -- Assert --
-        Assert.IsTrue(isSuccessful);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-
-        // Sessions should be soft-deleted
-        Assert.IsNotNull(gameDevSesh1.DeletedDateUtc);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
-
-        // The session's activity should not be soft-deleted
-        Assert.IsNull(gameDevAct.DeletedDateUtc);
+        _assertDeleteOk(isSuccessful);
     }
 
     [TestMethod]
@@ -540,15 +524,7 @@ public class SessionServiceTests : TestBase
         var isSuccessful = await sessionService.DeleteSessionAsync(JOHN_USER_GUID, GAME_DEV_SESH1_GUID);
 
         // -- Assert --
-        Assert.IsTrue(isSuccessful);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-
-        // Session should be soft-deleted
-        Assert.IsNotNull(gameDevSesh1.DeletedDateUtc);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
-
-        // The session's activity should not be soft-deleted
-        Assert.IsNull(gameDevAct.DeletedDateUtc);
+        _assertDeleteOk(isSuccessful);
     }
 
     [TestMethod]
@@ -562,8 +538,7 @@ public class SessionServiceTests : TestBase
         var isSuccessful = await sessionService.DeleteSessionAsync(JOHN_USER_GUID, NON_EXISTENT_GUID);
 
         // -- Assert --
-        Assert.IsFalse(isSuccessful);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertDeleteReturnFalse(isSuccessful);
     }
 
     [TestMethod]
@@ -577,8 +552,7 @@ public class SessionServiceTests : TestBase
         var isSuccessful = await sessionService.DeleteSessionAsync(JOHN_USER_GUID, GAME_DEV_SESH_DELETED_GUID);
 
         // -- Assert --
-        Assert.IsFalse(isSuccessful);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertDeleteReturnFalse(isSuccessful);
     }
     #endregion DeleteSessionAsync
 
@@ -624,6 +598,15 @@ public class SessionServiceTests : TestBase
         Assert.AreEqual(createDto.Notes, savedSesh.Notes);
     }
 
+    private void _assertUpdateOk(Guid sessionId, Guid activityId, SessionUpdateDto updateDto, SessionGetDto returnedSession)
+    {
+        // Check return object
+        _assertReturnedFromUpdate(activityId, updateDto, returnedSession);
+
+        // Check the fake DB
+        _assertDbFromUpdate(sessionId, activityId, updateDto);
+    }
+
     private void _assertReturnedFromUpdate(Guid activityId, SessionUpdateDto updateDto, SessionGetDto returnedSession)
     {
         Assert.IsNotNull(returnedSession);
@@ -646,5 +629,24 @@ public class SessionServiceTests : TestBase
         DatesEqualWithinSeconds((DateTime)updateDto.StartDateUtc, (DateTime)savedSesh.StartDateUtc);
         Assert.AreEqual(updateDto.DurationSeconds, savedSesh.DurationSeconds);
         Assert.AreEqual(updateDto.Notes, savedSesh.Notes);
+    }
+
+    private void _assertDeleteOk(bool isSuccessful)
+    {
+        Assert.IsTrue(isSuccessful);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+
+        // Session should be soft-deleted
+        Assert.IsNotNull(gameDevSesh1.DeletedDateUtc);
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
+
+        // The session's activity should not be soft-deleted
+        Assert.IsNull(gameDevAct.DeletedDateUtc);
+    }
+
+    private void _assertDeleteReturnFalse(bool isSuccessful)
+    {
+        Assert.IsFalse(isSuccessful);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 }

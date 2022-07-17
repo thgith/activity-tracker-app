@@ -97,7 +97,6 @@ public class ActivityServiceTests : TestBase
         // -- Assert --
         Assert.AreEqual(activities.Count(), 0);
     }
-
     #endregion
 
     #region GetActivityAsync
@@ -182,11 +181,9 @@ public class ActivityServiceTests : TestBase
         Assert.IsNull(activity);
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
-
     #endregion GetActivityAsync
 
     #region CreateActivityAsync
-
     [TestMethod]
     [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
     [TestCategory(nameof(ActivityService.CreateActivityAsync))]
@@ -220,11 +217,7 @@ public class ActivityServiceTests : TestBase
         var activity = await activityService.CreateActivityAsync(JANE_USER_GUID, JOHN_USER_GUID, actCreateDto);
 
         // -- Assert --
-        // Verify returned object is as expected
-        _verifyReturnedFromCreate(actCreateDto, activity);
-
-        // Verify DB changed
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        _assertCreateOk(actCreateDto, activity);
     }
 
     [TestMethod]
@@ -280,11 +273,7 @@ public class ActivityServiceTests : TestBase
         var activity = await activityService.CreateActivityAsync(JOHN_USER_GUID, JOHN_USER_GUID, actCreateDto);
 
         // -- Assert --
-        // Verify returned object is as expected
-        _verifyReturnedFromCreate(actCreateDto, activity);
-
-        // Verify DB changed
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        _assertCreateOk(actCreateDto, activity);
     }
 
     [TestMethod]
@@ -329,20 +318,12 @@ public class ActivityServiceTests : TestBase
 
         // -- Act --
         var activity = await activityService.CreateActivityAsync(JOHN_USER_GUID, JOHN_USER_GUID, actCreateDto);
-
-        // -- Assert --
-        // Verify returned object is as expected
-        _verifyReturnedFromCreate(actCreateDto, activity);
-
-        // Verify DB changed
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
     }
 
     // TODO more tests
     #endregion CreateActivityAsync
 
     #region UpdateActivityAsync
-
     [TestMethod]
     [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-12T01:27:26Z", "2022-07-12T01:27:26Z", "#3366ff")]
     [DataRow("UPDATED NAME", "UPDATE DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
@@ -382,16 +363,12 @@ public class ActivityServiceTests : TestBase
         var activity = await activityService.UpdateActivityAsync(JANE_USER_GUID, GAME_DEV_ACT_GUID, actUpdateDto);
 
         // -- Assert --
-        // Verify the returned object is as expected
-        _verifyReturnedFromUpdate(GAME_DEV_ACT_GUID, actUpdateDto, activity);
-
-        // Verify the DB is changed
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        _assertUpdateOk(GAME_DEV_ACT_GUID, actUpdateDto, activity);
     }
+
     [TestMethod]
     [DataRow("UPDATED NAME", "UPDATE DESC", MIN_DATE_STR, null, null, "#3366ff")]
     [TestCategory(nameof(ActivityService.UpdateActivityAsync))]
-
     public async Task UpdateActivityAsync_NonAdmin_OwnAct_StartDateMinDate_Ok(
         string name,
         string description,
@@ -422,11 +399,7 @@ public class ActivityServiceTests : TestBase
         var activity = await activityService.UpdateActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID, actUpdateDto);
 
         // -- Assert --
-        // Verify the returned object is as expected
-        _verifyReturnedFromUpdate(GAME_DEV_ACT_GUID, actUpdateDto, activity);
-
-        // Verify the DB is changed
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        _assertUpdateOk(GAME_DEV_ACT_GUID, actUpdateDto, activity);
     }
 
     [TestMethod]
@@ -468,11 +441,7 @@ public class ActivityServiceTests : TestBase
         var activity = await activityService.UpdateActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID, actUpdateDto);
 
         // -- Assert --
-        // Verify the returned object is as expected
-        _verifyReturnedFromUpdate(GAME_DEV_ACT_GUID, actUpdateDto, activity);
-
-        // Verify the DB is changed
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+        _assertUpdateOk(GAME_DEV_ACT_GUID, actUpdateDto, activity);
     }
 
     [TestMethod]
@@ -517,13 +486,6 @@ public class ActivityServiceTests : TestBase
 
         // -- Act --
         var activity = await activityService.UpdateActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID, actUpdateDto);
-
-        // -- Assert --
-        // Verify the returned object is as expected
-        _verifyReturnedFromUpdate(GAME_DEV_ACT_GUID, actUpdateDto, activity);
-
-        // Verify the DB is changed
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
     }
 
     [TestMethod]
@@ -539,7 +501,6 @@ public class ActivityServiceTests : TestBase
         // -- Act --
         var activity = await activityService.UpdateActivityAsync(JOHN_USER_GUID, PANIC_ACT_GUID, actUpdateDto);
     }
-
     // TODO add more tests
     #endregion UpdateActivityAsync
 
@@ -555,18 +516,7 @@ public class ActivityServiceTests : TestBase
         var isSuccessful = await activityService.DeleteActivityAsync(JANE_USER_GUID, GAME_DEV_ACT_GUID);
 
         // -- Assert --
-        Assert.IsTrue(isSuccessful);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-
-        // Activity should be soft-deleted
-        Assert.IsNotNull(gameDevAct.DeletedDateUtc);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevAct.DeletedDateUtc, DateTime.UtcNow));
-
-        // Sessions should be deleted too
-        Assert.IsNotNull(gameDevSesh1.DeletedDateUtc);
-        Assert.IsNotNull(gameDevSesh2.DeletedDateUtc);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh2.DeletedDateUtc, DateTime.UtcNow));
+        _assertDeleteOk(isSuccessful);
     }
 
     [TestMethod]
@@ -595,8 +545,7 @@ public class ActivityServiceTests : TestBase
         var isSuccessful = await activityService.DeleteActivityAsync(JOHN_USER_GUID, NON_EXISTENT_GUID);
 
         // -- Assert --
-        Assert.IsFalse(isSuccessful);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertDeleteReturnFalse(isSuccessful);
     }
 
     [TestMethod]
@@ -611,8 +560,7 @@ public class ActivityServiceTests : TestBase
         var isSuccessful = await activityService.DeleteActivityAsync(JOHN_USER_GUID, JOHNS_DELETED_ACT_GUID);
 
         // -- Assert --
-        Assert.IsFalse(isSuccessful);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+        _assertDeleteReturnFalse(isSuccessful);
     }
 
     [TestMethod]
@@ -627,20 +575,8 @@ public class ActivityServiceTests : TestBase
         var isSuccessful = await activityService.DeleteActivityAsync(JOHN_USER_GUID, GAME_DEV_ACT_GUID);
 
         // -- Assert --
-        Assert.IsTrue(isSuccessful);
-        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
-
-        // Activity should be soft-deleted
-        Assert.IsNotNull(gameDevAct.DeletedDateUtc);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevAct.DeletedDateUtc, DateTime.UtcNow));
-
-        // Sessions should be deleted too
-        Assert.IsNotNull(gameDevSesh1.DeletedDateUtc);
-        Assert.IsNotNull(gameDevSesh2.DeletedDateUtc);
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
-        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh2.DeletedDateUtc, DateTime.UtcNow));
+        _assertDeleteOk(isSuccessful);
     }
-
     // TODO more tests
     #endregion DeleteActivityAsync
 
@@ -707,7 +643,16 @@ public class ActivityServiceTests : TestBase
         }
     }
 
-    private void _verifyReturnedFromCreate(ActivityCreateDto createDto, ActivityGetDto returnedActivity)
+    private void _assertCreateOk(ActivityCreateDto createDto, ActivityGetDto returnedActivity)
+    {
+        // Verify returned object is as expected
+        _assertReturnedFromCreate(createDto, returnedActivity);
+
+        // Verify DB changed
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+    }
+
+    private void _assertReturnedFromCreate(ActivityCreateDto createDto, ActivityGetDto returnedActivity)
     {
         Assert.IsNotNull(returnedActivity);
         Assert.AreEqual(createDto.Name, returnedActivity.Name);
@@ -731,6 +676,7 @@ public class ActivityServiceTests : TestBase
                 DatesEqualWithinSeconds((DateTime)createDto.DueDateUtc, (DateTime)returnedActivity.DueDateUtc);
             }
         }
+
         void _checkCompletedDateUtc()
         {
             if (createDto.CompletedDateUtc == null || createDto.CompletedDateUtc == DateTime.MinValue)
@@ -744,7 +690,16 @@ public class ActivityServiceTests : TestBase
         }
     }
 
-    private void _verifyReturnedFromUpdate(Guid activityId, ActivityUpdateDto updateDto, ActivityGetDto returnedActivity)
+    private void _assertUpdateOk(Guid activityId, ActivityUpdateDto updateDto, ActivityGetDto returnedActivity)
+    {
+        // Verify the returned object is as expected
+        _assertReturnedFromUpdate(activityId, updateDto, returnedActivity);
+
+        // Verify the DB is changed
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+    }
+
+    private void _assertReturnedFromUpdate(Guid activityId, ActivityUpdateDto updateDto, ActivityGetDto returnedActivity)
     {
         Assert.IsNotNull(returnedActivity);
         Assert.AreEqual(updateDto.Name, returnedActivity.Name);
@@ -770,6 +725,7 @@ public class ActivityServiceTests : TestBase
                 DatesEqualWithinSeconds((DateTime)updateDto.DueDateUtc, (DateTime)returnedActivity.DueDateUtc);
             }
         }
+
         void _checkCompletedDateUtc()
         {
             if (updateDto.CompletedDateUtc == null || updateDto.CompletedDateUtc == DateTime.MinValue)
@@ -781,5 +737,27 @@ public class ActivityServiceTests : TestBase
                 DatesEqualWithinSeconds((DateTime)updateDto.CompletedDateUtc, (DateTime)returnedActivity.CompletedDateUtc);
             }
         }
+    }
+
+    private void _assertDeleteOk(bool isSuccessful)
+    {
+        Assert.IsTrue(isSuccessful);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Once);
+
+        // Activity should be soft-deleted
+        Assert.IsNotNull(gameDevAct.DeletedDateUtc);
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevAct.DeletedDateUtc, DateTime.UtcNow));
+
+        // Sessions should be deleted too
+        Assert.IsNotNull(gameDevSesh1.DeletedDateUtc);
+        Assert.IsNotNull(gameDevSesh2.DeletedDateUtc);
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh1.DeletedDateUtc, DateTime.UtcNow));
+        Assert.IsTrue(DatesEqualWithinSeconds((DateTime)gameDevSesh2.DeletedDateUtc, DateTime.UtcNow));
+    }
+
+    private void _assertDeleteReturnFalse(bool isSuccessful)
+    {
+        Assert.IsFalse(isSuccessful);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 }
