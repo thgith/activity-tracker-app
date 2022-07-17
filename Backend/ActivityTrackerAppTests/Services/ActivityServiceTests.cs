@@ -296,8 +296,8 @@ public class ActivityServiceTests : ServiceTestsBase
     [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", PREHISTORIC_DATE_STR, null, "#3366ff")]
     // DueDateUtc null. StartDateUtc is greater than CompletedDateUtc.
     [DataRow("NEW NAME", "NEW DESC", "2023-07-13T01:27:26Z", null, PREHISTORIC_DATE_STR, "#3366ff")]
-    [TestCategory("CreateActivityAsync")]
-    [TestCategory("InvalidData")]
+    [TestCategory(nameof(ActivityService.CreateActivityAsync))]
+    [TestCategory(nameof(InvalidDataException))]
     [ExpectedException(typeof(InvalidDataException))]
     public async Task CreateActivityAsync_NonAdmin_OwnAct_ThrowInvalidData(
         string name,

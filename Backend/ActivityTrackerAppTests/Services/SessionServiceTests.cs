@@ -26,7 +26,7 @@ public class SessionServiceTests : ServiceTestsBase
     #region GetAllSessionsAsync
     [TestMethod]
     [TestCategory(nameof(SessionService.GetAllSessionsByActivityIdAsync))]
-    public async Task GetAllSessionsByActivityIdAsync_Admin_AnotherUser_Ok()
+    public async Task GetAllSessionsByActivityIdAsync_Admin_AnothersSessions_Ok()
     {
         // -- Arrange --
         var sessionService = _createSessionService();
@@ -40,7 +40,7 @@ public class SessionServiceTests : ServiceTestsBase
 
     [TestMethod]
     [TestCategory(nameof(SessionService.GetAllSessionsByActivityIdAsync))]
-    public async Task GetAllSessionsByActivityIdAsync_NonAdmin_OwnSession_Ok()
+    public async Task GetAllSessionsByActivityIdAsync_NonAdmin_OwnSessions_Ok()
     {
         // -- Arrange --
         var sessionService = _createSessionService();
@@ -56,7 +56,7 @@ public class SessionServiceTests : ServiceTestsBase
     [TestCategory(nameof(SessionService.GetAllSessionsByActivityIdAsync))]
     [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
-    public async Task GetAllSessionsByActivityIdAsync_NonAdmin_AnothersSession_ThrowForbidden()
+    public async Task GetAllSessionsByActivityIdAsync_NonAdmin_AnothersSessions_ThrowForbidden()
     {
         // -- Arrange --
         var sessionService = _createSessionService();

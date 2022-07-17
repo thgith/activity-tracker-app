@@ -145,6 +145,7 @@ public class UserService : IUserService
         }
 
         var hasChange = false;
+        
         // Update fields
         if (userPutDto.FirstName != null)
         {

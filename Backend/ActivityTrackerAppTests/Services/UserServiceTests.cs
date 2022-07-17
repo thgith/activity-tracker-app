@@ -348,6 +348,53 @@ public class UserServiceTests
         _assertUpdateOk(user);
     }
 
+
+    [TestMethod]
+    [TestCategory(nameof(UserService.UpdateUserAsync))]
+    public async Task UpdateUserAsync_Admin_NonExistentUser_ReturnNull()
+    {
+        // -- Arrange --
+        var userService = _createUserService();
+
+        var userUpdateDto = new UserUpdateDto()
+        {
+            FirstName = "DoesNotExist"
+        };
+
+        // -- Act --
+        var user = await userService.UpdateUserAsync(
+            JANE_USER_GUID,
+            Guid.NewGuid(),
+            userUpdateDto
+        );
+
+        // -- Assert --
+        _assertUpdateReturnNull(user);
+    }
+
+    [TestMethod]
+    [TestCategory(nameof(UserService.UpdateUserAsync))]
+    public async Task UpdateUserAsync_Admin_DeletedUser_ReturnNull()
+    {
+        // -- Arrange --
+        var userService = _createUserService();
+
+        var userUpdateDto = new UserUpdateDto()
+        {
+            FirstName = "Juju"
+        };
+
+        // -- Act --
+        var user = await userService.UpdateUserAsync(
+            JANE_USER_GUID,
+            JUDY_USER_GUID,
+            userUpdateDto
+        );
+
+        // -- Assert --
+        _assertUpdateReturnNull(user);
+    }
+
     [TestMethod]
     [TestCategory(nameof(UserService.UpdateUserAsync))]
     public async Task UpdateUserAsync_NonAdmin_SameUser_Ok()
@@ -408,6 +455,28 @@ public class UserServiceTests
 
     [TestMethod]
     [TestCategory(nameof(UserService.UpdateUserAsync))]
+    [ExpectedException(typeof(InvalidDataException))]
+    public async Task UpdateUserAsync_NonAdmin_SameUser_TakenEmail_ThrowInvalidData()
+    {
+        // -- Arrange --
+        var userService = _createUserService();
+
+        // -- Act --
+        var user = await userService.UpdateUserAsync(
+            JOHN_USER_GUID,
+            JOHN_USER_GUID,
+            new UserUpdateDto
+            {
+                FirstName = NEW_FIRST_NAME,
+                LastName = NEW_LAST_NAME,
+                Email = JANE_EMAIL,
+                Password = NEW_PASSWORD
+            }
+        );
+    }
+
+    [TestMethod]
+    [TestCategory(nameof(UserService.UpdateUserAsync))]
     public async Task UpdateUserAsync_NonAdmin_SameUser_EmptyUpdateObject_Ok()
     {
         // -- Arrange --
@@ -431,53 +500,6 @@ public class UserServiceTests
         Assert.AreEqual(JOHN_EMAIL, _johnUser.Email);
         BCrypt.Net.BCrypt.Verify(COMMON_OLD_PASSWORD, _johnUser.PasswordHash);
     }
-
-    [TestMethod]
-    [TestCategory(nameof(UserService.UpdateUserAsync))]
-    public async Task UpdateUserAsync_Admin_NonexistentUser_ReturnNull()
-    {
-        // -- Arrange --
-        var userService = _createUserService();
-
-        var userUpdateDto = new UserUpdateDto()
-        {
-            FirstName = "DoesNotExist"
-        };
-
-        // -- Act --
-        var user = await userService.UpdateUserAsync(
-            JANE_USER_GUID,
-            Guid.NewGuid(),
-            userUpdateDto
-        );
-
-        // -- Assert --
-        _assertUpdateReturnNull(user);
-    }
-
-    [TestMethod]
-    [TestCategory(nameof(UserService.UpdateUserAsync))]
-    public async Task UpdateUserAsync_Admin_DeletedUser_ReturnNull()
-    {
-        // -- Arrange --
-        var userService = _createUserService();
-
-        var userUpdateDto = new UserUpdateDto()
-        {
-            FirstName = "Juju"
-        };
-
-        // -- Act --
-        var user = await userService.UpdateUserAsync(
-            JANE_USER_GUID,
-            JUDY_USER_GUID,
-            userUpdateDto
-        );
-
-        // -- Assert --
-        _assertUpdateReturnNull(user);
-    }
-
     #endregion
 
     #region DeleteUserAsync
@@ -588,7 +610,7 @@ public class UserServiceTests
         Assert.AreEqual(NEW_EMAIL, _johnUser.Email);
         BCrypt.Net.BCrypt.Verify(NEW_PASSWORD, _johnUser.PasswordHash);
     }
-    
+
     private void _assertUpdateReturnNull(UserGetDto returnedUser)
     {
         Assert.IsNull(returnedUser);

@@ -68,7 +68,6 @@ public class ActivityService : IActivityService
             .OrderBy(x => x.StartDateUtc)
             .ToListAsync();
 
-
         var activitiesGetDtos = activities.Select(x => _mapper.Map<ActivityGetDto>(x)).ToList();
         if (includeSessions)
         {
@@ -77,7 +76,6 @@ public class ActivityService : IActivityService
                 act.Sessions = (await _sessionService.GetAllSessionsByActivityIdAsync(currUserId, act.Id)).ToList();
             }
         }
-
 
         // Convert entity to DTO and return
         return activitiesGetDtos;
