@@ -10,6 +10,7 @@ public static class TestFixtures
     public const string MIN_DATE_STR = "1/1/0001 12:00:00 AM";
 
     // NOTE: These are just random GUIDs
+    public const string NON_EXISTENT_GUID_STR = "8068f966-91c6-4283-a8e4-279aa8b75d2b";
     // User GUID strings
     public const string JANE_USER_GUID_STR = "281b92b4-46e0-444f-aabe-da7aca9986a9";
     public const string JOHN_USER_GUID_STR = "e15d9f9a-4e5c-4311-b9c4-72cecdc2d672";
@@ -20,7 +21,7 @@ public static class TestFixtures
     public const string PIANO_ACT_GUID_STR = "de2e1178-0125-40ad-b6a3-f922a080489b";
     public const string GAME_DEV_ACT_GUID_STR = "3295ff98-14d1-4955-b4d0-97bed10c5833";
     public const string MCAT_ACT_GUID_STR = "b1f4699e-2694-4de4-bb85-200dc1fb94bd";
-    public const string SLEEPING_ACT_GUID_STR = "c5e095cf-10b3-4924-9735-f7eed8903ceb";
+    public const string JOHNS_DELETED_ACT_GUID_STR = "c5e095cf-10b3-4924-9735-f7eed8903ceb";
     public const string BASEBALL_ACT_GUID_STR = "9c789a9a-1a20-4ec8-8375-0c2d3875dcd1";
 
     // Session GUID strings
@@ -29,8 +30,13 @@ public static class TestFixtures
     public const string GAME_DEV_SESH2_GUID_STR = "3f90adb9-95dc-4abe-bee6-13b1b2977763";
     public const string PIANO_SESH1_GUID_STR = "16f33737-8d96-405e-856a-a47d869b0cfc";
     public const string PIANO_SESH2_GUID_STR = "11d1ae01-841e-4239-a35c-7391c00a8328";
-
+    public const string GAME_DEV_SESH_DELETED_GUID_STR = "f9f21b0e-888a-4a0c-827c-5c6ba40de3db";
+    public const string JOHNS_DELETED_SESH_ON_DELETED_ACT_GUID_STR = "c9044a48-059c-42f7-82ac-bae88ee49afe";
+    
+    public static Guid NON_EXISTENT_GUID;
+    
     // User
+    // User GUIDs
     public static Guid JANE_USER_GUID;
     public static Guid JOHN_USER_GUID;
     public static Guid JUDY_USER_GUID;
@@ -57,14 +63,14 @@ public static class TestFixtures
     public static Guid PIANO_ACT_GUID;
     public static Guid GAME_DEV_ACT_GUID;
     public static Guid MCAT_ACT_GUID;
-    public static Guid SLEEPING_ACT_GUID;
+    public static Guid JOHNS_DELETED_ACT_GUID;
     public static Guid PANIC_ACT_GUID;
     public static Guid BASEBALL_ACT_GUID;
     public const string PIANO_ACTIVITY_NAME = "Piano";
     public const string PIANO_ACTIVITY_DESC = "Time spent practicing piano";
     public const string GAME_DEV_ACT_NAME = "Game Dev";
     public const string GAME_DEV_ACT_DESC = "Time spent on game development";
-    public const string SLEEPING_ACT_NAME = "Sleeping";
+    public const string JOHNS_DELETED_ACT_NAME = "Sleeping";
     public const string MCAT_STUDY_ACTIVITY_NAME = "MCAT";
     public const string MCAT_STUDY_ACTIVITY_DESC = "Studying for the MCAT";
     public const string PANIC_ACTIVITY_NAME = "PANIC";
@@ -83,6 +89,8 @@ public static class TestFixtures
     public static Guid GAME_DEV_SESH2_GUID;
     public static Guid PIANO_SESH1_GUID;
     public static Guid PIANO_SESH2_GUID;
+    public static Guid GAME_DEV_SESH_DELETED_GUID;
+    public static Guid JOHNS_DELETED_SESH_ON_DELETED_ACT_GUID;
 
     public const string SHORT_GENERIC_NOTES = "notes notes...";
     public const string PIANO_SESH1_NOTES = "Scale exercises";
@@ -206,13 +214,13 @@ public static class TestFixtures
         };
     }
     // Deleted activity
-    public static Activity GenerateSleepingActivity()
+    public static Activity GenerateJohnsDeletedActivity()
     {
         return new Activity
         {
-            Id = SLEEPING_ACT_GUID,
+            Id = JOHNS_DELETED_ACT_GUID,
             OwnerId = JOHN_USER_GUID,
-            Name = SLEEPING_ACT_NAME,
+            Name = JOHNS_DELETED_ACT_NAME,
             Description = "",
             StartDateUtc = DateTime.UtcNow,
             DueDateUtc = null,
@@ -284,6 +292,19 @@ public static class TestFixtures
         };
     }
 
+    public static Session GenerateGameDevDeletedSession()
+    {
+        return new Session
+        {
+            Id = GAME_DEV_SESH2_GUID,
+            ActivityId = GAME_DEV_ACT_GUID,
+            Notes = GAME_DEV_SESH2_NOTES,
+            StartDateUtc = DateTime.UtcNow,
+            DurationSeconds = 4600,
+            DeletedDateUtc = DateTime.UtcNow
+        };
+    }
+
     public static Session GeneratePianoSession1()
     {
         return new Session
@@ -312,6 +333,8 @@ public static class TestFixtures
 
     static TestFixtures()
     {
+        Guid.TryParse(NON_EXISTENT_GUID_STR, out NON_EXISTENT_GUID);
+
         Guid.TryParse(JANE_USER_GUID_STR, out JANE_USER_GUID);
         Guid.TryParse(JOHN_USER_GUID_STR, out JOHN_USER_GUID);
         Guid.TryParse(JUDY_USER_GUID_STR, out JUDY_USER_GUID);
@@ -321,15 +344,17 @@ public static class TestFixtures
         Guid.TryParse(PIANO_ACT_GUID_STR, out PIANO_ACT_GUID);
         Guid.TryParse(GAME_DEV_ACT_GUID_STR, out GAME_DEV_ACT_GUID);
         Guid.TryParse(MCAT_ACT_GUID_STR, out MCAT_ACT_GUID);
-        Guid.TryParse(SLEEPING_ACT_GUID_STR, out SLEEPING_ACT_GUID);
+        Guid.TryParse(JOHNS_DELETED_ACT_GUID_STR, out JOHNS_DELETED_ACT_GUID);
         Guid.TryParse(BASEBALL_ACT_GUID_STR, out BASEBALL_ACT_GUID);
 
         // Session GUIDs
         Guid.TryParse(PANIC_SESH_GUID_STR, out PANIC_SESH_GUID);
         Guid.TryParse(GAME_DEV_SESH1_GUID_STR, out GAME_DEV_SESH1_GUID);
         Guid.TryParse(GAME_DEV_SESH2_GUID_STR, out GAME_DEV_SESH2_GUID);
+        Guid.TryParse(GAME_DEV_SESH_DELETED_GUID_STR, out GAME_DEV_SESH_DELETED_GUID);
         Guid.TryParse(PIANO_SESH1_GUID_STR, out PIANO_SESH1_GUID);
         Guid.TryParse(PIANO_SESH2_GUID_STR, out PIANO_SESH2_GUID);
+        Guid.TryParse(JOHNS_DELETED_SESH_ON_DELETED_ACT_GUID_STR, out GAME_DEV_SESH_DELETED_GUID);
 
         JANE_JOIN_DATE_UTC = DateTime.UtcNow;
         JOHN_JOIN_DATE_UTC = DateTime.UtcNow.AddSeconds(1);

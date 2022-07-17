@@ -44,8 +44,8 @@ public class UserServiceTests
         // Init users here b/c they may change throughout each user test
         _setUpUsers();
         _setUpMocks();
-
     }
+    
     private void _setUpUsers()
     {
         _janeUser = GenerateJaneUser();

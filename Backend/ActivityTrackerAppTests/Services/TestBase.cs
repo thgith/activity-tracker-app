@@ -21,11 +21,12 @@ public abstract class TestBase
     protected static Activity gameDevAct;
     protected static Session gameDevSesh1;
     protected static Session gameDevSesh2;
+    protected static Session gameDevDeletedSesh;
     protected static Activity pianoAct;
     protected static Session pianoSesh1;
     protected static Session pianoSesh2;
     protected static Activity mcatAct;
-    protected static Activity sleepingAct;
+    protected static Activity johnsDeletedAct;
 
     protected static List<Activity> janesActs;
     protected static List<Activity> johnsActs;
@@ -74,8 +75,9 @@ public abstract class TestBase
         // John's acts
         gameDevSesh1 = GenerateGameDevSession1();
         gameDevSesh2 = GenerateGameDevSession2();
+        gameDevDeletedSesh = GenerateGameDevDeletedSession();
         gameDevAct = GenerateGameDevActivity();
-        gameDevAct.Sessions = new List<Session> { gameDevSesh1, gameDevSesh2 };
+        gameDevAct.Sessions = new List<Session> { gameDevSesh1, gameDevSesh2, gameDevDeletedSesh };
 
         pianoSesh1 = GeneratePianoSession1();
         pianoSesh2 = GeneratePianoSession2();
@@ -83,15 +85,15 @@ public abstract class TestBase
         pianoAct.Sessions = new List<Session> { pianoSesh1, pianoSesh2 };
 
         mcatAct = GenerateMcatActivity();
-        sleepingAct = GenerateSleepingActivity();
-        johnsActs = new List<Activity> { gameDevAct, pianoAct, mcatAct, sleepingAct };
+        johnsDeletedAct = GenerateJohnsDeletedActivity();
+        johnsActs = new List<Activity> { gameDevAct, pianoAct, mcatAct, johnsDeletedAct };
 
         // Judy's acts
         baseballAct = GenerateBaseballActivity();
         judysActs = new List<Activity> { baseballAct };
 
         allSessions = new List<Session> { panicSesh, gameDevSesh1, gameDevSesh2, pianoSesh1, pianoSesh2 };
-        allActs = new List<Activity> { panicAct, gameDevAct, pianoAct, mcatAct, sleepingAct, baseballAct };
+        allActs = new List<Activity> { panicAct, gameDevAct, pianoAct, mcatAct, johnsDeletedAct, baseballAct };
     }
 
     private void _setUpDbMocks()

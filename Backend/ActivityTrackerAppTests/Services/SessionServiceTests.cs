@@ -34,6 +34,8 @@ public class SessionServiceTests : TestBase
 
         // -- Assert --
         Assert.IsNotNull(sessions);
+
+        // Only non-deleted sessions
         Assert.AreEqual(2, sessions.Count());
         var sessionsList = sessions.ToList();
         _assertSessionsEqual(gameDevSesh1, sessionsList[0]);
@@ -54,6 +56,8 @@ public class SessionServiceTests : TestBase
 
         // -- Assert --
         Assert.IsNotNull(sessions);
+
+        // Only non-deleted sessions
         Assert.AreEqual(2, sessions.Count());
         var sessionsList = sessions.ToList();
         _assertSessionsEqual(gameDevSesh1, sessionsList[0]);
@@ -90,8 +94,6 @@ public class SessionServiceTests : TestBase
         // -- Assert --
         Assert.IsNotNull(session);
         _assertSessionsEqual(gameDevSesh1, session);
-        _assertSessionsEqual(gameDevSesh1, session);
-
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 
@@ -108,8 +110,37 @@ public class SessionServiceTests : TestBase
         // -- Assert --
         Assert.IsNotNull(session);
         _assertSessionsEqual(gameDevSesh1, session);
-        _assertSessionsEqual(gameDevSesh1, session);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
 
+    [TestMethod]
+    [TestCategory(nameof(SessionService.GetSessionAsync))]
+    public async Task GetSessionAsync_NonAdmin_NonExistentSession_ReturnNull()
+    {
+        // -- Arrange --
+        Guid.TryParse(NON_EXISTENT_GUID_STR, out var sessionGuid);
+        var sessionService = _createSessionService();
+
+        // -- Act --
+        var session = await sessionService.GetSessionAsync(JOHN_USER_GUID, sessionGuid);
+
+        // -- Assert --
+        Assert.IsNull(session);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
+    [TestMethod]
+    [TestCategory(nameof(SessionService.GetSessionAsync))]
+    public async Task GetSessionAsync_NonAdmin_DeletedSession_ReturnNull()
+    {
+        // -- Arrange --
+        var sessionService = _createSessionService();
+
+        // -- Act --
+        var session = await sessionService.GetSessionAsync(JOHN_USER_GUID, GAME_DEV_SESH_DELETED_GUID);
+
+        // -- Assert --
+        Assert.IsNull(session);
         dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
 
@@ -175,6 +206,7 @@ public class SessionServiceTests : TestBase
         // Check the fake DB
         _assertDbFromCreate(newSessionDto);
     }
+
     [TestMethod]
     [DataRow(GAME_DEV_ACT_GUID_STR, "", (uint)0, "")]
     [DataRow(GAME_DEV_ACT_GUID_STR, "", (uint)60, SHORT_GENERIC_NOTES)]
@@ -223,6 +255,66 @@ public class SessionServiceTests : TestBase
     }
 
     [TestMethod]
+    [DataRow(NON_EXISTENT_GUID_STR, MIN_DATE_STR, (uint)200, SHORT_GENERIC_NOTES)]
+    [TestCategory(nameof(SessionService.CreateSessionAsync))]
+    public async Task CreateSessionAsync_NonAdmin_OwnSession_NonExistentSession_ReturnNull(
+        string activityIdStr,
+        string startDateUtcStr,
+        uint durationSeconds,
+        string notes)
+    {
+        // -- Arrange --
+        Guid.TryParse(activityIdStr, out var activityGuid);
+        DateTime.TryParse(startDateUtcStr, out var startDateUtc);
+        var newSessionDto = new SessionCreateDto
+        {
+            ActivityId = activityGuid,
+            StartDateUtc = startDateUtc,
+            DurationSeconds = durationSeconds,
+            Notes = notes
+        };
+
+        var sessionService = _createSessionService();
+
+        // -- Act --
+        var session = await sessionService.CreateSessionAsync(JOHN_USER_GUID, newSessionDto);
+
+        // -- Assert --
+        Assert.IsNull(session);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
+    [TestMethod]
+    [DataRow(GAME_DEV_SESH_DELETED_GUID_STR, MIN_DATE_STR, (uint)200, SHORT_GENERIC_NOTES)]
+    [TestCategory(nameof(SessionService.CreateSessionAsync))]
+    public async Task CreateSessionAsync_NonAdmin_OwnSession_DeletedSession_ReturnNull(
+        string activityIdStr,
+        string startDateUtcStr,
+        uint durationSeconds,
+        string notes)
+    {
+        // -- Arrange --
+        Guid.TryParse(activityIdStr, out var activityGuid);
+        DateTime.TryParse(startDateUtcStr, out var startDateUtc);
+        var newSessionDto = new SessionCreateDto
+        {
+            ActivityId = activityGuid,
+            StartDateUtc = startDateUtc,
+            DurationSeconds = durationSeconds,
+            Notes = notes
+        };
+
+        var sessionService = _createSessionService();
+
+        // -- Act --
+        var session = await sessionService.CreateSessionAsync(JOHN_USER_GUID, newSessionDto);
+
+        // -- Assert --
+        Assert.IsNull(session);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
+    [TestMethod]
     [TestCategory(nameof(SessionService.CreateSessionAsync))]
     [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
@@ -253,7 +345,7 @@ public class SessionServiceTests : TestBase
     [DataRow(GAME_DEV_SESH1_GUID_STR, MIN_DATE_STR, (uint)200, SHORT_GENERIC_NOTES)]
     [DataRow(GAME_DEV_SESH1_GUID_STR, "2025-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
     [TestCategory(nameof(SessionService.UpdateSessionAsync))]
-        public async Task UpdateSessionAsync_Admin_AnothersSession_Ok(
+    public async Task UpdateSessionAsync_Admin_AnothersSession_Ok(
         string sessionIdStr,
         string startDateUtcStr,
         uint durationSeconds,
@@ -338,13 +430,73 @@ public class SessionServiceTests : TestBase
         _assertDbFromUpdate(sessionGuid, GAME_DEV_ACT_GUID, updateSessionDto);
     }
 
+    [TestMethod]
+    [DataRow(NON_EXISTENT_GUID_STR, "2022-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
+    [TestCategory(nameof(SessionService.UpdateSessionAsync))]
+    public async Task UpdateSessionAsync_NonAdmin_OwnSession_NonExistentSession_ReturnNull(
+        string sessionIdStr,
+        string startDateUtcStr,
+        uint durationSeconds,
+        string notes)
+    {
+        // -- Arrange --
+        Guid.TryParse(sessionIdStr, out var sessionGuid);
+        DateTime.TryParse(startDateUtcStr, out var startDateUtc);
+
+        var updateSessionDto = new SessionUpdateDto
+        {
+            StartDateUtc = startDateUtc,
+            DurationSeconds = durationSeconds,
+            Notes = notes
+        };
+
+        var sessionService = _createSessionService();
+
+        // -- Act --
+        var session = await sessionService.UpdateSessionAsync(JOHN_USER_GUID, sessionGuid, updateSessionDto);
+
+        // -- Assert --
+        Assert.IsNull(session);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
+    [TestMethod]
+    [DataRow(GAME_DEV_SESH_DELETED_GUID_STR, "2022-07-15T01:27:26Z", (uint)200, SHORT_GENERIC_NOTES)]
+    [TestCategory(nameof(SessionService.UpdateSessionAsync))]
+    public async Task UpdateSessionAsync_NonAdmin_OwnSession_DeletedSession_ReturnNull(
+        string sessionIdStr,
+        string startDateUtcStr,
+        uint durationSeconds,
+        string notes)
+    {
+        // -- Arrange --
+        Guid.TryParse(sessionIdStr, out var sessionGuid);
+        DateTime.TryParse(startDateUtcStr, out var startDateUtc);
+
+        var updateSessionDto = new SessionUpdateDto
+        {
+            StartDateUtc = startDateUtc,
+            DurationSeconds = durationSeconds,
+            Notes = notes
+        };
+
+        var sessionService = _createSessionService();
+
+        // -- Act --
+        var session = await sessionService.UpdateSessionAsync(JOHN_USER_GUID, sessionGuid, updateSessionDto);
+
+        // -- Assert --
+        Assert.IsNull(session);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
     // TODO add more tests
     #endregion UpdateSessionAsync
 
     #region DeleteSessionAsync
     [TestMethod]
     [TestCategory(nameof(SessionService.DeleteSessionAsync))]
-    public async Task DeleteActivityAsync_Admin_AnothersSession_Ok()
+    public async Task DeleteSessionAsync_Admin_AnothersSession_Ok()
     {
         // -- Arrange --
         var sessionService = _createSessionService();
@@ -368,7 +520,7 @@ public class SessionServiceTests : TestBase
     [TestCategory(nameof(SessionService.DeleteSessionAsync))]
     [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
-    public async Task DeleteActivityAsync_NonAdmin_AnothersSession_ThrowForbidden()
+    public async Task DeleteSessionAsync_NonAdmin_AnothersSession_ThrowForbidden()
     {
         // -- Arrange --
         var sessionService = _createSessionService();
@@ -379,7 +531,7 @@ public class SessionServiceTests : TestBase
 
     [TestMethod]
     [TestCategory(nameof(SessionService.DeleteSessionAsync))]
-    public async Task DeleteActivityAsync_NonAdmin_OwnActivity_Ok()
+    public async Task DeleteSessionAsync_NonAdmin_OwnActivity_Ok()
     {
         // -- Arrange --
         var sessionService = _createSessionService();
@@ -397,6 +549,36 @@ public class SessionServiceTests : TestBase
 
         // The session's activity should not be soft-deleted
         Assert.IsNull(gameDevAct.DeletedDateUtc);
+    }
+
+    [TestMethod]
+    [TestCategory(nameof(SessionService.DeleteSessionAsync))]
+    public async Task DeleteSessionAsync_NonAdmin_OwnSession_NonExistentSession_ReturnFalse()
+    {
+        // -- Arrange --
+        var sessionService = _createSessionService();
+
+        // -- Act --
+        var isSuccessful = await sessionService.DeleteSessionAsync(JOHN_USER_GUID, NON_EXISTENT_GUID);
+
+        // -- Assert --
+        Assert.IsFalse(isSuccessful);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
+    [TestMethod]
+    [TestCategory(nameof(SessionService.DeleteSessionAsync))]
+    public async Task DeleteSessionAsync_NonAdmin_OwnSession_DeletedSession_ReturnFalse()
+    {
+        // -- Arrange --
+        var sessionService = _createSessionService();
+
+        // -- Act --
+        var isSuccessful = await sessionService.DeleteSessionAsync(JOHN_USER_GUID, GAME_DEV_SESH_DELETED_GUID);
+
+        // -- Assert --
+        Assert.IsFalse(isSuccessful);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
     }
     #endregion DeleteSessionAsync
 

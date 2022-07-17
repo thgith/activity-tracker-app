@@ -78,6 +78,14 @@
                             "durationSeconds": 3600,
                             "notes": "More game jam",
                             "deletedDateUtc": null 
+                        },
+                        {
+                            "id": "f9f21b0e-888a-4a0c-827c-5c6ba40de3db",
+                            "activityId": "3295ff98-14d1-4955-b4d0-97bed10c5833",
+                            "startDateUtc": "2022-07-15T01:27:26Z",
+                            "durationSeconds": 3600,
+                            "notes": "More game jam",
+                            "deletedDateUtc": "2022-07-15T01:27:26Z" 
                         }
                     ]
                 },

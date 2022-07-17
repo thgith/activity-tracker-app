@@ -27,7 +27,7 @@ public class ActivityServiceTests : TestBase
     #region GetAllActivitiesAsync
     [TestMethod]
     [TestCategory(nameof(ActivityService.GetAllActivitiesForUserAsync))]
-    public async Task GetAllActivitiesAsync_Admin_AnotherUser_Ok()
+    public async Task GetAllActivitiesAsync_Admin_AnothersActs_Ok()
     {
         // -- Arrange --
         var activityService = _createActivityService();
@@ -50,7 +50,7 @@ public class ActivityServiceTests : TestBase
 
     [TestMethod]
     [TestCategory(nameof(ActivityService.GetAllActivitiesForUserAsync))]
-    public async Task GetAllActivitiesAsync_NonAdmin_OwnActivities_Ok()
+    public async Task GetAllActivitiesForUserAsync_NonAdmin_OwnActs_Ok()
     {
         // -- Arrange --
         var activityService = _createActivityService();
@@ -75,7 +75,7 @@ public class ActivityServiceTests : TestBase
     [TestCategory(nameof(ActivityService.GetActivityAsync))]
     [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
-    public async Task GetAllActivitiesAsync_NonAdmin_AnothersActivities_ThrowForbidden()
+    public async Task GetAllActivitiesAsync_NonAdmin_AnothersActs_ThrowForbidden()
     {
         // -- Arrange --
         var activityService = _createActivityService();
@@ -86,7 +86,7 @@ public class ActivityServiceTests : TestBase
 
     [TestMethod]
     [TestCategory(nameof(ActivityService.GetActivityAsync))]
-    public async Task GetAllActivitiesAsync_Admin_AnothersActivity_DeletedActivity_ReturnEmpty()
+    public async Task GetAllActivitiesAsync_Admin_AnothersAct_DeletedAct_ReturnEmpty()
     {
         // -- Arrange --
         var activityService = _createActivityService();
@@ -106,7 +106,7 @@ public class ActivityServiceTests : TestBase
     [DataRow(PIANO_ACT_GUID_STR)]
     [DataRow(MCAT_ACT_GUID_STR)]
     [TestCategory(nameof(ActivityService.GetActivityAsync))]
-    public async Task GetActivityAsync_Admin_AnothersActivity_Ok(string activityIdStr)
+    public async Task GetActivityAsync_Admin_AnothersAct_Ok(string activityIdStr)
     {
         // -- Arrange --
         var activityService = _createActivityService();
@@ -125,7 +125,7 @@ public class ActivityServiceTests : TestBase
     [DataRow(PIANO_ACT_GUID_STR)]
     [DataRow(MCAT_ACT_GUID_STR)]
     [TestCategory(nameof(ActivityService.GetActivityAsync))]
-    public async Task GetActivityAsync_NonAdmin_OwnActivity_Ok(string activityIdStr)
+    public async Task GetActivityAsync_NonAdmin_OwnAct_Ok(string activityIdStr)
     {
         // -- Arrange --
         var activityService = _createActivityService();
@@ -144,7 +144,7 @@ public class ActivityServiceTests : TestBase
     [TestCategory(nameof(ActivityService.GetActivityAsync))]
     [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
-    public async Task GetActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
+    public async Task GetActivityAsync_NonAdmin_AnothersAct_ThrowForbidden()
     {
         // -- Arrange --
         var activityService = _createActivityService();
@@ -155,13 +155,28 @@ public class ActivityServiceTests : TestBase
 
     [TestMethod]
     [TestCategory(nameof(ActivityService.GetActivityAsync))]
-    public async Task GetActivityAsync_Admin_AnothersActivity_DeletedActivity_ReturnEmpty()
+    public async Task GetActivityAsync_NonAdmin_OwnAct_NonExistentAct_ReturnNull()
     {
         // -- Arrange --
         var activityService = _createActivityService();
 
         // -- Act --
-        var activity = await activityService.GetActivityAsync(JANE_USER_GUID, SLEEPING_ACT_GUID);
+        var activity = await activityService.GetActivityAsync(JOHN_USER_GUID, NON_EXISTENT_GUID);
+
+        // -- Assert --
+        Assert.IsNull(activity);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
+    [TestMethod]
+    [TestCategory(nameof(ActivityService.GetActivityAsync))]
+    public async Task GetActivityAsync_NonAdmin_OwnAct_DeletedAct_ReturnNull()
+    {
+        // -- Arrange --
+        var activityService = _createActivityService();
+
+        // -- Act --
+        var activity = await activityService.GetActivityAsync(JOHN_USER_GUID, JOHNS_DELETED_ACT_GUID);
 
         // -- Assert --
         Assert.IsNull(activity);
@@ -175,7 +190,7 @@ public class ActivityServiceTests : TestBase
     [TestMethod]
     [DataRow("NEW NAME", "NEW DESC", "2022-07-12T01:27:26Z", "2022-07-13T01:27:26Z", "2022-07-14T01:27:26Z", "#3366ff")]
     [TestCategory(nameof(ActivityService.CreateActivityAsync))]
-    public async Task CreateActivityAsync_Admin_AnothersActivity_Ok(
+    public async Task CreateActivityAsync_Admin_AnothersAct_Ok(
         string name,
         string description,
         string startDateUtcStr,
@@ -216,7 +231,7 @@ public class ActivityServiceTests : TestBase
     [TestCategory(nameof(ActivityService.CreateActivityAsync))]
     [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
-    public async Task CreateActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
+    public async Task CreateActivityAsync_NonAdmin_AnothersAct_ThrowForbidden()
     {
         // -- Arrange --
         var actCreateDto = new ActivityCreateDto();
@@ -235,7 +250,7 @@ public class ActivityServiceTests : TestBase
     // StartDateUtc null so will be UtcNow.
     [DataRow("NEW NAME", "NEW DESC", null, null, null, "#3366ff")]
     [TestCategory(nameof(ActivityService.CreateActivityAsync))]
-    public async Task CreateActivityAsync_NonAdmin_OwnActivity_Ok(
+    public async Task CreateActivityAsync_NonAdmin_OwnAct_Ok(
         string name,
         string description,
         string startDateUtcStr,
@@ -286,7 +301,7 @@ public class ActivityServiceTests : TestBase
     [TestCategory("CreateActivityAsync")]
     [TestCategory("InvalidData")]
     [ExpectedException(typeof(InvalidDataException))]
-    public async Task CreateActivityAsync_NonAdmin_OwnActivity_ThrowInvalidData(
+    public async Task CreateActivityAsync_NonAdmin_OwnAct_ThrowInvalidData(
         string name,
         string description,
         string startDateUtcStr,
@@ -337,7 +352,7 @@ public class ActivityServiceTests : TestBase
     // StartDateUtc null so will be UtcNow.
     [DataRow("UPDATED NAME", "UPDATED DESC", null, null, null, "#3366ff")]
     [TestCategory(nameof(ActivityService.UpdateActivityAsync))]
-    public async Task UpdateActivityAsync_Admin_AnothersActivity_Ok(
+    public async Task UpdateActivityAsync_Admin_AnothersAct_Ok(
         string name,
         string description,
         string startDateUtcStr,
@@ -377,7 +392,7 @@ public class ActivityServiceTests : TestBase
     [DataRow("UPDATED NAME", "UPDATE DESC", MIN_DATE_STR, null, null, "#3366ff")]
     [TestCategory(nameof(ActivityService.UpdateActivityAsync))]
 
-    public async Task UpdateActivityAsync_NonAdmin_OwnActivity_StartDateMinDate_Ok(
+    public async Task UpdateActivityAsync_NonAdmin_OwnAct_StartDateMinDate_Ok(
         string name,
         string description,
         string startDateUtcStr,
@@ -423,7 +438,7 @@ public class ActivityServiceTests : TestBase
     // StartDateUtc null so will be UtcNow.
     [DataRow("UPDATED NAME", "UPDATED DESC", null, null, null, "#3366ff")]
     [TestCategory(nameof(ActivityService.UpdateActivityAsync))]
-    public async Task UpdateActivityAsync_NonAdmin_OwnActivity_Ok(
+    public async Task UpdateActivityAsync_NonAdmin_OwnAct_Ok(
         string name,
         string description,
         string startDateUtcStr,
@@ -474,7 +489,7 @@ public class ActivityServiceTests : TestBase
     [TestCategory(nameof(ActivityService.UpdateActivityAsync))]
     [TestCategory(nameof(InvalidDataException))]
     [ExpectedException(typeof(InvalidDataException))]
-    public async Task UpdateActivityAsync_NonAdmin_OwnActivity_ThrowInvalidData(
+    public async Task UpdateActivityAsync_NonAdmin_OwnAct_ThrowInvalidData(
         string name,
         string description,
         string startDateUtcStr,
@@ -515,7 +530,7 @@ public class ActivityServiceTests : TestBase
     [TestCategory(nameof(ActivityService.UpdateActivityAsync))]
     [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
-    public async Task UpdateActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
+    public async Task UpdateActivityAsync_NonAdmin_AnothersAct_ThrowForbidden()
     {
         // -- Arrange --
         var actUpdateDto = new ActivityUpdateDto();
@@ -531,7 +546,7 @@ public class ActivityServiceTests : TestBase
     #region DeleteActivityAsync
     [TestMethod]
     [TestCategory(nameof(ActivityService.DeleteActivityAsync))]
-    public async Task DeleteActivityAsync_Admin_AnothersActivity_Ok()
+    public async Task DeleteActivityAsync_Admin_AnothersAct_Ok()
     {
         // -- Arrange --
         var activityService = _createActivityService();
@@ -559,7 +574,7 @@ public class ActivityServiceTests : TestBase
     [TestCategory(nameof(ForbiddenException))]
     [ExpectedException(typeof(ForbiddenException))]
 
-    public async Task DeleteActivityAsync_NonAdmin_AnothersActivity_ThrowForbidden()
+    public async Task DeleteActivityAsync_NonAdmin_AnothersAct_ThrowForbidden()
     {
         // -- Arrange --
         var activityService = _createActivityService();
@@ -571,7 +586,39 @@ public class ActivityServiceTests : TestBase
     [TestMethod]
     [TestCategory(nameof(ActivityService.DeleteActivityAsync))]
 
-    public async Task DeleteActivityAsync_NonAdmin_OwnActivity_Ok()
+    public async Task DeleteActivityAsync_NonAdmin_OwnAct_NonExistentAct_ReturnFalse()
+    {
+        // -- Arrange --
+        var activityService = _createActivityService();
+
+        // -- Act --
+        var isSuccessful = await activityService.DeleteActivityAsync(JOHN_USER_GUID, NON_EXISTENT_GUID);
+
+        // -- Assert --
+        Assert.IsFalse(isSuccessful);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
+    [TestMethod]
+    [TestCategory(nameof(ActivityService.DeleteActivityAsync))]
+
+    public async Task DeleteActivityAsync_NonAdmin_OwnAct_DeletedAct_ReturnFalse()
+    {
+        // -- Arrange --
+        var activityService = _createActivityService();
+
+        // -- Act --
+        var isSuccessful = await activityService.DeleteActivityAsync(JOHN_USER_GUID, JOHNS_DELETED_ACT_GUID);
+
+        // -- Assert --
+        Assert.IsFalse(isSuccessful);
+        dbContextMock.Verify(m => m.SaveChangesAsync(default(CancellationToken)), Times.Never);
+    }
+
+    [TestMethod]
+    [TestCategory(nameof(ActivityService.DeleteActivityAsync))]
+
+    public async Task DeleteActivityAsync_NonAdmin_OwnAct_Ok()
     {
         // -- Arrange --
         var activityService = _createActivityService();

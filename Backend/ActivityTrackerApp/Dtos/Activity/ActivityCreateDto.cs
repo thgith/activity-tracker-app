@@ -50,6 +50,5 @@ public class ActivityCreateDto
     /// A list of tags associated with the activity.
     /// Used for sorting and filtering.
     /// </summary>
-    [MaxLength(10)]
     public IList<string>? Tags { get; set; }
 }
