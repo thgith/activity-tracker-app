@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate, useParams } from "react-router-dom"; // This is syntax that changed with v6
 import moment from 'moment';
 import { STANDARD_DATE_DISPLAY_FORMAT } from '../../../app/constants';
-import { displayTags, getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
+import { calculateTotalHoursFromSeconds, displayTags, getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
 import { SessionsList } from '../../sessions/views/SessionsList';
 import { Timer } from '../../timer/Timer';
 import { getUser } from '../../User/userSlice';
@@ -59,16 +59,17 @@ export const ActivityDetails = () => {
     activity = activityFromList ?? activityFromGet;
 
     const getTotalActivityHours = () => {
-        let totalSeconds = 0;
         let sessions: any = []
         if (activityIdToSessions && activityIdToSessions[activity.id]) {
             sessions = activityIdToSessions[activity.id];
         }
+        
+        let totalSeconds = 0;
         sessions.map((x: ISession) => {
-            totalSeconds += x.durationSeconds
+            return totalSeconds += x.durationSeconds;
         });
 
-        return Math.round(totalSeconds / 3600 * 10) / 10;
+        return calculateTotalHoursFromSeconds(totalSeconds);
     }
 
     const isActivityOverdue = () => {

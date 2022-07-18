@@ -13,7 +13,7 @@ import './styles/App.scss';
 import { ActivityAdd } from './features/activities/views/ActivityAdd';
 import { ActivityEdit } from './features/activities/views/ActivityEdit';
 import { ActivitiesList } from './features/activities/views/ActivitiesList';
-import { ActivityDetails as ActivityDetails } from './features/activities/views/ActivityDetails';
+import { ActivityDetails } from './features/activities/views/ActivityDetails';
 import { SessionDetails } from './features/sessions/views/SessionDetails';
 import { SessionEdit } from './features/sessions/views/SessionEdit';
 import { SessionAdd } from './features/sessions/views/SessionAdd';

@@ -1,6 +1,6 @@
 import { Dictionary } from '@reduxjs/toolkit';
 import moment from 'moment';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { ISession } from '../../features/sessions/ISession';
 import { CURR_USER_ID_COOKIE_NAME, MIN_DATE } from '../constants';
 
@@ -25,7 +25,6 @@ export const getUserIdCookie = () => {
 };
 
 export const useEffectSkipInitialRender = (callback: any) => {
-    const [data, setData] = useState(null);
     const isInitialRender = useRef(true);// in react, when refs are changed component dont re-render 
 
     useEffect(() => {
@@ -35,7 +34,6 @@ export const useEffectSkipInitialRender = (callback: any) => {
         }
         return callback();
     });
-
 };
 
 const onlyUnique = (value: string, index: number, self: string[]) => {
@@ -74,16 +72,55 @@ export const trimStrArray = (array: string[]) => {
  * @param {string} activityId - The ID of the activity.
  */
 export const calculateActivityHours = (activityIdToSessions: Dictionary<ISession[]>, activityId: string) => {
-    let totalSeconds = 0;
     let sessions = activityIdToSessions ? activityIdToSessions[activityId] : [];
     if (!sessions || sessions.length === 0) {
         return 0;
     }
+
+    let totalSeconds = 0;
     sessions.map((x: ISession) => {
-        totalSeconds += x.durationSeconds
+        return totalSeconds += x.durationSeconds;
     });
 
+    return calculateTotalHoursFromSeconds(totalSeconds);
+};
+
+/**
+ * This only calculates seconds in hours, rounding to the closest decimal.
+ * @param totalSeconds - The total seconds.
+ * @returns The estimated total hours.
+ */
+export const calculateTotalHoursFromSeconds = (totalSeconds: number) => {
     return Math.round(totalSeconds / 3600 * 10) / 10;
+}
+
+/**
+ * This only calculates the hours part of the total seconds. No decimal
+ * because this doesn't include the leftover minutes or seconds.
+ * @param totalSeconds - The total seconds.
+ * @returns The hours portion.
+ */
+export const calculateHoursPortionOnly = (totalSeconds: number) => {
+    return Math.floor(totalSeconds / 3600);
+}
+
+/**
+ * This only calculates the remaining minutes of the total seconds. No decimal
+ * because this doesn't include the leftover minutes or seconds.
+ * @param totalSeconds - The total seconds.
+ * @returns The minutes portion.
+ */
+export const calculateRemainingMinOnly = (durationSeconds: number) => {
+    return Math.round(durationSeconds % 3600 / 60);
+}
+
+/**
+ * This only calculates the remaining seconds of the total seconds.
+ * @param totalSeconds - The total seconds.
+ * @returns The seconds portion.
+ */
+export const calculateRemainingSecOnly = (durationSeconds: number) => {
+    return durationSeconds % 3600 % 60;
 };
 
 /**
@@ -95,11 +132,11 @@ export const calculateTotalActivityHours = (activityIdToSessions: Dictionary<ISe
         Object.keys(activityIdToSessions).forEach((k: string) => {
             let sessions = activityIdToSessions[k];
             (sessions as ISession[]).map((x: ISession) => {
-                totalSeconds += x.durationSeconds
+                return totalSeconds += x.durationSeconds;
             })
         });
     }
-    return Math.round(totalSeconds / 3600 * 10) / 10;
+    return calculateTotalHoursFromSeconds(totalSeconds);
 };
 
 /**

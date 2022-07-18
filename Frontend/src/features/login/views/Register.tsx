@@ -15,7 +15,7 @@ const Register = () => {
 
     useEffect(() => {
         dispatch(clearMessage());
-    }, [dispatch]);
+    });
 
     const initialValues = {
         firstName: '',

@@ -9,12 +9,14 @@ export const Stats = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate();
     const timerData = useSelector((state: any) => state.timer);
-    
+
     useEffect(() => {
         dispatch(clearMessage());
-        clearInterval(timerData.intervalId);
-        dispatch(resetTimer({}));
-    }, [dispatch]);
+        if (timerData.intervalId) {
+            clearInterval(timerData.intervalId);
+            dispatch(resetTimer({}));
+        }
+    });
 
     useEffect(() => {
         // Redirect to login if not authenticated
@@ -22,7 +24,7 @@ export const Stats = () => {
             navigate('/login');
         }
     });
-    
+
     return (
         <div className="stats container">
             <div className="panel-container panel-lg">

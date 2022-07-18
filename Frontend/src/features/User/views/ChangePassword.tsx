@@ -21,9 +21,11 @@ export const ChangePassword = (props: any) => {
 
     useEffect(() => {
         dispatch(clearMessage());
-        clearInterval(timerData.intervalId);
-        dispatch(resetTimer({}));
-    }, [dispatch]);
+        if (timerData.intervalId) {
+            clearInterval(timerData.intervalId);
+            dispatch(resetTimer({}));
+        }
+    });
 
     useEffectSkipInitialRender(() => {
         const currUserId = getUserIdCookie();

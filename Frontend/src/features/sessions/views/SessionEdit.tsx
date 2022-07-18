@@ -5,12 +5,12 @@ import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import moment from 'moment';
 import { PICKER_DATE_DISPLAY_FORMAT, REQUIRED_FIELD_MSG } from '../../../app/constants';
-import { getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
+import { calculateHoursPortionOnly, calculateRemainingMinOnly, getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
 import { Loader } from '../../../app/views/Loader';
 import { SessionNotFound } from './SessionNotFound';
 import { ISession, ISessionEdit } from '../ISession';
 import { getUser } from '../../User/userSlice';
-import { listSessionsForActivity, deleteSession, addSession, editSession } from '../sessionMethods';
+import { listSessionsForActivity, deleteSession, editSession } from '../sessionMethods';
 import { clearMessage } from '../../message/messageSlice';
 import { resetTimer } from '../../timer/timerSlice';
 
@@ -29,9 +29,11 @@ export const SessionEdit = () => {
 
     useEffect(() => {
         dispatch(clearMessage());
-        clearInterval(timerData.intervalId);
-        dispatch(resetTimer({}));
-    }, [dispatch]);
+        if (timerData.intervalId) {
+            clearInterval(timerData.intervalId);
+            dispatch(resetTimer({}));
+        }
+    });
 
     let sessions: any = null;
     // Try to get session from dictionary
@@ -82,10 +84,6 @@ export const SessionEdit = () => {
         return <SessionNotFound />
     }
 
-    const calculateRemainingMinutes = (durationSeconds: number) => {
-        return Math.round(durationSeconds % 3600 / 60)
-    }
-
     /**
      * Create the selects for time fields. 0-60.
      */
@@ -108,7 +106,7 @@ export const SessionEdit = () => {
         let date = new Date(dateDt + ' ' + timeDt);
         return date;
     };
-    
+
     /**
      * Converts the display hours and minutes to seconds.
      * @param {number} hours - The hours to convert.
@@ -165,8 +163,8 @@ export const SessionEdit = () => {
         notes: session.notes ?? '',
         startDateOnly: moment(session.startDateUtc).local().format(PICKER_DATE_DISPLAY_FORMAT),
         startTimeOnly: moment(session.startDateUtc).local().format('HH:mm'),
-        durationHours: Math.floor(session.durationSeconds / 3600),
-        durationMin: calculateRemainingMinutes(session.durationSeconds)
+        durationHours: calculateHoursPortionOnly(session.durationSeconds),
+        durationMin: calculateRemainingMinOnly(session.durationSeconds)
     };
 
     const validationSchema = Yup.object().shape({

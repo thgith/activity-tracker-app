@@ -28,9 +28,11 @@ export const SessionAdd = () => {
 
     useEffect(() => {
         dispatch(clearMessage());
-        clearInterval(timerData.intervalId);
-        dispatch(resetTimer({}));
-    }, [dispatch]);
+        if (timerData.intervalId) {
+            clearInterval(timerData.intervalId);
+            dispatch(resetTimer({}));
+        }
+    });
 
     const activityFromList: IActivity = useSelector((state: any) =>
         state.activitiesData ? state.activitiesData.activities.find((activity: any) => activity.id === activityId) : null

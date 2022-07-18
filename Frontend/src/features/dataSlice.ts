@@ -35,7 +35,7 @@ const dataSlice = createSlice({
             // Make a dictionary of activityId to sessions
             const updatedDictionary = produce(state.activityIdToSessions, (draft: any) => {
                 action.payload.activities.map((x: IActivity) => {
-                    draft[x.id as string] = x.sessions;
+                    return draft[x.id as string] = x.sessions;
                 });
             });
             state.activityIdToSessions = updatedDictionary;

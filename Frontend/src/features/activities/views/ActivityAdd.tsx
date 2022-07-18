@@ -22,9 +22,11 @@ export const ActivityAdd = () => {
 
     useEffect(() => {
         dispatch(clearMessage());
-        clearInterval(timerData.intervalId);
-        dispatch(resetTimer({}));
-    }, [dispatch]);
+        if (timerData.intervalId) {
+            clearInterval(timerData.intervalId);
+            dispatch(resetTimer({}));
+        }
+    });
 
     useEffectSkipInitialRender(() => {
         const currUserId = getUserIdCookie();
@@ -257,7 +259,7 @@ export const ActivityAdd = () => {
                                             <div className="action-button-group">
                                                 {loading ? <span className="fa fa-spinner fa-pulse fa-2x" /> :
                                                     <div>
-                                                        <button 
+                                                        <button
                                                             className="cancel-btn btn btn-secondary d-inline-block d-md-none"
                                                             type="button">
                                                             <span className="fa fa-times fa-lg"></span>

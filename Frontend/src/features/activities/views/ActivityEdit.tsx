@@ -31,9 +31,11 @@ export const ActivityEdit = (props: any) => {
 
     useEffect(() => {
         dispatch(clearMessage());
-        clearInterval(timerData.intervalId);
-        dispatch(resetTimer({}));
-    }, [dispatch]);
+        if (timerData.intervalId) {
+            clearInterval(timerData.intervalId);
+            dispatch(resetTimer({}));
+        }
+    });
 
     useEffectSkipInitialRender(() => {
         const currUserId = getUserIdCookie();
@@ -151,10 +153,11 @@ export const ActivityEdit = (props: any) => {
 
     /**
      * Archive the activity.
+     * TODO add archiving
      */
-    const onArchiveClicked = () => {
-        console.log('TBD');
-    }
+    // const onArchiveClicked = () => {
+    //     console.log('TBD');
+    // }
 
     /**
      * Delete the activity.

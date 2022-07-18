@@ -2,12 +2,15 @@ import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { LONG_DATE_FORMAT } from '../../../app/constants';
 import { ISession } from '../ISession';
+import { calculateHoursPortionOnly } from '../../../app/helpers/helpers';
 
+// NOTE: I calculate the hour w/o moment b/c the format
+//       will mess up after a certain number of hours w/ moment
 const createSessionDurationDisplay = (seconds: number) => {
     const momentTime = moment.utc(seconds * 1000);
     return (
     <span>
-        {Math.floor(seconds / 3600)} hours {momentTime.format('m')} minutes {momentTime.format('s')} seconds
+        {calculateHoursPortionOnly(seconds)} hours {momentTime.format('m')} minutes {momentTime.format('s')} seconds
     </span>);
 };
 

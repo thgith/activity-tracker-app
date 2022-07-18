@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"; // This is syntax that changed with v6
 import moment from 'moment';
 import { LONG_DATE_FORMAT } from '../../../app/constants';
-import { getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
+import { calculateHoursPortionOnly, calculateRemainingMinOnly as calculateRemainingMinOnly, calculateRemainingSecOnly, getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
 import { ISession } from '../ISession';
 import { getUser } from '../../User/userSlice';
 import { listSessionsForActivity } from '../sessionMethods';
@@ -26,9 +26,11 @@ export const SessionDetails = () => {
 
     useEffect(() => {
         dispatch(clearMessage());
-        clearInterval(timerData.intervalId);
-        dispatch(resetTimer({}));
-    }, [dispatch]);
+        if (timerData.intervalId) {
+            clearInterval(timerData.intervalId);
+            dispatch(resetTimer({}));
+        }
+    });
 
     let sessions: any = null;
     // Try to get session from dictionary
@@ -96,7 +98,7 @@ export const SessionDetails = () => {
                         </h2>
                         <div className="panel-body-container">
                             <div className="row">
-                                <h1 className="session-duration text-center">{getHourFromDurationSec(session.durationSeconds)} hr {getRemainingMinFromDurationSec(session.durationSeconds)} min {getRemainingSecFromDurationSec(session.durationSeconds)} sec</h1>
+                                <h1 className="session-duration text-center">{calculateHoursPortionOnly(session.durationSeconds)} hr {calculateRemainingMinOnly(session.durationSeconds)} min {calculateRemainingSecOnly(session.durationSeconds)} sec</h1>
                                 <p className="session-notes text-center">{session.notes}</p>
                             </div>
                         </div>
@@ -111,20 +113,6 @@ export const SessionDetails = () => {
                     </Link>
                 </div>
             </div>
-
-
         </div>
     );
-};
-
-const getHourFromDurationSec = (durationSeconds: number) => {
-    return Math.floor(durationSeconds / 3600);
-};
-
-const getRemainingMinFromDurationSec = (durationSeconds: number) => {
-    return Math.round(durationSeconds % 3600 / 60)
-};
-
-const getRemainingSecFromDurationSec = (durationSeconds: number) => {
-    return durationSeconds % 3600 % 60
 };
