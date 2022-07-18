@@ -16,14 +16,14 @@ public class User : BaseEntity
     /// User's first name.
     /// </summary>
     [Required]
-    [MinLength(1), MaxLength(50)]
+    [MinLength(1), MaxLength(GlobalConstants.SHORT_TEXT_MAX_CHAR)]
     public string FirstName { get; set; }
     
     /// <summary>
     /// User's last name.
     /// </summary>
     [Required]
-    [MinLength(1), MaxLength(50)]
+    [MinLength(1), MaxLength(GlobalConstants.SHORT_TEXT_MAX_CHAR)]
     public string LastName { get; set; }
     
     /// <summary>
@@ -55,6 +55,6 @@ public class User : BaseEntity
     /// The role of the user. <see cref="Roles"></see>
     /// </summary>
     [Required]
-    [MaxLength(50)]
+    [MaxLength(GlobalConstants.SHORT_TEXT_MAX_CHAR)]
     public string Role { get; set; }
 }

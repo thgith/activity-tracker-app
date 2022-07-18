@@ -40,4 +40,14 @@ public static class GlobalConstants
     /// Location of the JWT audience in the appsettings.
     /// </summary>
     public const string JWT_AUDIENCE_KEY_NAME = "JwtConfig:Audience";
+
+    /// <summary>
+    /// The max character length for short text.
+    /// </summary>
+    public const int SHORT_TEXT_MAX_CHAR = 50;
+    
+    /// <summary>
+    /// The max character length for long text.
+    /// </summary>
+    public const int LONG_TEXT_MAX_CHAR = 1024;
 }

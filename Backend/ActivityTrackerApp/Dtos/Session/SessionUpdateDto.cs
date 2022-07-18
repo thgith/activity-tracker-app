@@ -22,6 +22,6 @@ public class SessionUpdateDto
     /// <summary>
     /// Optional additional notes.
     /// </summary>
-    [MaxLength(1024)]
+    [MaxLength(GlobalConstants.LONG_TEXT_MAX_CHAR)]
     public string? Notes { get; set; }
 }

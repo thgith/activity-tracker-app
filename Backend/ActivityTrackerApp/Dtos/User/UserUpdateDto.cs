@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using ActivityTrackerApp.Constants;
 
 namespace ActivityTrackerApp.Dtos;
 
@@ -10,13 +11,13 @@ public class UserUpdateDto
     /// <summary>
     /// User's first name.
     /// </summary>
-    [MinLength(1), MaxLength(50)]
+    [MinLength(1), MaxLength(GlobalConstants.SHORT_TEXT_MAX_CHAR)]
     public string? FirstName { get; set; }
 
     /// <summary>
     /// User's last name.
     /// </summary>
-    [MinLength(1), MaxLength(50)]
+    [MinLength(1), MaxLength(GlobalConstants.SHORT_TEXT_MAX_CHAR)]
     public string? LastName { get; set; }
 
     /// <summary>
@@ -28,6 +29,6 @@ public class UserUpdateDto
     /// <summary>
     /// User's password.
     /// </summary>
-    [MinLength(8), MaxLength(50)]
+    [MinLength(8), MaxLength(GlobalConstants.SHORT_TEXT_MAX_CHAR)]
     public string? Password { get; set; }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using ActivityTrackerApp.Constants;
 
 namespace ActivityTrackerApp.Dtos;
 
@@ -18,6 +19,6 @@ public class UserLoginDto
     /// User's password.
     /// </summary>
     [Required]
-    [MinLength(8), MaxLength(50)]
+    [MinLength(8), MaxLength(GlobalConstants.SHORT_TEXT_MAX_CHAR)]
     public string Password { get; set; }
 }

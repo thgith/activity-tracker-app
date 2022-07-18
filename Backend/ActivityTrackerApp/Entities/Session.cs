@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ActivityTrackerApp.Constants;
 
 namespace ActivityTrackerApp.Entities;
 
@@ -37,7 +38,7 @@ public class Session : BaseEntity
     /// <summary>
     /// Optional additional notes.
     /// </summary>
-    [MaxLength(1024)]
+    [MaxLength(GlobalConstants.LONG_TEXT_MAX_CHAR)]
     public string Notes { get; set; }
 
     /// <summary>

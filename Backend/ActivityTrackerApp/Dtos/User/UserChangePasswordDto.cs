@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using ActivityTrackerApp.Constants;
 
 namespace ActivityTrackerApp.Dtos;
 
@@ -18,13 +19,13 @@ public class UserChangePasswordDto
     /// User's old password. Will be checked against current password.
     /// </summary>
     [Required]
-    [MinLength(8), MaxLength(50)]
+    [MinLength(8), MaxLength(GlobalConstants.SHORT_TEXT_MAX_CHAR)]
     public string OldPassword { get; set; }
 
     /// <summary>
     /// User's new password.
     /// </summary>
     [Required]
-    [MinLength(8), MaxLength(50)]
+    [MinLength(8), MaxLength(GlobalConstants.SHORT_TEXT_MAX_CHAR)]
     public string NewPassword { get; set; }
 }

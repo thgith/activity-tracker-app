@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using ActivityTrackerApp.Constants;
 
 namespace ActivityTrackerApp.Entities;
 
@@ -12,13 +13,13 @@ public class Activity : BaseEntity
     /// Name of the activity.
     /// </summary>
     [Required]
-    [MaxLength(50)]
+    [MaxLength(GlobalConstants.SHORT_TEXT_MAX_CHAR)]
     public string Name { get; set; }
 
     /// <summary>
     /// Description of the activity.
     /// </summary>
-    [MaxLength(1000)]
+    [MaxLength(GlobalConstants.LONG_TEXT_MAX_CHAR)]
     public string Description { get; set; }
 
     /// <summary>
