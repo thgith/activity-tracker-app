@@ -7,16 +7,22 @@ import { REQUIRED_FIELD_MSG } from '../../../app/constants';
 import { clearMessage } from '../../message/messageSlice';
 import { getUserIdCookie } from '../../../app/helpers/helpers';
 import { logIn } from '../../User/userSlice';
+import { resetTimer } from '../../timer/timerSlice';
 
 export const Login = (props: any) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const { message } = useSelector((state: any) => state.message);
+    const timerData = useSelector((state: any) => state.timer);
 
     useEffect(() => {
         dispatch(clearMessage());
-    });
+        if (timerData.intervalId) {
+            clearInterval(timerData.intervalId);
+            dispatch(resetTimer({}));
+        }
+    }, [dispatch, timerData.intervalId]);
 
     const initialValues = {
         username: '',

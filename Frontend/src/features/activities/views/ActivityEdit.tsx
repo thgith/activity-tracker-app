@@ -35,7 +35,7 @@ export const ActivityEdit = (props: any) => {
             clearInterval(timerData.intervalId);
             dispatch(resetTimer({}));
         }
-    });
+    }, [dispatch, timerData.intervalId]);
 
     useEffectSkipInitialRender(() => {
         const currUserId = getUserIdCookie();

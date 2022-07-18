@@ -22,8 +22,7 @@ export const Profile = (props: any) => {
             clearInterval(timerData.intervalId);
             dispatch(resetTimer({}));
         }
-    });
-
+    }, [dispatch, timerData.intervalId]);
 
     useEffect(() => {
         const currUserId = getUserIdCookie();

@@ -16,7 +16,7 @@ export const Stats = () => {
             clearInterval(timerData.intervalId);
             dispatch(resetTimer({}));
         }
-    });
+    }, [dispatch, timerData.intervalId]);
 
     useEffect(() => {
         // Redirect to login if not authenticated

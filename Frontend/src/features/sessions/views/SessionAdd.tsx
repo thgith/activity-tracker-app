@@ -32,7 +32,7 @@ export const SessionAdd = () => {
             clearInterval(timerData.intervalId);
             dispatch(resetTimer({}));
         }
-    });
+    }, [dispatch, timerData.intervalId]);
 
     const activityFromList: IActivity = useSelector((state: any) =>
         state.activitiesData ? state.activitiesData.activities.find((activity: any) => activity.id === activityId) : null

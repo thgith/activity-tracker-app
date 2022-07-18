@@ -25,7 +25,7 @@ export const ActivitiesList = () => {
             clearInterval(timerData.intervalId);
             dispatch(resetTimer({}));
         }
-    });
+    }, [dispatch, timerData.intervalId]);
 
     useEffectSkipInitialRender(() => {
         const currUserId = getUserIdCookie();

@@ -33,7 +33,7 @@ export const SessionEdit = () => {
             clearInterval(timerData.intervalId);
             dispatch(resetTimer({}));
         }
-    });
+    }, [dispatch, timerData.intervalId]);
 
     let sessions: any = null;
     // Try to get session from dictionary

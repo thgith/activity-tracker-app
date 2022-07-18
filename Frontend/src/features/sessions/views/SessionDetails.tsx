@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"; // This is syntax that changed with v6
 import moment from 'moment';
 import { LONG_DATE_FORMAT } from '../../../app/constants';
-import { calculateHoursPortionOnly, calculateRemainingMinOnly as calculateRemainingMinOnly, calculateRemainingSecOnly, getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
+import { calculateHoursPortionOnly, calculateRemainingMinOnly, calculateRemainingSecOnly, getUserIdCookie, useEffectSkipInitialRender } from '../../../app/helpers/helpers';
 import { ISession } from '../ISession';
 import { getUser } from '../../User/userSlice';
 import { listSessionsForActivity } from '../sessionMethods';
@@ -30,7 +30,7 @@ export const SessionDetails = () => {
             clearInterval(timerData.intervalId);
             dispatch(resetTimer({}));
         }
-    });
+    }, [dispatch, timerData.intervalId]);
 
     let sessions: any = null;
     // Try to get session from dictionary

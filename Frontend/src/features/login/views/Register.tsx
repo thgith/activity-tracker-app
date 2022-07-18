@@ -6,16 +6,22 @@ import * as Yup from 'yup';
 import { REQUIRED_FIELD_MSG } from '../../../app/constants';
 import { clearMessage } from '../../message/messageSlice';
 import { register } from '../../User/userSlice';
+import { resetTimer } from '../../timer/timerSlice';
 
 const Register = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [successful, setSuccessful] = useState(false);
     const { message } = useSelector((state: any) => state.message);
+    const timerData = useSelector((state: any) => state.timer);
 
     useEffect(() => {
         dispatch(clearMessage());
-    });
+        if (timerData.intervalId) {
+            clearInterval(timerData.intervalId);
+            dispatch(resetTimer({}));
+        }
+    }, [dispatch, timerData.intervalId]);
 
     const initialValues = {
         firstName: '',
