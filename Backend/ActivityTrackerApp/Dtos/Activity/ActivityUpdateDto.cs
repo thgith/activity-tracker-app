@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+
 using ActivityTrackerApp.Constants;
 
 namespace ActivityTrackerApp.Dtos;
