@@ -12,7 +12,9 @@ using static ActivityTrackerAppTests.Helpers.TestHelpers;
 
 namespace ActivityTrackerAppTests;
 
-// TODO: write these tests
+// TODO: write these tests.
+// Go to services to see tests that are actually written.
+// Here will be similar but also need to set up the Request object.
 [TestClass]
 public class SessionControllerTests : ControllerTestsBase<SessionController>
 {
@@ -31,9 +33,44 @@ public class SessionControllerTests : ControllerTestsBase<SessionController>
     public async Task GetAllSessionsByActivityIdAsync_Authorized_Ok()
     {
         throw new NotImplementedException();
-
     }
     #endregion GetAllSessionsByActivityIdAsync
+
+    #region GetSessionAsync
+    [TestMethod]
+    [TestCategory(nameof(SessionService.GetSessionAsync))]
+    public async Task GetSessionAsync_Authorized_Ok()
+    {
+        throw new NotImplementedException();
+    }
+    #endregion GetSessionAsync
+
+    #region CreateSessionAsync
+    [TestMethod]
+    [TestCategory(nameof(SessionService.CreateSessionAsync))]
+    public async Task CreateSessionAsync_Authorized_Ok()
+    {
+        throw new NotImplementedException();
+    }
+    #endregion CreateSessionAsync
+
+    #region UpdateSessionAsync
+    [TestMethod]
+    [TestCategory(nameof(SessionService.UpdateSessionAsync))]
+    public async Task UpdateSessionAsync_Authorized_Ok()
+    {
+        throw new NotImplementedException();
+    }
+    #endregion UpdateSessionAsync
+
+    #region DeleteSessionAsync
+    [TestMethod]
+    [TestCategory(nameof(SessionService.DeleteSessionAsync))]
+    public async Task DeleteSessionAsync_Authorized_Ok()
+    {
+        throw new NotImplementedException();
+    }
+    #endregion DeleteSessionAsync
 
     private SessionController _createSessionCtrl()
     {

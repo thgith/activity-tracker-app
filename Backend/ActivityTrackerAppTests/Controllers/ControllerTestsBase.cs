@@ -17,6 +17,9 @@ using Microsoft.Extensions.Logging;
 namespace ActivityTrackerAppTests;
 
 [TestClass]
+// TODO: write these tests.
+// Go to services to see tests that are actually written
+// Here will be similar but also need to set up the Request object.
 public abstract class ControllerTestsBase<T>
 {
     protected static Mock<IUserService> userServiceMock;
