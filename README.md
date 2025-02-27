@@ -71,7 +71,7 @@ Used to track how much time is spent on activities.
 ---
 ## Tech Stack
 ### Backend
-- .NET Core 4
+- .NET 6
 - Entity Framework (code-first)
 - Postgres
 - MSTest / Moq
@@ -155,39 +155,3 @@ need to hit the `/api/v1/Auth/register` endpoint first to be authenticated for t
 
 ## How to Run Tests
 - Go into `/Backend/ActivityTrackerAppTests`. Just click the test controls by hovering over the class/test methods.
-
----
-## To Dos
-### Soon
-- Archive an activity
-
-### Clean up
-- Combine common details and edit views
-- Make tags pop up as pills when adding/editing them
-- Fix tests after changes
-- Add tests for other services
-
-### Authentication
-- Stronger password requirements
-- Confirm registration email
-- Password reset
-- 2-factor auth
-- Token refresh
-
-### User
-- Admin view
-- Default profile pictures
-- Upload profile picture
-
-### Activities / Sessions
-- Order activities
-- Only get first 10 sessions with load more button(?)
-- Side bar of most recent sessions
-- Make clicking on a tag go to the list page with activities filtered by the string
-
-### Other Features
-- Stats
-- Export data
-- Import data
-- Dark mode
-- Pomodoro
